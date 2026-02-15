@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { STYLE_PRESETS, INDUSTRIES, PLATFORMS, PRICING_TIERS, type StylePreset } from '@/lib/types'
 import { AlertTriangle } from 'lucide-react'
 
@@ -360,7 +361,7 @@ export default function OnboardingPage() {
       {/* Header */}
       <div className="glass border-x-0 border-t-0 px-6 py-4">
         <div className="max-w-xl mx-auto flex items-center justify-between">
-          <span className="text-xl font-bold gradient-text">AutoLocal.ai</span>
+          <span className="flex items-center gap-2 text-xl font-bold gradient-text"><Image src="/logo.png" alt="AutoLocal.ai" width={32} height={32} className="rounded-lg" />AutoLocal.ai</span>
           <span className="text-sm text-slate-500">{step + 1} of {STEPS.length}</span>
         </div>
       </div>

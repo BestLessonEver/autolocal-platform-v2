@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Globe, BarChart3, Bot } from 'lucide-react'
 
@@ -14,7 +15,7 @@ export default function CustomSolutions() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-7xl mx-auto">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-2xl font-bold gradient-text">AutoLocal.ai</Link>
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold gradient-text"><Image src="/logo.png" alt="AutoLocal.ai" width={36} height={36} className="rounded-lg" />AutoLocal.ai</Link>
           <div className="hidden md:flex items-center gap-6">
             <Link href="/#features" className="text-slate-400 hover:text-white transition text-sm">Features</Link>
             <Link href="/#pricing" className="text-slate-400 hover:text-white transition text-sm">Pricing</Link>
@@ -76,7 +77,7 @@ export default function CustomSolutions() {
       <footer className="border-t border-slate-800/50 py-16 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <span className="text-lg font-bold gradient-text">AutoLocal.ai</span>
+            <span className="flex items-center gap-2 text-lg font-bold gradient-text"><Image src="/logo.png" alt="AutoLocal.ai" width={28} height={28} className="rounded-md" />AutoLocal.ai</span>
             <p className="text-sm text-slate-500 mt-3">Agentic marketing for local businesses.</p>
           </div>
           <div>

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
@@ -29,7 +30,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-navy-950 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold gradient-text">AutoLocal.ai</Link>
+          <Link href="/" className="flex items-center gap-3 text-3xl font-bold gradient-text"><Image src="/logo.png" alt="AutoLocal.ai" width={44} height={44} className="rounded-xl" />AutoLocal.ai</Link>
           <p className="text-slate-400 mt-2">Welcome back</p>
         </div>
         <div className="glass rounded-2xl p-8">

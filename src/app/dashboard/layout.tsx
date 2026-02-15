@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
@@ -39,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="glass border-x-0 border-t-0 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-xl font-bold gradient-text">AutoLocal.ai</Link>
+            <Link href="/dashboard" className="flex items-center gap-2 text-xl font-bold gradient-text"><Image src="/logo.png" alt="AutoLocal.ai" width={32} height={32} className="rounded-lg" />AutoLocal.ai</Link>
             {bizName && <span className="hidden sm:inline text-sm text-slate-500">• {bizName}</span>}
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition">
