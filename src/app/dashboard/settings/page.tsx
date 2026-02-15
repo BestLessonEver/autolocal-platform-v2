@@ -35,71 +35,71 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  if (!business) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full" /></div>
+  if (!business) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full" /></div>
 
   return (
     <div className="pb-20 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">⚙️ Settings</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">⚙️ Settings</h1>
 
       <div className="space-y-8">
         {/* Business Info */}
-        <section className="bg-white rounded-xl border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Info</h2>
+        <section className="glass rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-4">Business Info</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-              <input value={business.name || ''} onChange={e => setBusiness({ ...business, name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-400 outline-none" />
+              <label className="block text-sm font-medium text-slate-400 mb-1">Business Name</label>
+              <input value={business.name || ''} onChange={e => setBusiness({ ...business, name: e.target.value })} className="w-full px-4 py-3 rounded-xl dark-input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-              <input value={business.industry || ''} onChange={e => setBusiness({ ...business, industry: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-400 outline-none" />
+              <label className="block text-sm font-medium text-slate-400 mb-1">Industry</label>
+              <input value={business.industry || ''} onChange={e => setBusiness({ ...business, industry: e.target.value })} className="w-full px-4 py-3 rounded-xl dark-input" />
             </div>
           </div>
         </section>
 
         {/* Style Preset */}
-        <section className="bg-white rounded-xl border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Brand Style</h2>
+        <section className="glass rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-4">Brand Style</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {(Object.entries(STYLE_PRESETS) as [StylePreset, typeof STYLE_PRESETS[StylePreset]][]).map(([key, preset]) => (
-              <button key={key} onClick={() => setBusiness({ ...business, style_preset: key })} className={`p-3 rounded-xl border-2 text-left transition text-sm ${business.style_preset === key ? 'border-brand-500 bg-brand-50' : 'border-gray-200 hover:border-brand-300'}`}>
+              <button key={key} onClick={() => setBusiness({ ...business, style_preset: key })} className={`p-3 rounded-xl text-left transition text-sm ${business.style_preset === key ? 'glass border-cyan-500/50 ring-1 ring-cyan-500/30' : 'glass glass-hover'}`}>
                 <span className="text-xl">{preset.emoji}</span>
-                <div className="font-medium text-gray-900 mt-1">{preset.label}</div>
+                <div className="font-medium text-white mt-1">{preset.label}</div>
               </button>
             ))}
           </div>
         </section>
 
         {/* Connected Accounts */}
-        <section className="bg-white rounded-xl border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Connected Accounts</h2>
+        <section className="glass rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-4">Connected Accounts</h2>
           <div className="space-y-3">
             {PLATFORMS.map(p => (
-              <div key={p.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-200">
+              <div key={p.id} className="flex items-center justify-between p-3 rounded-xl glass">
                 <span className="flex items-center gap-3">
                   <span className="text-xl">{p.icon}</span>
-                  <span className="font-medium text-gray-900">{p.label}</span>
+                  <span className="font-medium text-white">{p.label}</span>
                 </span>
-                <button className="text-sm text-brand-500 font-medium hover:underline">Connect</button>
+                <button className="text-sm text-cyan-400 font-medium hover:underline">Connect</button>
               </div>
             ))}
           </div>
         </section>
 
         {/* Subscription */}
-        <section className="bg-white rounded-xl border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscription</h2>
-          <div className="flex items-center justify-between p-4 bg-brand-50 rounded-xl">
+        <section className="glass rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-white mb-4">Subscription</h2>
+          <div className="flex items-center justify-between p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
             <div>
-              <div className="font-semibold text-brand-700">7-Day Free Trial</div>
-              <div className="text-sm text-brand-600">Full access to all features</div>
+              <div className="font-semibold text-cyan-400">7-Day Free Trial</div>
+              <div className="text-sm text-slate-400">Full access to all features</div>
             </div>
-            <button className="px-4 py-2 bg-brand-gradient text-white text-sm rounded-lg font-medium">Upgrade</button>
+            <button className="px-4 py-2 btn-gradient text-white text-sm rounded-lg font-medium">Upgrade</button>
           </div>
         </section>
 
         {/* Save */}
-        <button onClick={handleSave} disabled={saving} className="w-full bg-brand-gradient text-white font-semibold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+        <button onClick={handleSave} disabled={saving} className="w-full btn-gradient text-white font-semibold py-3 rounded-xl disabled:opacity-50">
           {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Changes'}
         </button>
       </div>

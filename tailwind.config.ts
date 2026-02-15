@@ -25,7 +25,12 @@ const config: Config = {
           400: '#38bdf8',
           500: '#0ea5e9',
           600: '#0284c7',
-        }
+        },
+        navy: {
+          800: '#1a2148',
+          900: '#0f1535',
+          950: '#0a0e27',
+        },
       },
       backgroundImage: {
         'brand-gradient': 'linear-gradient(135deg, #7c3aed 0%, #0ea5e9 100%)',

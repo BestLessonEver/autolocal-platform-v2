@@ -1,32 +1,42 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { STYLE_PRESETS, type StylePreset } from '@/lib/types'
+import { buildContentSystemPrompt, buildUserPrompt } from '@/lib/content-engine'
 import { addDays } from 'date-fns'
+import OpenAI from 'openai'
 
 const CONTENT_TYPES = ['promotional', 'educational', 'behind_the_scenes', 'social_proof', 'seasonal', 'engagement']
 
-async function generateWithAI(prompt: string): Promise<string[]> {
-  // Try OpenAI if key is available
-  if (process.env.OPENAI_API_KEY) {
+async function generateWithAI(systemPrompt: string, userPrompt: string): Promise<string[]> {
+  if (!process.env.OPENAI_API_KEY) return []
+
+  try {
+    const openai = new OpenAI()
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.8,
+    })
+
+    const text = completion.choices?.[0]?.message?.content || ''
+
+    // Try parsing as JSON array first
     try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.8,
-        }),
-      })
-      const data = await res.json()
-      const text = data.choices?.[0]?.message?.content || ''
+      const parsed = JSON.parse(text)
+      if (Array.isArray(parsed)) {
+        return parsed.map((p: { text?: string }) => p.text || '').filter(Boolean)
+      }
+    } catch {
+      // Fall back to --- separator
       return text.split('\n---\n').map((p: string) => p.trim()).filter(Boolean)
-    } catch (e) {
-      console.error('OpenAI error:', e)
     }
+  } catch (e) {
+    console.error('OpenAI error:', e)
   }
 
-  // Fallback: generate template-based posts
   return []
 }
 
@@ -54,23 +64,27 @@ function generateFallbackPosts(bizName: string, industry: string, preset: StyleP
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { businessId, bizName, industry, stylePreset, services, voiceDesc, targetCustomer, count = 14, isSample } = body
+  const { businessId, bizName, industry, stylePreset, services, voiceDesc, targetCustomer, brandDescription, count = 14, isSample } = body
 
   const preset = (stylePreset || 'warm_personal') as StylePreset
-  const style = STYLE_PRESETS[preset]
 
-  const prompt = `You are a social media content creator for a local business.
-Business: ${bizName}
-Industry: ${industry}
-Services: ${services}
-Target customers: ${targetCustomer || 'local community'}
-Brand voice: ${style.tone}. ${voiceDesc || ''}
+  const systemPrompt = buildContentSystemPrompt({
+    businessName: bizName || 'Our Business',
+    businessType: industry || 'Services',
+    services: services || '',
+    differentiator: voiceDesc || '',
+    targetCustomer: targetCustomer || 'local community',
+    stylePreset: preset,
+    brandDescription: brandDescription || undefined,
+  })
 
-Generate exactly ${count} unique social media posts. Each post should be 1-3 sentences with relevant emojis and hashtags.
+  const userPrompt = isSample
+    ? buildUserPrompt({ count, platform: 'facebook' })
+    : `Generate exactly ${count} unique social media posts. Each post should be 1-3 sentences with relevant emojis and hashtags.
 Mix content types: promotional, educational, behind-the-scenes, social proof, seasonal, engagement.
 Separate each post with "---" on its own line. Output ONLY the posts, nothing else.`
 
-  let posts = await generateWithAI(prompt)
+  let posts = await generateWithAI(systemPrompt, userPrompt)
   if (posts.length < count) {
     posts = generateFallbackPosts(bizName || 'Our Business', industry || 'Services', preset, services || '', count)
   }
