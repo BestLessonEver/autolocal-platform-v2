@@ -10,14 +10,16 @@ export default function MarketingFooter() {
             <Image src="/logo.png" alt="AutoLocal.ai" width={28} height={28} className="rounded-md" />
             AutoLocal.ai
           </Link>
-          <p className="text-sm text-slate-500 mt-3">Agentic marketing for local businesses.</p>
+          <p className="text-sm text-slate-500 mt-3">AI-powered marketing audits and done-for-you fixes for local businesses.</p>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-white mb-3">Product</h4>
+          <h4 className="text-sm font-semibold text-white mb-3">Services</h4>
           <ul className="space-y-2 text-sm text-slate-500">
-            <li><a href="/#features" className="hover:text-slate-300 transition">Features</a></li>
-            <li><a href="/#pricing" className="hover:text-slate-300 transition">Pricing</a></li>
-            <li><Link href="/onboarding" className="hover:text-slate-300 transition">Start Free Trial</Link></li>
+            <li><a href="/#services" className="hover:text-slate-300 transition">Website Audit</a></li>
+            <li><a href="/#services" className="hover:text-slate-300 transition">Review Management</a></li>
+            <li><a href="/#services" className="hover:text-slate-300 transition">Social Media</a></li>
+            <li><a href="/#services" className="hover:text-slate-300 transition">SEO</a></li>
+            <li><a href="/#pricing" className="hover:text-slate-300 transition">New Websites</a></li>
           </ul>
         </div>
         <div>
@@ -26,14 +28,6 @@ export default function MarketingFooter() {
             <li><Link href="/about" className="hover:text-slate-300 transition">About</Link></li>
             <li><Link href="/blog" className="hover:text-slate-300 transition">Blog</Link></li>
             <li><Link href="/contact" className="hover:text-slate-300 transition">Contact</Link></li>
-            <li><Link href="/services" className="hover:text-slate-300 transition">Services</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-sm font-semibold text-white mb-3">Legal</h4>
-          <ul className="space-y-2 text-sm text-slate-500">
-            <li><a href="#" className="hover:text-slate-300 transition">Privacy</a></li>
-            <li><a href="#" className="hover:text-slate-300 transition">Terms</a></li>
           </ul>
         </div>
         <div>
@@ -42,9 +36,16 @@ export default function MarketingFooter() {
             <li><Link href="/houston-tx" className="hover:text-slate-300 transition">Houston TX</Link></li>
             <li><Link href="/friendswood-tx" className="hover:text-slate-300 transition">Friendswood TX</Link></li>
             <li><Link href="/clear-lake-tx" className="hover:text-slate-300 transition">Clear Lake TX</Link></li>
-            <li><Link href="/league-city-tx" className="hover:text-slate-300 transition">League City TX</Link></li>
-            <li><Link href="/pearland-tx" className="hover:text-slate-300 transition">Pearland TX</Link></li>
-            <li><Link href="/houston-tx" className="text-cyan-400 hover:text-cyan-300 transition">All Service Areas →</Link></li>
+            <li><Link href="/savannah-ga" className="hover:text-slate-300 transition">Savannah GA</Link></li>
+            <li><Link href="/chattanooga-tn" className="hover:text-slate-300 transition">Chattanooga TN</Link></li>
+            <li><Link href="/houston-tx" className="text-cyan-400 hover:text-cyan-300 transition">All Areas →</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-white mb-3">Legal</h4>
+          <ul className="space-y-2 text-sm text-slate-500">
+            <li><a href="#" className="hover:text-slate-300 transition">Privacy</a></li>
+            <li><a href="#" className="hover:text-slate-300 transition">Terms</a></li>
           </ul>
         </div>
       </div>
