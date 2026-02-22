@@ -65,10 +65,14 @@ export default function Home() {
     setSubmitting(true)
     try {
       const [city, state] = form.cityState.split(',').map(s => s.trim())
+      let website = form.website.trim()
+      if (website && !website.startsWith('http://') && !website.startsWith('https://')) {
+        website = 'https://' + website
+      }
       const res = await fetch('/api/audit-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName: form.businessName, website: form.website, city, state: state || '', email: form.email }),
+        body: JSON.stringify({ businessName: form.businessName, website, city, state: state || '', email: form.email }),
       })
       if (res.ok) setSubmitted(true)
     } finally {
@@ -301,7 +305,7 @@ export default function Home() {
               </div>
               <div>
                 <input
-                  type="url"
+                  type="text"
                   placeholder="Website URL (optional)"
                   value={form.website}
                   onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
