@@ -114,3 +114,75 @@ Unsubscribe: {unsubscribe_url}`
 
   return { subject, html, text }
 }
+
+export function generateWelcomeEmail(clientName: string, businessName: string, packageName: string, onboardUrl: string): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = `Welcome to AutoLocal.ai — let's fix ${businessName}'s marketing`
+
+  const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0e27; color: #e2e8f0; margin: 0; padding: 0; }
+  .container { max-width: 600px; margin: 0 auto; padding: 32px 24px; }
+  .cta-btn { display: inline-block; background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; }
+  a { color: #38bdf8; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 style="color: white; font-size: 24px;">Welcome aboard, ${clientName}! 🚀</h1>
+  
+  <p>Thanks for choosing AutoLocal.ai for ${businessName}. You picked the <strong>${packageName}</strong> package — great choice.</p>
+  
+  <p>Here's what happens next:</p>
+  
+  <div style="background: rgba(6, 182, 212, 0.1); border-left: 3px solid #06b6d4; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0;">
+    <strong style="color: #06b6d4;">Step 1 (right now):</strong> Complete your quick onboarding form — takes 3 minutes
+  </div>
+  
+  <div style="background: rgba(6, 182, 212, 0.1); border-left: 3px solid #06b6d4; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0;">
+    <strong style="color: #06b6d4;">Step 2 (next 24 hours):</strong> We research your market, competitors, and create your first batch of content
+  </div>
+  
+  <div style="background: rgba(6, 182, 212, 0.1); border-left: 3px solid #06b6d4; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0;">
+    <strong style="color: #06b6d4;">Step 3:</strong> You review and approve — then we handle everything
+  </div>
+
+  <div style="text-align: center; margin: 32px 0;">
+    <a href="${onboardUrl}" class="cta-btn" style="color: white;">Complete Onboarding →</a>
+  </div>
+
+  <p style="color: #64748b; font-size: 14px;">We're already looking at your digital presence. You'll hear from us within 24 hours with your first content.</p>
+  
+  <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;">
+  
+  <p>Talk soon,<br><strong>Brian Carrion</strong><br>AutoLocal.ai<br><a href="mailto:brian@autolocal.ai">brian@autolocal.ai</a></p>
+</div>
+</body>
+</html>`
+
+  const text = `Welcome aboard, ${clientName}! 🚀
+
+Thanks for choosing AutoLocal.ai for ${businessName}. You picked the ${packageName} package — great choice.
+
+Here's what happens next:
+
+Step 1 (right now): Complete your quick onboarding form — takes 3 minutes
+Step 2 (next 24 hours): We research your market, competitors, and create your first batch of content
+Step 3: You review and approve — then we handle everything
+
+Complete Onboarding: ${onboardUrl}
+
+We're already looking at your digital presence. You'll hear from us within 24 hours with your first content.
+
+Talk soon,
+Brian Carrion
+AutoLocal.ai
+brian@autolocal.ai`
+
+  return { subject, html, text }
+}

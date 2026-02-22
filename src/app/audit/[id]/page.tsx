@@ -412,7 +412,7 @@ export default async function AuditReportPage({ params }: { params: { id: string
               {packages.map((pkg) => (
                 <a
                   key={pkg.slug}
-                  href={`/checkout/${pkg.slug}`}
+                  href={`/client/demo?package=${pkg.slug}`}
                   className="glass rounded-xl p-5 text-left hover:border-cyan-400/40 transition-all hover:-translate-y-1 block"
                 >
                   <p className="text-white font-bold text-lg">{pkg.name}</p>
