@@ -241,21 +241,21 @@ export default function Home() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {PACKAGES.map((pkg) => (
-            <div key={pkg.name} className={`gradient-card rounded-2xl p-7 transition-all duration-300 ${pkg.popular ? 'scale-105 glow-cyan ring-1 ring-cyan-500/30' : ''}`}>
+            <div key={pkg.name} className={`gradient-card rounded-2xl p-7 transition-all duration-300 flex flex-col ${pkg.popular ? 'scale-105 glow-cyan ring-1 ring-cyan-500/30' : ''}`}>
               {pkg.popular && <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-wider">⭐ Most Popular</div>}
               <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
               <div className="mt-3 mb-4">
                 <span className="text-4xl font-bold text-white">${pkg.price.toLocaleString()}</span>
               </div>
               <p className="text-slate-400 text-sm mb-6">{pkg.tagline}</p>
-              <ul className="space-y-2 mb-8">
+              <ul className="space-y-2 flex-1">
                 {pkg.features.map((f, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
                     <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> {f}
                   </li>
                 ))}
               </ul>
-              <a href="#audit-form" className={`block text-center py-3 rounded-xl font-semibold transition ${pkg.popular ? 'btn-gradient text-white' : 'border border-slate-600 text-slate-300 hover:border-cyan-500/50 hover:text-white'}`}>
+              <a href="#audit-form" className={`block text-center py-3 rounded-xl font-semibold transition mt-8 ${pkg.popular ? 'btn-gradient text-white' : 'border border-slate-600 text-slate-300 hover:border-cyan-500/50 hover:text-white'}`}>
                 Get Your Free Audit
               </a>
             </div>
