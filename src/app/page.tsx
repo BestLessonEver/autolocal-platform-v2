@@ -15,7 +15,7 @@ const STEPS = [
   { num: '01', title: 'Tell us your business name', desc: 'That\'s it. We handle the rest.' },
   { num: '02', title: 'We scan everything', desc: 'Website, Google, social media, competitors within 5 miles. Takes 24 hours.' },
   { num: '03', title: 'Get your report card', desc: 'A brutally specific audit with your score, competitor comparison, and revenue impact estimate.' },
-  { num: '04', title: 'We fix it', desc: 'Pick a package. We handle everything — website rebuilds, review management, social media, SEO. Flat rate, no contracts.' },
+  { num: '04', title: 'We fix it — by tomorrow', desc: 'Pick a package. We handle everything — website rebuilds, review management, social media, SEO. Flat rate, no contracts. Most fixes delivered in 24 hours.' },
 ]
 
 const PACKAGES = [
@@ -257,7 +257,8 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <p className="text-center text-slate-400 mt-8">Not sure what you need? Get your free audit first — we&apos;ll recommend the right package.</p>
+        <p className="text-center text-cyan-400 font-semibold mt-8">Traditional agencies quote 2-4 weeks. We deliver in 24 hours.</p>
+        <p className="text-center text-slate-500 mt-2">Not sure what you need? Get your free audit first — we&apos;ll recommend the right package.</p>
       </section>
 
       <div className="section-divider" />

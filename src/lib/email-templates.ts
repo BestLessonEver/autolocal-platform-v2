@@ -79,8 +79,9 @@ export function generateAuditEmail(audit: AuditResult, reportUrl: string): {
 
     <div style="text-align: center;">
       <p style="font-size: 18px; font-weight: 600; color: white;">Want us to fix this?</p>
-      <p style="color: #94a3b8;">Flat rates. No contracts. No BS.</p>
-      <p style="color: #94a3b8; font-size: 14px;">Starting at $499</p>
+      <p style="color: #06b6d4; font-size: 16px; font-weight: 600;">We can have this fixed by tomorrow.</p>
+      <p style="color: #94a3b8;">Flat rates. No contracts. No BS. Starting at $499.</p>
+      <p style="color: #64748b; font-size: 13px; margin-top: 8px;">Traditional agencies quote 2-4 weeks. We move in 24 hours.</p>
     </div>
 
     <div class="footer">
@@ -104,8 +105,9 @@ ${criticalRecs.length > 0 ? `TOP RECOMMENDATIONS:\n${criticalRecs.map(r => `• 
 VIEW FULL REPORT: ${reportUrl}
 
 ---
-Want us to fix this? Flat rates. No contracts. No BS.
-Starting at $499. Flat rate, no contracts.
+Want us to fix this? We can have this fixed by tomorrow.
+Flat rates. No contracts. No BS. Starting at $499.
+Traditional agencies quote 2-4 weeks. We move in 24 hours.
 
 AutoLocal.ai — Agentic Marketing for Local Businesses
 Unsubscribe: {unsubscribe_url}`
