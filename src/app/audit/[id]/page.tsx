@@ -120,10 +120,10 @@ function PriorityBadge({ priority }: { priority: string }) {
 }
 
 const packages = [
-  { name: 'Social Revive', price: 500, slug: 'social-revive', desc: 'Get your social media active and professional', features: ['3 posts/week across 2 platforms', 'Profile optimization', 'Content calendar'] },
-  { name: 'Digital Cleanup', price: 1000, slug: 'digital-cleanup', desc: 'Fix your entire online presence', features: ['Everything in Social Revive', 'Google Business optimization', 'Review generation system', 'Monthly reporting'] },
-  { name: 'Growth Engine', price: 2000, slug: 'growth-engine', desc: 'Full marketing machine on autopilot', features: ['Everything in Digital Cleanup', '5 posts/week across 3 platforms', 'Email marketing setup', 'Competitor monitoring', 'Local SEO optimization'] },
-  { name: 'New Website', price: 3500, slug: 'new-website', desc: 'Modern, fast, mobile-first website', features: ['Custom design', 'Mobile optimized', 'SEO-ready', 'Contact forms', 'Google Analytics', 'SSL included'] },
+  { name: 'Social Revive', price: 499, slug: 'social-revive', desc: 'Get your social media active and professional', features: ['3 posts/week across 2 platforms', 'Profile optimization', 'Content calendar'] },
+  { name: 'Digital Cleanup', price: 999, slug: 'digital-cleanup', desc: 'Fix your entire online presence', features: ['Everything in Social Revive', 'Google Business optimization', 'Review generation system', 'Monthly reporting'] },
+  { name: 'Growth Engine', price: 1999, slug: 'growth-engine', desc: 'Full marketing machine on autopilot', features: ['Everything in Digital Cleanup', '5 posts/week across 3 platforms', 'Email marketing setup', 'Competitor monitoring', 'Local SEO optimization'] },
+  { name: 'New Website', price: 3499, slug: 'new-website', desc: 'Modern, fast, mobile-first website', features: ['Custom design', 'Mobile optimized', 'SEO-ready', 'Contact forms', 'Google Analytics', 'SSL included'] },
 ]
 
 export default async function AuditReportPage({ params }: { params: { id: string } }) {

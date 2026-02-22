@@ -21,26 +21,26 @@ const STEPS = [
 const PACKAGES = [
   {
     name: 'Social Media Revive',
-    price: 500,
+    price: 499,
     tagline: 'We take over your social media for 30 days',
     features: ['AI-generated posts', '5x/week posting', 'Platform optimization', 'Hashtag strategy', 'Engagement monitoring'],
   },
   {
     name: 'Full Digital Cleanup',
-    price: 1000,
+    price: 999,
     tagline: 'Social media + reviews + website fixes',
     popular: true,
     features: ['Everything in Social Revive', 'Google review response strategy', 'Website speed optimization', 'Mobile fixes & SEO basics', 'Local listing cleanup'],
   },
   {
     name: 'Growth Engine',
-    price: 2000,
+    price: 1999,
     tagline: 'The full transformation',
     features: ['Everything in Digital Cleanup', 'Competitor monitoring', 'Monthly reporting', 'Content calendar', 'Ongoing optimization', 'Converts to $199/mo after first month'],
   },
   {
     name: 'New Website + SEO',
-    price: 3500,
+    price: 3499,
     tagline: 'Modern website built to convert',
     features: ['Custom designed, mobile-first', 'SEO-optimized & fast-loading', 'Google Business integration', 'Contact forms', 'Booking integration'],
   },

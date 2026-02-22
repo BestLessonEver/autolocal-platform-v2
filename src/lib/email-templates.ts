@@ -80,7 +80,7 @@ export function generateAuditEmail(audit: AuditResult, reportUrl: string): {
     <div style="text-align: center;">
       <p style="font-size: 18px; font-weight: 600; color: white;">Want us to fix this?</p>
       <p style="color: #94a3b8;">Flat rates. No contracts. No BS.</p>
-      <p style="color: #94a3b8; font-size: 14px;">Starting at $500/month</p>
+      <p style="color: #94a3b8; font-size: 14px;">Starting at $499</p>
     </div>
 
     <div class="footer">
@@ -105,7 +105,7 @@ VIEW FULL REPORT: ${reportUrl}
 
 ---
 Want us to fix this? Flat rates. No contracts. No BS.
-Starting at $500/month.
+Starting at $499. Flat rate, no contracts.
 
 AutoLocal.ai — Agentic Marketing for Local Businesses
 Unsubscribe: {unsubscribe_url}`
