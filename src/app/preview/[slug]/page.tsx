@@ -46,7 +46,8 @@ export default async function PreviewPage({ params }: Props) {
   }
 
   // Track view (fire and forget)
-  supabase.rpc('increment_preview_views', { preview_slug: params.slug }).then(() => {})
+  // Fire and forget view tracking
+  void supabase.rpc('increment_preview_views', { preview_slug: params.slug })
 
   return <PreviewWrapper data={data} />
 }

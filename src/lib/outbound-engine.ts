@@ -323,7 +323,7 @@ export async function scheduleFollowUps(
       follow_up_day: fu.day,
       parent_email_id: parentEmailId,
       scheduled_for: fu.scheduledFor,
-    }).catch(() => {})
+    })
   }
 }
 
