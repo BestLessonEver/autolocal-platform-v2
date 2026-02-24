@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
+import StickyContactBar from './StickyContactBar'
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -305,6 +306,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
           <p className="text-white/30 text-xs text-center mt-10">© {new Date().getFullYear()} {data.business_name}. All rights reserved.</p>
         </div>
       </footer>
-    </div>
+    <StickyContactBar data={data} />
+      </div>
   )
 }
