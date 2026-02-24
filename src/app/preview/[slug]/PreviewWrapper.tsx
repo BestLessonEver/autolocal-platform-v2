@@ -54,7 +54,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             </p>
             <div className="flex items-center gap-3 shrink-0">
               <a
-                href="https://autolocal.ai/packages"
+                href="https://autolocal.ai/offer"
                 className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
               >
                 Get Started — $499
