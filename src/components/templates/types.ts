@@ -30,3 +30,26 @@ export interface PreviewData {
 export interface TemplateProps {
   data: PreviewData
 }
+
+export type TemplateName = 'bold' | 'elegant' | 'professional'
+
+/** Get the correct CTA button text based on URL type */
+export function getCtaButtonText(data: PreviewData): string {
+  if (data.cta_url && data.cta_url.startsWith('tel:')) {
+    return 'Call Now'
+  }
+  return data.cta_text || 'Get Started'
+}
+
+/** Map legacy category names to template names */
+export function categoryToTemplate(category: string): TemplateName {
+  switch (category) {
+    case 'salon':
+      return 'elegant'
+    case 'dental':
+    case 'contractor':
+      return 'professional'
+    default:
+      return 'bold'
+  }
+}

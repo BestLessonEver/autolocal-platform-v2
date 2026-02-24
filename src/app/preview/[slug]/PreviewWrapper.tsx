@@ -2,22 +2,39 @@
 'use client'
 
 import { useState } from 'react'
-import { type PreviewData } from '@/components/templates/types'
-import ModernCleanTemplate from '@/components/templates/ModernCleanTemplate'
-import SalonSpaTemplate from '@/components/templates/SalonSpaTemplate'
+import { type PreviewData, type TemplateName, categoryToTemplate } from '@/components/templates/types'
+import BoldTemplate from '@/components/templates/BoldTemplate'
+import ElegantTemplate from '@/components/templates/ElegantTemplate'
 import ProfessionalTemplate from '@/components/templates/ProfessionalTemplate'
 
-function getTemplate(data: PreviewData) {
-  switch (data.category) {
-    case 'salon': return <SalonSpaTemplate data={data} />
-    case 'dental':
-    case 'contractor': return <ProfessionalTemplate data={data} />
-    default: return <ModernCleanTemplate data={data} />
-  }
+const TEMPLATE_MAP: Record<TemplateName, React.ComponentType<{ data: PreviewData }>> = {
+  bold: BoldTemplate,
+  elegant: ElegantTemplate,
+  professional: ProfessionalTemplate,
+}
+
+const TEMPLATE_OPTIONS: { key: TemplateName; label: string; icon: string }[] = [
+  { key: 'bold', label: 'Bold', icon: '⚡' },
+  { key: 'elegant', label: 'Elegant', icon: '✨' },
+  { key: 'professional', label: 'Professional', icon: '🏢' },
+]
+
+function resolveTemplate(data: PreviewData): TemplateName {
+  // Check data.template first
+  const t = data.template?.toLowerCase()
+  if (t === 'bold' || t === 'elegant' || t === 'professional') return t
+  // Legacy: map old template names
+  if (t === 'modern_clean' || t === 'modern-clean') return 'bold'
+  if (t === 'salon_spa' || t === 'salon-spa') return 'elegant'
+  // Fall back to category mapping
+  return categoryToTemplate(data.category)
 }
 
 export default function PreviewWrapper({ data }: { data: PreviewData }) {
   const [bannerVisible, setBannerVisible] = useState(true)
+  const [activeTemplate, setActiveTemplate] = useState<TemplateName>(() => resolveTemplate(data))
+
+  const Template = TEMPLATE_MAP[activeTemplate]
 
   return (
     <>
@@ -48,9 +65,29 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
         </div>
       )}
 
+      {/* Template Selector — Floating pill */}
+      <div className={`fixed z-50 left-1/2 -translate-x-1/2 ${bannerVisible ? 'top-[60px]' : 'top-3'}`}>
+        <div className="flex items-center gap-1 bg-white/95 backdrop-blur-md rounded-full shadow-xl border border-gray-200 p-1">
+          {TEMPLATE_OPTIONS.map(opt => (
+            <button
+              key={opt.key}
+              onClick={() => setActiveTemplate(opt.key)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                activeTemplate === opt.key
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <span className="text-xs">{opt.icon}</span>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Add top padding when banner is visible */}
       <div className={bannerVisible ? 'pt-[52px]' : ''}>
-        {getTemplate(data)}
+        <Template data={data} />
       </div>
 
       {/* Powered by AutoLocal */}

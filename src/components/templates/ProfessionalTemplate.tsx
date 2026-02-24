@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { type TemplateProps } from './types'
+import { type TemplateProps, getCtaButtonText } from './types'
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -22,26 +22,25 @@ const HERO_IMAGES: Record<string, string> = {
   general: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop',
 }
 
-const TRUST_BADGES = [
-  { icon: '🛡️', label: 'Licensed & Insured' },
-  { icon: '⭐', label: '5-Star Rated' },
-  { icon: '🏆', label: 'Award Winning' },
-  { icon: '✅', label: 'Satisfaction Guaranteed' },
-]
-
 export default function ProfessionalTemplate({ data }: TemplateProps) {
-  const [_formData, _setFormData] = useState({ name: '', email: '', phone: '', message: '' })
   const primary = data.brand_color_primary
-  const secondary = data.brand_color_secondary
   const accent = data.brand_color_accent
   const heroImg = data.hero_image_url || HERO_IMAGES[data.category] || HERO_IMAGES.general
+  const ctaText = getCtaButtonText(data)
 
   const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
   const dayLabels: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
 
+  const stats = [
+    { value: data.google_review_count ? `${data.google_review_count}+` : '500+', label: 'Happy Clients' },
+    { value: data.google_rating ? `${data.google_rating}★` : '5★', label: 'Google Rating' },
+    { value: '10+', label: 'Years Experience' },
+    { value: '100%', label: 'Satisfaction' },
+  ]
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      {/* Sticky Header */}
+      {/* Sticky Header — Professional colored bar */}
       <header className="sticky top-0 z-40 shadow-md" style={{ backgroundColor: primary }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
@@ -60,44 +59,61 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                 📞 {data.phone}
               </a>
             )}
-            <a href={data.cta_url || '#contact'} className="px-5 py-2.5 rounded-lg text-sm font-semibold shadow-lg transition-all hover:scale-105" style={{ backgroundColor: accent, color: '#fff' }}>
-              {data.cta_text}
+            <a
+              href={data.cta_url || '#contact'}
+              className="px-5 py-2.5 rounded-lg text-sm font-semibold shadow-lg transition-all hover:scale-105"
+              style={{ backgroundColor: accent, color: '#fff' }}
+            >
+              {ctaText}
             </a>
           </div>
         </div>
       </header>
 
       {/* Hero — Split layout */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 min-h-[600px]">
             <div className="flex items-center px-4 sm:px-8 lg:px-16 py-16 lg:py-24">
-              <div>
+              <div className="max-w-lg">
                 {data.google_rating && data.google_rating >= 4.0 && (
                   <div className="flex items-center gap-2 mb-6">
                     <StarRating rating={Math.round(data.google_rating)} />
                     <span className="text-sm font-semibold text-gray-600">{data.google_rating} stars · {data.google_review_count} reviews</span>
                   </div>
                 )}
-                <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6" style={{ color: primary }}>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: primary }}>
                   {data.business_name}
                 </h1>
                 {data.tagline && (
                   <p className="text-xl text-gray-600 mb-8 leading-relaxed">{data.tagline}</p>
                 )}
                 <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                  <a href={data.cta_url || '#contact'} className="inline-flex items-center justify-center px-8 py-4 rounded-lg text-white text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105" style={{ backgroundColor: primary }}>
-                    {data.cta_text}
+                  <a
+                    href={data.cta_url || '#contact'}
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-lg text-white text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+                    style={{ backgroundColor: primary }}
+                  >
+                    {ctaText}
                   </a>
                   {data.phone && (
-                    <a href={`tel:${data.phone}`} className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 text-lg font-semibold transition-all hover:bg-gray-50" style={{ borderColor: primary, color: primary }}>
+                    <a
+                      href={`tel:${data.phone}`}
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 text-lg font-semibold transition-all hover:bg-gray-50"
+                      style={{ borderColor: primary, color: primary }}
+                    >
                       📞 Call Now
                     </a>
                   )}
                 </div>
                 {/* Trust badges */}
                 <div className="grid grid-cols-2 gap-3">
-                  {TRUST_BADGES.map((b, i) => (
+                  {[
+                    { icon: '🛡️', label: 'Licensed & Insured' },
+                    { icon: '⭐', label: '5-Star Rated' },
+                    { icon: '🏆', label: 'Award Winning' },
+                    { icon: '✅', label: 'Satisfaction Guaranteed' },
+                  ].map((b, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
                       <span className="text-lg">{b.icon}</span>
                       <span className="font-medium">{b.label}</span>
@@ -108,15 +124,29 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
             </div>
             <div className="hidden lg:block relative">
               <img src={heroImg} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0" style={{ background: `linear-gradient(to right, white 0%, transparent 15%)` }} />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-transparent to-transparent" />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="py-12 text-white" style={{ backgroundColor: primary }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            {stats.map((s, i) => (
+              <div key={i}>
+                <p className="text-3xl sm:text-4xl font-bold mb-1">{s.value}</p>
+                <p className="text-white/70 text-sm font-medium">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Services */}
       {data.services.length > 0 && (
-        <section id="services" className="py-24 bg-gray-50">
+        <section id="services" className="py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>Our Services</h2>
@@ -135,8 +165,8 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
         </section>
       )}
 
-      {/* Why Us — Trust section */}
-      <section id="why-us" className="py-24">
+      {/* Why Us */}
+      <section id="why-us" className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>Why Choose {data.business_name}?</h2>
@@ -146,12 +176,12 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
               { icon: '🎯', title: 'Expert Team', desc: 'Experienced professionals dedicated to quality results.' },
               { icon: '⏰', title: 'On Time, Every Time', desc: 'We respect your schedule and deliver as promised.' },
               { icon: '💰', title: 'Fair Pricing', desc: 'Transparent pricing with no hidden fees or surprises.' },
-              { icon: '🤝', title: 'Customer First', desc: `${data.google_review_count}+ happy customers and counting.` },
+              { icon: '🤝', title: 'Customer First', desc: `${data.google_review_count || 'Many'}+ happy customers and counting.` },
             ].map((item, i) => (
-              <div key={i} className="text-center">
+              <div key={i} className="text-center bg-white rounded-xl p-8 shadow-sm">
                 <div className="text-4xl mb-4">{item.icon}</div>
                 <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.desc}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -160,7 +190,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
 
       {/* Reviews */}
       {data.reviews.length > 0 && (
-        <section id="reviews" className="py-24 bg-gray-50">
+        <section id="reviews" className="py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>What Our Clients Say</h2>
@@ -173,7 +203,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data.reviews.slice(0, 6).map((r, i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div key={i} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: primary }}>
                       {r.author.charAt(0)}
@@ -191,18 +221,15 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
         </section>
       )}
 
-      {/* Contact with Form */}
-      <section id="contact" className="py-24">
+      {/* Contact */}
+      <section id="contact" className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16">
-            {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: primary }}>{data.cta_text}</h2>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: primary }}>{ctaText}</h2>
               <p className="text-gray-600 mb-8">Fill out the form and we&apos;ll get back to you within 24 hours.</p>
               <form onSubmit={e => e.preventDefault()} className="space-y-5">
-                <div>
-                  <input type="text" placeholder="Your Name" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition" style={{ '--tw-ring-color': primary } as React.CSSProperties} />
-                </div>
+                <input type="text" placeholder="Your Name" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition" style={{ '--tw-ring-color': primary } as React.CSSProperties} />
                 <div className="grid sm:grid-cols-2 gap-4">
                   <input type="email" placeholder="Email Address" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition" />
                   <input type="tel" placeholder="Phone Number" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition" />
@@ -214,7 +241,6 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
               </form>
             </div>
 
-            {/* Info + Hours */}
             <div className="space-y-8">
               <div>
                 <h3 className="text-xl font-bold mb-4" style={{ color: primary }}>Contact Information</h3>
@@ -236,7 +262,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                   <h3 className="text-xl font-bold mb-4" style={{ color: primary }}>Business Hours</h3>
                   <div className="space-y-2">
                     {daysOrder.map(day => data.hours[day] ? (
-                      <div key={day} className="flex justify-between py-2 border-b border-gray-100">
+                      <div key={day} className="flex justify-between py-2 border-b border-gray-200">
                         <span className="font-medium">{dayLabels[day]}</span>
                         <span className="text-gray-600">{data.hours[day]}</span>
                       </div>
@@ -244,11 +270,6 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                   </div>
                 </div>
               )}
-
-              {/* Map placeholder */}
-              <div className="bg-gray-200 rounded-xl h-48 flex items-center justify-center text-gray-500">
-                📍 Google Maps
-              </div>
             </div>
           </div>
         </div>
@@ -269,7 +290,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
             </div>
             <div className="flex items-center justify-center md:justify-end">
               <a href={data.cta_url || '#contact'} className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105" style={{ backgroundColor: accent }}>
-                {data.cta_text}
+                {ctaText}
               </a>
             </div>
           </div>
