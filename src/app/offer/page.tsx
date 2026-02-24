@@ -1,9 +1,49 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function OfferPage() {
+function PackageSelector({ selected, onChange }: { selected: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-gray-300 mb-4">Choose Your Package</label>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => onChange('starter')}
+          className={`p-5 rounded-xl border-2 text-left transition-all ${
+            selected === 'starter'
+              ? 'border-indigo-500 bg-indigo-500/10'
+              : 'border-white/10 hover:border-white/30'
+          }`}
+        >
+          <p className="font-bold text-white text-lg mb-1">Custom Website</p>
+          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$499</p>
+          <p className="text-sm text-gray-400">One-time. Includes 1 year hosting.</p>
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange('living')}
+          className={`p-5 rounded-xl border-2 text-left transition-all relative ${
+            selected === 'living'
+              ? 'border-amber-500 bg-amber-500/10'
+              : 'border-white/10 hover:border-white/30'
+          }`}
+        >
+          <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
+          <p className="font-bold text-white text-lg mb-1">Living Website 🚀</p>
+          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$499 + $99/mo</p>
+          <p className="text-sm text-gray-400">Self-improving. A/B testing. SEO. Updates.</p>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function OfferContent() {
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     businessName: '',
     contactName: '',
@@ -15,10 +55,27 @@ export default function OfferPage() {
   })
   const [submitted, setSubmitted] = useState(false)
 
+  // Prepopulate from URL params (from preview page or audit)
+  useEffect(() => {
+    const biz = searchParams.get('business') || searchParams.get('b') || ''
+    const name = searchParams.get('name') || searchParams.get('n') || ''
+    const email = searchParams.get('email') || searchParams.get('e') || ''
+    const phone = searchParams.get('phone') || searchParams.get('p') || ''
+    const website = searchParams.get('website') || searchParams.get('w') || ''
+    setFormData(f => ({
+      ...f,
+      businessName: biz || f.businessName,
+      contactName: name || f.contactName,
+      email: email || f.email,
+      phone: phone || f.phone,
+      currentWebsite: website || f.currentWebsite,
+    }))
+  }, [searchParams])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/audit-request', {
+      await fetch('/api/audit-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -33,6 +90,10 @@ export default function OfferPage() {
     } catch {
       setSubmitted(true)
     }
+  }
+
+  const scrollToOrder = () => {
+    document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   if (submitted) {
@@ -56,21 +117,27 @@ export default function OfferPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Hero */}
-      <section className="pt-16 pb-12 px-4">
+      <section className="pt-20 pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-indigo-400 font-bold text-sm uppercase tracking-widest mb-4">
-            Limited Availability — Only 5 Spots This Month
+          <p className="text-indigo-400 font-bold text-sm uppercase tracking-widest mb-6">
+            Limited Availability
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.95] mb-6">
-            A Website That Actually
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-              {' '}Brings You Customers
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6">
+            A Website That Actually{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Brings You Customers
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             Most web designers charge $5,000+ and take 6-8 weeks. We build yours in <strong className="text-white">24 hours</strong> for 
             a fraction of the cost. And if you don&apos;t love it, you don&apos;t pay.
           </p>
+          <button
+            onClick={scrollToOrder}
+            className="px-10 py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Get Started — $499 →
+          </button>
         </div>
       </section>
 
@@ -107,8 +174,14 @@ export default function OfferPage() {
             <p className="text-gray-400 text-sm mb-2">Total Value</p>
             <p className="text-4xl font-black text-white mb-1 line-through opacity-50">$7,500+</p>
             <p className="text-gray-400 text-sm mb-4">Today&apos;s Price</p>
-            <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$499</p>
-            <p className="text-gray-500 text-sm">One-time payment. No hidden fees. No contracts.</p>
+            <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-4">$499</p>
+            <p className="text-gray-500 text-sm mb-6">One-time payment. No hidden fees. No contracts.</p>
+            <button
+              onClick={scrollToOrder}
+              className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Get Started Now →
+            </button>
           </div>
         </div>
       </section>
@@ -141,7 +214,7 @@ export default function OfferPage() {
               ))}
             </ul>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-black text-white">+$299/mo</span>
+              <span className="text-3xl font-black text-white">+$99/mo</span>
               <span className="text-gray-500">after your site launches</span>
             </div>
           </div>
@@ -244,39 +317,7 @@ export default function OfferPage() {
               />
             </div>
 
-            {/* Package Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-4">Choose Your Package</label>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setFormData(f => ({ ...f, package: 'starter' }))}
-                  className={`p-5 rounded-xl border-2 text-left transition-all ${
-                    formData.package === 'starter'
-                      ? 'border-indigo-500 bg-indigo-500/10'
-                      : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <p className="font-bold text-white text-lg mb-1">New Website</p>
-                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$499</p>
-                  <p className="text-sm text-gray-400">One-time. Includes 1 year hosting.</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData(f => ({ ...f, package: 'living' }))}
-                  className={`p-5 rounded-xl border-2 text-left transition-all relative ${
-                    formData.package === 'living'
-                      ? 'border-amber-500 bg-amber-500/10'
-                      : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
-                  <p className="font-bold text-white text-lg mb-1">Living Website 🚀</p>
-                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$499 + $299/mo</p>
-                  <p className="text-sm text-gray-400">Self-improving. A/B testing. SEO. Updates.</p>
-                </button>
-              </div>
-            </div>
+            <PackageSelector selected={formData.package} onChange={v => setFormData(f => ({ ...f, package: v }))} />
 
             <button
               type="submit"
@@ -299,5 +340,13 @@ export default function OfferPage() {
         </p>
       </footer>
     </div>
+  )
+}
+
+export default function OfferPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+      <OfferContent />
+    </Suspense>
   )
 }
