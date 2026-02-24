@@ -105,7 +105,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                   >
                     {ctaText}
                   </a>
-                  {data.phone && (
+                  {data.phone && !(data.cta_url || '').startsWith('tel:') && (
                     <a
                       href={`tel:${data.phone}`}
                       className="inline-flex items-center justify-center px-8 py-4 rounded-lg border-2 text-lg font-semibold transition-all hover:bg-gray-50"
