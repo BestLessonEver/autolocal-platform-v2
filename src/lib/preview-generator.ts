@@ -79,7 +79,7 @@ function createSlug(businessName: string, city?: string): string {
 
 function extractReviews(audit: AuditResult): { author: string; rating: number; text: string; date: string }[] {
   // If audit has competitor data with reviews, generate plausible reviews from rating
-  const rating = audit.googleBusiness.rating || 4.5
+  // const rating = audit.googleBusiness.rating || 4.5
   const sampleReviews = [
     { text: `Absolutely wonderful experience! ${audit.prospect.businessName} exceeded all my expectations. Will definitely be coming back.`, rating: 5 },
     { text: `Great service and friendly staff. They really know what they're doing. Highly recommend to anyone in the area.`, rating: 5 },

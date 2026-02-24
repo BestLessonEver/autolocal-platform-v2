@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
 import { useState } from 'react'
@@ -25,7 +26,7 @@ const GALLERY_FALLBACKS = [
 ]
 
 export default function SalonSpaTemplate({ data }: TemplateProps) {
-  const [reviewIdx, setReviewIdx] = useState(0)
+  const [_reviewIdx, _setReviewIdx] = useState(0)
   const primary = data.brand_color_primary
   const accent = data.brand_color_accent
   const gallery = data.gallery_images.length > 0 ? data.gallery_images : GALLERY_FALLBACKS

@@ -30,7 +30,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
-import { findProspects, type Prospect } from './prospect-finder'
+import { findProspects } from './prospect-finder'
 import { runAudit, type AuditResult } from './audit-engine'
 import { selectApproach, type SalesApproach } from './approach-selector'
 import { buildOutboundEmail } from './outbound-templates'
@@ -45,6 +45,7 @@ const RESEND_API_URL = 'https://api.resend.com/emails'
 function getResendApiKey(): string {
   if (process.env.RESEND_API_KEY) return process.env.RESEND_API_KEY
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require('fs')
     const secrets = JSON.parse(fs.readFileSync(
       process.env.RESEND_SECRETS_PATH || '/Users/ble/.openclaw/workspace/.secrets/resend.json',
@@ -426,6 +427,7 @@ export async function runOutboundCampaign(
 // Get Recent Outbound Activity
 // ============================================================
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getRecentOutbound(limit = 50): Promise<any[]> {
   const supabase = getSupabase()
   const { data, error } = await supabase

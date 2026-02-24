@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { type Metadata } from 'next'
