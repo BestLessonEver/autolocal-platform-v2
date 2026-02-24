@@ -17,7 +17,10 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 const HERO_IMAGES: Record<string, string> = {
+  salon: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&h=600&fit=crop',
   dental: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1200&h=600&fit=crop',
+  fitness: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=600&fit=crop',
+  restaurant: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=600&fit=crop',
   contractor: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&h=600&fit=crop',
   general: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop',
 }
@@ -70,11 +73,16 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
         </div>
       </header>
 
-      {/* Hero — Split layout */}
+      {/* Hero — Image background on mobile, split on desktop */}
       <section className="relative overflow-hidden bg-gray-50">
+        {/* Mobile hero image */}
+        <div className="lg:hidden relative h-[300px] sm:h-[400px]">
+          <img src={heroImg} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50" />
+        </div>
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 min-h-[600px]">
-            <div className="flex items-center px-4 sm:px-8 lg:px-16 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-2 lg:min-h-[600px]">
+            <div className="flex items-center px-4 sm:px-8 lg:px-16 py-10 lg:py-24">
               <div className="max-w-lg">
                 {data.google_rating && data.google_rating >= 4.0 && (
                   <div className="flex items-center gap-2 mb-6">
