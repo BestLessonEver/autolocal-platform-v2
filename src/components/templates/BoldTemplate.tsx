@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
 import StickyContactBar from './StickyContactBar'
 
@@ -28,6 +28,15 @@ const HERO_IMAGES: Record<string, string> = {
 
 export default function BoldTemplate({ data }: TemplateProps) {
   const [reviewIdx, setReviewIdx] = useState(0)
+
+  // Auto-rotate testimonials every 5 seconds
+  useEffect(() => {
+    if (!data.reviews || data.reviews.length <= 1) return
+    const interval = setInterval(() => {
+      setReviewIdx(prev => (prev + 1) % data.reviews.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [data.reviews])
   const heroImg = data.hero_image_url || HERO_IMAGES[data.category] || HERO_IMAGES.general
   const primary = data.brand_color_primary
   const accent = data.brand_color_accent
@@ -74,7 +83,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
               {data.google_rating && (
                 <div className="flex items-center gap-3 mb-6">
                   <StarRating rating={Math.round(data.google_rating)} />
-                  <span className="text-white/90 font-semibold text-sm">{data.google_rating} · {data.google_review_count} reviews on Google</span>
+                  <span className="text-white/90 font-semibold text-sm">{data.google_rating} stars{(data.google_review_count || 0) >= 20 ? ` · ${data.google_review_count} reviews on Google` : " on Google"}</span>
                 </div>
               )}
               <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight mb-6">
@@ -147,7 +156,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
                   <div className="text-5xl font-black" style={{ color: primary }}>{data.google_rating}</div>
                   <div>
                     <div className="flex mb-1"><StarRating rating={Math.round(data.google_rating)} /></div>
-                    <p className="text-gray-500 text-sm font-medium">{data.google_review_count} verified reviews</p>
+                    <p className="text-gray-500 text-sm font-medium">{(data.google_review_count || 0) >= 20 ? `${data.google_review_count} verified reviews` : "Verified on Google"}</p>
                   </div>
                 </div>
               )}

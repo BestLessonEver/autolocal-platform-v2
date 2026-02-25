@@ -88,7 +88,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                 {data.google_rating && data.google_rating >= 4.0 && (
                   <div className="flex items-center gap-2 mb-6">
                     <StarRating rating={Math.round(data.google_rating)} />
-                    <span className="text-sm font-semibold text-gray-600">{data.google_rating} stars · {data.google_review_count} reviews</span>
+                    <span className="text-sm font-semibold text-gray-600">{data.google_rating} stars{(data.google_review_count || 0) >= 20 ? ` · ${data.google_review_count} reviews` : ''}</span>
                   </div>
                 )}
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6" style={{ color: primary }}>
@@ -206,7 +206,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
               {data.google_rating && (
                 <div className="flex items-center justify-center gap-3">
                   <StarRating rating={Math.round(data.google_rating)} />
-                  <span className="font-semibold">{data.google_rating} average from {data.google_review_count} reviews</span>
+                  <span className="font-semibold">{data.google_rating} stars{(data.google_review_count || 0) >= 20 ? ` from ${data.google_review_count} reviews` : ''}</span>
                 </div>
               )}
             </div>

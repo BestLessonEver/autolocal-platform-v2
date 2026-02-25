@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
 import StickyContactBar from './StickyContactBar'
 
@@ -26,6 +26,15 @@ const GALLERY_FALLBACKS = [
 
 export default function ElegantTemplate({ data }: TemplateProps) {
   const [reviewIdx, setReviewIdx] = useState(0)
+
+  useEffect(() => {
+    if (!data.reviews || data.reviews.length <= 1) return
+    const interval = setInterval(() => {
+      setReviewIdx(prev => (prev + 1) % data.reviews.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [data.reviews])
+
   const primary = data.brand_color_primary
   const accent = data.brand_color_accent
   const gallery = data.gallery_images.length > 0 ? data.gallery_images : GALLERY_FALLBACKS
@@ -78,7 +87,7 @@ export default function ElegantTemplate({ data }: TemplateProps) {
           {data.google_rating && (
             <div className="flex items-center justify-center gap-3 mb-10">
               <StarRating rating={Math.round(data.google_rating)} />
-              <span className="text-white/90 font-medium text-sm font-sans">{data.google_rating} · {data.google_review_count} reviews</span>
+              <span className="text-white/90 font-medium text-sm font-sans">{data.google_rating} stars{(data.google_review_count || 0) >= 20 ? ` · ${data.google_review_count} reviews` : ""}</span>
             </div>
           )}
           <a
@@ -134,6 +143,7 @@ export default function ElegantTemplate({ data }: TemplateProps) {
                     alt=""
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     style={{ minHeight: i === 0 ? '400px' : '200px' }}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.style.background = 'linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%)'; }}
                   />
                 </div>
               ))}
