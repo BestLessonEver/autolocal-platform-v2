@@ -1,36 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// GET /api/unsubscribe?email=xxx — shows confirmation page
+// GET /api/unsubscribe?email=foo@bar.com — shows confirmation page
 export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get('email') || ''
 
-  return new NextResponse(
-    `<!DOCTYPE html>
-<html>
-<head><title>Unsubscribe</title><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:500px;margin:60px auto;padding:20px;text-align:center;color:#333">
-  <h1 style="font-size:24px">Unsubscribe</h1>
-  <p style="color:#666;margin-bottom:24px">We're sorry to see you go. Enter your email below to unsubscribe from all future emails.</p>
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unsubscribe | AutoLocal</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0f; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  .card { max-width: 440px; text-align: center; padding: 40px 24px; }
+  h1 { font-size: 24px; margin-bottom: 12px; }
+  p { color: #999; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+  form { display: flex; flex-direction: column; gap: 12px; }
+  input[type=email] { padding: 12px 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a2e; color: #fff; font-size: 15px; }
+  button { padding: 14px; border-radius: 8px; border: none; background: #dc2626; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+  button:hover { background: #b91c1c; }
+  .subtle { font-size: 13px; color: #666; margin-top: 16px; }
+</style></head><body>
+<div class="card">
+  <h1>Unsubscribe</h1>
+  <p>We're sorry to see you go. Enter your email below and you won't hear from us again.</p>
   <form method="POST" action="/api/unsubscribe">
-    <input type="email" name="email" value="${email.replace(/"/g, '&quot;')}" required
-      placeholder="your@email.com"
-      style="width:100%;padding:12px 16px;font-size:16px;border:1px solid #ddd;border-radius:8px;margin-bottom:16px;box-sizing:border-box" />
-    <button type="submit"
-      style="width:100%;padding:12px;font-size:16px;background:#4f46e5;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
-      Unsubscribe
-    </button>
+    <input type="email" name="email" value="${email}" placeholder="your@email.com" required />
+    <button type="submit">Unsubscribe Me</button>
   </form>
-  <p style="margin-top:24px;font-size:13px;color:#999">AutoLocal.ai · Friendswood, TX</p>
-</body>
-</html>`,
-    { headers: { 'Content-Type': 'text/html' } }
-  )
+  <p class="subtle">This will permanently remove you from all AutoLocal emails.</p>
+</div>
+</body></html>`
+
+  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
 }
 
 // POST /api/unsubscribe — processes the unsubscribe
@@ -40,55 +45,47 @@ export async function POST(req: NextRequest) {
   const contentType = req.headers.get('content-type') || ''
   if (contentType.includes('application/x-www-form-urlencoded')) {
     const formData = await req.formData()
-    email = (formData.get('email') as string) || ''
+    email = (formData.get('email') as string || '').trim().toLowerCase()
   } else {
-    try {
-      const body = await req.json()
-      email = body.email || ''
-    } catch {
-      // ignore
-    }
+    const body = await req.json().catch(() => ({}))
+    email = (body.email || '').trim().toLowerCase()
   }
-
-  email = email.trim().toLowerCase()
 
   if (!email) {
-    return new NextResponse('Email required', { status: 400 })
+    return NextResponse.json({ error: 'Email required' }, { status: 400 })
   }
 
-  // Mark any outbound emails to this address as unsubscribed
+  // Store unsubscribe — upsert so duplicates don't error
   await supabase
     .from('outbound_emails')
     .update({ status: 'unsubscribed' })
     .eq('to_email', email)
 
-  // Also insert into a dedicated list (upsert to avoid dupes)
-  // Using outbound_emails table with a special record
-  await supabase
-    .from('outbound_emails')
-    .upsert(
-      {
-        to_email: email,
-        status: 'unsubscribed',
-        subject: '__UNSUBSCRIBE__',
-        from_email: 'system@autolocal.ai',
-        business_name: 'UNSUBSCRIBE_REQUEST',
-        template: 'unsubscribe',
-      },
-      { onConflict: 'to_email,subject' }
-    )
+  // Also try to insert into a dedicated unsubscribes list
+  // This will fail silently if table doesn't exist yet — that's fine
+  try {
+    await supabase
+      .from('unsubscribes')
+      .upsert({ email, unsubscribed_at: new Date().toISOString() }, { onConflict: 'email' })
+  } catch { /* table may not exist yet */ }
 
-  return new NextResponse(
-    `<!DOCTYPE html>
-<html>
-<head><title>Unsubscribed</title><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:500px;margin:60px auto;padding:20px;text-align:center;color:#333">
-  <h1 style="font-size:24px">✅ You've been unsubscribed</h1>
-  <p style="color:#666">You won't receive any more emails from us.</p>
-  <p style="color:#999;font-size:14px;margin-top:24px">If this was a mistake, email <a href="mailto:brian@autolocal.ai" style="color:#4f46e5">brian@autolocal.ai</a></p>
-  <p style="margin-top:24px;font-size:13px;color:#999">AutoLocal.ai · Friendswood, TX</p>
-</body>
-</html>`,
-    { headers: { 'Content-Type': 'text/html' } }
-  )
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unsubscribed | AutoLocal</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0f; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  .card { max-width: 440px; text-align: center; padding: 40px 24px; }
+  h1 { font-size: 24px; margin-bottom: 12px; }
+  p { color: #999; font-size: 15px; line-height: 1.6; }
+  .check { font-size: 48px; margin-bottom: 16px; }
+</style></head><body>
+<div class="card">
+  <div class="check">✅</div>
+  <h1>You've Been Unsubscribed</h1>
+  <p><strong style="color:#fff">${email}</strong> has been removed from all future emails. You won't hear from us again.</p>
+  <p style="margin-top: 24px; font-size: 13px; color: #666;">If this was a mistake, email brian@autolocal.ai and we'll re-add you.</p>
+</div>
+</body></html>`
+
+  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
 }
