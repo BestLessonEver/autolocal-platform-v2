@@ -217,14 +217,14 @@ export default function ElegantTemplate({ data }: TemplateProps) {
                 {ctaText}
               </a>
             </div>
-            {Object.keys(data.hours).length > 0 && (
+            {Object.keys(data.hours || {}).length > 0 && (
               <div>
                 <h3 className="font-bold text-xl mb-8" style={{ color: primary }}>Hours</h3>
                 <div className="space-y-3">
-                  {daysOrder.map(day => data.hours[day] ? (
+                  {daysOrder.map(day => data.hours?.[day] ? (
                     <div key={day} className="flex justify-between py-3 border-b border-stone-200">
                       <span className="font-medium font-sans text-sm">{dayLabels[day]}</span>
-                      <span className="text-stone-500 font-sans text-sm">{data.hours[day]}</span>
+                      <span className="text-stone-500 font-sans text-sm">{data.hours?.[day]}</span>
                     </div>
                   ) : null)}
                 </div>

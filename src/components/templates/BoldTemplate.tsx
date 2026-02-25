@@ -243,14 +243,14 @@ export default function BoldTemplate({ data }: TemplateProps) {
               )}
             </div>
 
-            {Object.keys(data.hours).length > 0 && (
+            {Object.keys(data.hours || {}).length > 0 && (
               <div>
                 <h3 className="text-xl font-bold mb-6">Business Hours</h3>
                 <div className="space-y-3">
-                  {daysOrder.map(day => data.hours[day] ? (
+                  {daysOrder.map(day => data.hours?.[day] ? (
                     <div key={day} className="flex justify-between py-3 border-b border-gray-100">
                       <span className="font-semibold">{dayLabels[day]}</span>
-                      <span className="text-gray-600">{data.hours[day]}</span>
+                      <span className="text-gray-600">{data.hours?.[day]}</span>
                     </div>
                   ) : null)}
                 </div>
