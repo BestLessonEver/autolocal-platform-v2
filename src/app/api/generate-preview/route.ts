@@ -158,16 +158,27 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert to Supabase
+    console.log('[generate-preview] Inserting slug:', fullSlug, 'name:', name)
     const { error: insertError } = await supabase
       .from('website_previews')
       .insert(payload)
 
-    if (insertError?.code === '23505') {
-      // Duplicate slug — update instead
-      await supabase
-        .from('website_previews')
-        .update(payload)
-        .eq('slug', fullSlug)
+    if (insertError) {
+      console.log('[generate-preview] Insert error:', insertError.code, insertError.message)
+      if (insertError.code === '23505') {
+        // Duplicate slug — update instead
+        const { error: updateError } = await supabase
+          .from('website_previews')
+          .update(payload)
+          .eq('slug', fullSlug)
+        if (updateError) {
+          console.error('[generate-preview] Update error:', updateError)
+          return NextResponse.json({ error: 'Failed to save preview. Please try again.' }, { status: 500 })
+        }
+      } else {
+        console.error('[generate-preview] Insert failed:', insertError)
+        return NextResponse.json({ error: `Failed to create preview: ${insertError.message}` }, { status: 500 })
+      }
     }
 
     // Save lead if email provided
@@ -184,6 +195,7 @@ export async function POST(req: NextRequest) {
         .then(() => {})
     }
 
+    console.log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
     return NextResponse.json({
       success: true,
       previewUrl: `/preview/${fullSlug}`,
