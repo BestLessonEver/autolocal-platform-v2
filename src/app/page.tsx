@@ -1,411 +1,280 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Zap, CheckCircle2 } from 'lucide-react'
 
-const AUDIT_AREAS = [
-  { emoji: '🌐', title: 'Website Analysis', desc: 'Load speed, mobile experience, SSL, SEO basics, broken pages. We find every issue costing you customers.' },
-  { emoji: '⭐', title: 'Google Reviews', desc: 'Review count, rating, response rate vs. your competitors. We show you exactly how many customers you\'re losing.' },
-  { emoji: '📱', title: 'Social Media', desc: 'Posting frequency, engagement, platform presence. We identify what\'s dead and what\'s working.' },
-  { emoji: '🏆', title: 'Competitor Intel', desc: 'We scan your top 5 local competitors and show you where they\'re beating you — and where you can win.' },
-]
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 const STEPS = [
-  { num: '01', title: 'Tell us your business name', desc: 'That\'s it. We handle the rest.' },
-  { num: '02', title: 'We scan everything', desc: 'Website, Google, social media, competitors within 5 miles. Takes 24 hours.' },
-  { num: '03', title: 'Get your report card', desc: 'A brutally specific audit with your score, competitor comparison, and revenue impact estimate.' },
-  { num: '04', title: 'We fix it — by tomorrow', desc: 'Pick a package. We handle everything — website rebuilds, review management, social media, SEO. Flat rate, no contracts. Most fixes delivered in 24 hours.' },
+  'Finding your business on Google...',
+  'Pulling your reviews and photos...',
+  'Designing your custom layout...',
+  'Adding your hours and contact info...',
+  'Polishing the final design...',
 ]
 
-const PACKAGES = [
-  {
-    name: 'Social Media Revive',
-    price: 499,
-    tagline: 'We take over your social media for 30 days',
-    features: ['AI-generated posts', '5x/week posting', 'Platform optimization', 'Hashtag strategy', 'Engagement monitoring'],
-  },
-  {
-    name: 'Full Digital Cleanup',
-    price: 999,
-    tagline: 'Social media + reviews + website fixes',
-    popular: true,
-    features: ['Everything in Social Revive', 'Google review response strategy', 'Website speed optimization', 'Mobile fixes & SEO basics', 'Local listing cleanup'],
-  },
-  {
-    name: 'Growth Engine',
-    price: 1999,
-    tagline: 'The full transformation',
-    features: ['Everything in Digital Cleanup', 'Competitor monitoring', 'Monthly reporting', 'Content calendar', 'Ongoing optimization', 'Converts to $199/mo after first month'],
-  },
-  {
-    name: 'New Website + SEO',
-    price: 3499,
-    tagline: 'Modern website built to convert',
-    features: ['Custom designed, mobile-first', 'SEO-optimized & fast-loading', 'Google Business integration', 'Contact forms', 'Booking integration'],
-  },
-]
+export default function HomePage() {
+  const router = useRouter()
+  const [businessName, setBusinessName] = useState('')
+  const [city, setCity] = useState('')
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
+  const [error, setError] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
 
-const REPORT_FINDINGS = [
-  '❌ Website loads in 6.2s (should be under 3s)',
-  '❌ No Google review responses in 90+ days',
-  '❌ Last social media post was 47 days ago',
-  '⚠️ 2 competitors rank higher for your top keyword',
-]
+  useEffect(() => {
+    if (!loading) return
+    const interval = setInterval(() => {
+      setLoadingStep(s => (s < STEPS.length - 1 ? s + 1 : s))
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [loading])
 
-const CITIES = ['Houston', 'Friendswood', 'Clear Lake', 'Savannah', 'Chattanooga', 'Tulsa', 'League City', 'Pearland', 'Webster', 'Austin', 'San Antonio', 'Nashville']
-
-export default function Home() {
-  const [form, setForm] = useState({ businessName: '', website: '', cityState: '', email: '' })
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitting(true)
+    if (!businessName.trim()) return
+    setLoading(true)
+    setError('')
+    setLoadingStep(0)
+
     try {
-      const [city, state] = form.cityState.split(',').map(s => s.trim())
-      let website = form.website.trim()
-      if (website && !website.startsWith('http://') && !website.startsWith('https://')) {
-        website = 'https://' + website
-      }
-      const res = await fetch('/api/audit-request', {
+      const res = await fetch('/api/generate-preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName: form.businessName, website, city, state: state || '', email: form.email }),
+        body: JSON.stringify({
+          businessName: businessName.trim(),
+          city: city.trim() || undefined,
+          email: email.trim() || undefined,
+        }),
       })
-      if (res.ok) setSubmitted(true)
-    } finally {
-      setSubmitting(false)
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Try again.')
+        setLoading(false)
+        return
+      }
+
+      // Small delay so the last step feels complete
+      await new Promise(r => setTimeout(r, 1500))
+      router.push(data.previewUrl)
+    } catch {
+      setError('Connection error. Please try again.')
+      setLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-navy-950">
-      {/* Nav */}
-      <nav className="relative z-50 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold gradient-text">
-            <Image src="/logo.png" alt="AutoLocal.ai" width={36} height={36} className="rounded-lg" />
-            AutoLocal.ai
-          </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <a href="#how-it-works" className="text-slate-400 hover:text-white transition text-sm">How It Works</a>
-            <a href="#services" className="text-slate-400 hover:text-white transition text-sm">Services</a>
-            <a href="#pricing" className="text-slate-400 hover:text-white transition text-sm">Pricing</a>
+  // Loading state — full screen
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="mb-8">
+            <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto" />
           </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="#audit-form" className="btn-gradient px-5 py-2.5 rounded-lg text-sm font-semibold text-white">Get Your Free Audit</a>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="relative hero-gradient overflow-hidden">
-        <div className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-cyan-500/10 blur-3xl orb" />
-        <div className="absolute top-40 right-[15%] w-96 h-96 rounded-full bg-indigo-500/8 blur-3xl orb" style={{ animationDelay: '-7s' }} />
-        <div className="absolute bottom-10 left-[40%] w-64 h-64 rounded-full bg-purple-500/8 blur-3xl orb" style={{ animationDelay: '-14s' }} />
-
-        <div className="relative z-10 text-center pt-20 pb-32 px-6 max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-8 text-sm text-cyan-300">
-            <Zap className="w-4 h-4" /> AI-Powered Marketing Intelligence
-          </div>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.1] mb-6">
-            <span className="text-white">We </span>
-            <span className="gradient-text">find what&apos;s broken</span>
-            <br />
-            <span className="text-white">in your marketing — and fix it.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-            Free audit of your website, Google reviews, social media, and competitors. Specific numbers. Actionable fixes. No fluff.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-            <a href="#audit-form" className="btn-gradient px-8 py-4 rounded-xl text-lg font-semibold text-white">
-              Get Your Free Audit →
-            </a>
-            <Link href="/audit/demo" className="border border-slate-600 hover:border-cyan-500/50 px-8 py-4 rounded-xl text-lg font-semibold text-slate-300 hover:text-white transition">
-              See a sample report →
-            </Link>
-          </div>
-          <p className="text-slate-500 text-sm">✓ Free · ✓ No credit card · ✓ Results in 24 hours</p>
-        </div>
-      </section>
-
-      <div className="section-divider" />
-
-      {/* What We Audit */}
-      <section id="services" className="py-24 px-6 max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">What We Audit</h2>
-          <p className="text-slate-400 text-lg">A complete scan of your digital presence — no stone unturned</p>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-6">
-          {AUDIT_AREAS.map((a, i) => (
-            <div key={i} className="gradient-card glass-hover rounded-2xl p-7 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className="text-4xl mb-4">{a.emoji}</div>
-              <h3 className="text-lg font-bold text-white mb-2">{a.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{a.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="section-divider" />
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
-          <p className="text-slate-400 text-lg">From audit to action in four simple steps</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          <div className="hidden lg:block absolute top-16 left-[15%] right-[15%] h-px bg-gradient-to-r from-cyan-500/30 via-indigo-500/30 to-purple-500/30" />
-          {STEPS.map((s, i) => (
-            <div key={i} className="glass glass-hover rounded-2xl p-8 text-center relative animate-fade-in-up" style={{ animationDelay: `${i * 0.15}s` }}>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm mx-auto mb-6 glow-cyan relative z-10">
-                {s.num}
-              </div>
-              <h3 className="text-lg font-bold text-white mb-3">{s.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="section-divider" />
-
-      {/* Report Preview */}
-      <section className="py-24 px-6 max-w-4xl mx-auto">
-        <div className="text-center mb-12 animate-fade-in-up">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">See What You&apos;ll Get</h2>
-          <p className="text-slate-400 text-lg">A brutally honest look at your marketing — with real numbers</p>
-        </div>
-        <div className="glass rounded-2xl p-8 animate-fade-in-up">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-3 h-3 rounded-full bg-red-400/60" />
-            <div className="w-3 h-3 rounded-full bg-amber-400/60" />
-            <div className="w-3 h-3 rounded-full bg-green-400/60" />
-            <span className="text-xs text-slate-500 ml-2">autolocal.ai/audit/sample</span>
-          </div>
-
-          <div className="text-center mb-8">
-            <div className="text-sm text-slate-400 mb-1">Overall Score</div>
-            <div className="text-5xl font-bold text-amber-400">34<span className="text-2xl text-slate-500">/100</span></div>
-          </div>
-
-          <div className="space-y-4 mb-8">
-            {[
-              { label: 'Website', score: 45, color: 'bg-amber-400' },
-              { label: 'Google Reviews', score: 28, color: 'bg-red-400' },
-              { label: 'Social Media', score: 15, color: 'bg-red-400' },
-              { label: 'vs. Competitors', score: 52, color: 'bg-amber-400' },
-            ].map(c => (
-              <div key={c.label}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-slate-300">{c.label}</span>
-                  <span className="text-slate-400">{c.score}/100</span>
-                </div>
-                <div className="h-2 bg-navy-900/50 rounded-full overflow-hidden">
-                  <div className={`h-full ${c.color} rounded-full`} style={{ width: `${c.score}%` }} />
-                </div>
+          <h2 className="text-2xl font-black text-white mb-6">Building Your Website</h2>
+          <div className="space-y-3">
+            {STEPS.map((step, i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-3 transition-all duration-500 ${
+                  i < loadingStep ? 'opacity-40' : i === loadingStep ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {i < loadingStep ? (
+                  <span className="text-green-400 text-lg">✓</span>
+                ) : i === loadingStep ? (
+                  <span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <span className="w-4 h-4" />
+                )}
+                <span className={`text-sm ${i <= loadingStep ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {step}
+                </span>
               </div>
             ))}
           </div>
+          <p className="text-gray-600 text-xs mt-8">This usually takes about 15 seconds</p>
+        </div>
+      </div>
+    )
+  }
 
-          <div className="glass rounded-xl p-4 mb-6">
-            <p className="text-lg font-semibold text-amber-400 text-center mb-4">
-              You&apos;re losing an estimated $2,400/month in potential revenue
+  return (
+    <div className="min-h-screen bg-[#09090b] text-white">
+      {/* Hero */}
+      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-20 relative overflow-hidden">
+        {/* Subtle gradient bg */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/5 via-transparent to-purple-600/5" />
+        
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-xs text-gray-400 font-medium">Free • No credit card • Ready in 15 seconds</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.1] mb-6">
+            See Your Business on a{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+              Beautiful Website
+            </span>
+            <br />
+            Right Now
+          </h1>
+
+          <p className="text-lg sm:text-xl text-gray-400 max-w-xl mx-auto mb-12 leading-relaxed">
+            Enter your business name. We&apos;ll build you a custom website preview in 15 seconds — 
+            with your real Google reviews, photos, and hours.
+          </p>
+
+          {/* The Form */}
+          <form ref={formRef} onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
+            <div>
+              <input
+                type="text"
+                value={businessName}
+                onChange={e => setBusinessName(e.target.value)}
+                placeholder="Your business name"
+                required
+                autoFocus
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white text-lg placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                value={city}
+                onChange={e => setCity(e.target.value)}
+                placeholder="City (optional)"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition"
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Email (optional)"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-sm text-center">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Build My Website — Free Preview ✨
+            </button>
+
+            <p className="text-gray-600 text-xs text-center">
+              No credit card. No commitment. Just see what your business looks like.
             </p>
-            <ul className="space-y-2">
-              {REPORT_FINDINGS.map((f, i) => (
-                <li key={i} className="text-sm text-slate-300">{f}</li>
-              ))}
-            </ul>
+          </form>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 px-4 border-t border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-black text-center mb-16">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { num: '1', title: 'Enter Your Business Name', desc: 'That\'s literally it. We find everything else from Google.' },
+              { num: '2', title: 'See Your Custom Website', desc: 'In 15 seconds, your business is live on a professional site with your real reviews, photos, and hours.' },
+              { num: '3', title: 'Love It? It\'s Yours for $499', desc: 'Unlimited revisions until it\'s perfect. Don\'t love it? Don\'t pay. Simple.' },
+            ].map((step, i) => (
+              <div key={i} className="text-center">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center text-xl font-black mx-auto mb-4">
+                  {step.num}
+                </div>
+                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="text-center mt-8">
-          <p className="text-slate-400 mb-4">This is a real audit. Yours will be even more specific.</p>
-          <a href="#audit-form" className="btn-gradient px-8 py-4 rounded-xl text-lg font-semibold text-white inline-block">
-            Get Your Free Audit →
-          </a>
-        </div>
       </section>
 
-      <div className="section-divider" />
-
-      {/* Pricing */}
-      <section id="pricing" className="py-24 px-6 max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Fix-It Packages</h2>
-          <p className="text-slate-400 text-lg">Flat rate. No contracts. We handle everything.</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PACKAGES.map((pkg) => (
-            <div key={pkg.name} className={`gradient-card rounded-2xl p-7 transition-all duration-300 flex flex-col ${pkg.popular ? 'scale-105 glow-cyan ring-1 ring-cyan-500/30' : ''}`}>
-              {pkg.popular && <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-wider">⭐ Most Popular</div>}
-              <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
-              <div className="mt-3 mb-4">
-                <span className="text-4xl font-bold text-white">${pkg.price.toLocaleString()}</span>
+      {/* What You Get */}
+      <section className="py-20 px-4 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-black mb-4">What You Get for $499</h2>
+          <p className="text-gray-500 mb-12">What agencies charge $5,000+ for. Delivered in 24 hours.</p>
+          <div className="grid sm:grid-cols-2 gap-4 text-left">
+            {[
+              'Custom design built for YOUR brand',
+              '3 styles to choose from',
+              'Your real Google reviews displayed',
+              'Mobile-fast and SEO optimized',
+              'Click-to-call and contact forms',
+              'Unlimited revisions until perfect',
+              '1 year hosting + SSL included',
+              'Money-back guarantee',
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-4 py-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-gray-300 text-sm">{item}</span>
               </div>
-              <p className="text-slate-400 text-sm mb-6">{pkg.tagline}</p>
-              <ul className="space-y-2 flex-1">
-                {pkg.features.map((f, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <a href="#audit-form" className={`block text-center py-3 rounded-xl font-semibold transition mt-8 ${pkg.popular ? 'btn-gradient text-white' : 'border border-slate-600 text-slate-300 hover:border-cyan-500/50 hover:text-white'}`}>
-                Get Your Free Audit
-              </a>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        <p className="text-center text-cyan-400 font-semibold mt-8">Traditional agencies quote 2-4 weeks. We deliver in 24 hours.</p>
-        <p className="text-center text-slate-500 mt-2">Not sure what you need? Get your free audit first — we&apos;ll recommend the right package.</p>
       </section>
-
-      <div className="section-divider" />
 
       {/* Social Proof */}
-      <section className="py-16 px-6 max-w-4xl mx-auto text-center">
-        <p className="text-slate-400 text-lg mb-6">Trusted by local businesses across 25+ cities</p>
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-          {CITIES.map(c => (
-            <span key={c} className="text-slate-600 text-sm">{c}</span>
-          ))}
+      <section className="py-20 px-4 border-t border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-black text-center mb-12">Built for Local Businesses</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { quote: 'I was paying $150/month for a website that looked like it was built in 2015. This replaced it in a day.', name: 'Sarah M.', biz: 'Salon Owner' },
+              { quote: 'Three design options, picked my favorite, two revisions and it was perfect. My patients actually comment on it.', name: 'Dr. Kevin R.', biz: 'Dental Practice' },
+              { quote: 'I was skeptical about the 24-hour thing. They sent me the preview the next morning. Wife made me upgrade on the spot.', name: 'Marcus T.', biz: 'Home Contractor' },
+            ].map((t, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex gap-0.5 mb-3">
+                  {[1,2,3,4,5].map(s => (
+                    <svg key={s} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-4">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-white font-bold text-sm">{t.name}</p>
+                <p className="text-gray-600 text-xs">{t.biz}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-
-      <div className="section-divider" />
-
-      {/* Audit Form */}
-      <section id="audit-form" className="py-24 px-6 max-w-2xl mx-auto">
-        <div className="glass rounded-2xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-white text-center mb-2">Get Your Free Marketing Audit</h2>
-          <p className="text-slate-400 text-center mb-8">We&apos;ll email your full report within 24 hours</p>
-
-          {submitted ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">🎉</div>
-              <h3 className="text-xl font-bold text-white mb-2">We&apos;re on it!</h3>
-              <p className="text-slate-400">Check your inbox within 24 hours for your full marketing audit.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Business name *"
-                  required
-                  value={form.businessName}
-                  onChange={e => setForm(f => ({ ...f, businessName: e.target.value }))}
-                  className="w-full bg-navy-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Website URL (optional)"
-                  value={form.website}
-                  onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                  className="w-full bg-navy-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="City, State *"
-                  required
-                  value={form.cityState}
-                  onChange={e => setForm(f => ({ ...f, cityState: e.target.value }))}
-                  className="w-full bg-navy-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
-                />
-              </div>
-              <div>
-                <input
-                  type="email"
-                  placeholder="Your email *"
-                  required
-                  value={form.email}
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full bg-navy-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full btn-gradient py-4 rounded-xl text-lg font-semibold text-white disabled:opacity-50"
-              >
-                {submitting ? 'Submitting...' : 'Run My Free Audit →'}
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
-
-      <div className="section-divider" />
 
       {/* Final CTA */}
-      <section className="py-24 px-6 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 max-w-3xl mx-auto">
-          Every day without a marketing audit is a day you&apos;re losing customers to competitors who showed up.
-        </h2>
-        <a href="#audit-form" className="btn-gradient px-8 py-4 rounded-xl text-lg font-semibold text-white inline-block mt-6">
-          Get Your Free Audit →
-        </a>
+      <section className="py-20 px-4 border-t border-white/5">
+        <div className="max-w-xl mx-auto text-center">
+          <h2 className="text-3xl font-black mb-4">Ready to See Your New Website?</h2>
+          <p className="text-gray-500 mb-8">Takes 15 seconds. Completely free.</p>
+          <button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+              setTimeout(() => {
+                const input = document.querySelector('input[type="text"]') as HTMLInputElement
+                input?.focus()
+              }, 500)
+            }}
+            className="px-10 py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Build My Website — Free ✨
+          </button>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/50 py-16 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 text-lg font-bold gradient-text">
-              <Image src="/logo.png" alt="AutoLocal.ai" width={28} height={28} className="rounded-md" />
-              AutoLocal.ai
-            </Link>
-            <p className="text-sm text-slate-500 mt-3">AI-powered marketing audits and done-for-you fixes for local businesses.</p>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Services</h4>
-            <ul className="space-y-2 text-sm text-slate-500">
-              <li><a href="#services" className="hover:text-slate-300 transition">Website Audit</a></li>
-              <li><a href="#services" className="hover:text-slate-300 transition">Review Management</a></li>
-              <li><a href="#services" className="hover:text-slate-300 transition">Social Media</a></li>
-              <li><a href="#services" className="hover:text-slate-300 transition">SEO</a></li>
-              <li><a href="#pricing" className="hover:text-slate-300 transition">New Websites</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Company</h4>
-            <ul className="space-y-2 text-sm text-slate-500">
-              <li><Link href="/about" className="hover:text-slate-300 transition">About</Link></li>
-              <li><Link href="/blog" className="hover:text-slate-300 transition">Blog</Link></li>
-              <li><Link href="/contact" className="hover:text-slate-300 transition">Contact</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Service Areas</h4>
-            <ul className="space-y-2 text-sm text-slate-500">
-              <li><Link href="/houston-tx" className="hover:text-slate-300 transition">Houston TX</Link></li>
-              <li><Link href="/friendswood-tx" className="hover:text-slate-300 transition">Friendswood TX</Link></li>
-              <li><Link href="/clear-lake-tx" className="hover:text-slate-300 transition">Clear Lake TX</Link></li>
-              <li><Link href="/savannah-ga" className="hover:text-slate-300 transition">Savannah GA</Link></li>
-              <li><Link href="/chattanooga-tn" className="hover:text-slate-300 transition">Chattanooga TN</Link></li>
-              <li><Link href="/houston-tx" className="text-cyan-400 hover:text-cyan-300 transition">All Areas →</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Legal</h4>
-            <ul className="space-y-2 text-sm text-slate-500">
-              <li><a href="#" className="hover:text-slate-300 transition">Privacy</a></li>
-              <li><a href="#" className="hover:text-slate-300 transition">Terms</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-slate-800/50 text-center text-sm text-slate-600">
-          © 2026 AutoLocal.ai — All rights reserved
-        </div>
+      <footer className="py-8 px-4 border-t border-white/5 text-center">
+        <p className="text-gray-600 text-sm">
+          © {new Date().getFullYear()} AutoLocal.ai · brian@autolocal.ai · (281) 393-7551
+        </p>
       </footer>
     </div>
   )
