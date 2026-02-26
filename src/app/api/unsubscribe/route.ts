@@ -6,9 +6,20 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+/** Escape HTML special chars to prevent XSS */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 // GET /api/unsubscribe?email=foo@bar.com — shows confirmation page
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get('email') || ''
+  const rawEmail = req.nextUrl.searchParams.get('email') || ''
+  const email = escapeHtml(rawEmail)
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -61,14 +72,17 @@ export async function POST(req: NextRequest) {
     .update({ status: 'unsubscribed' })
     .eq('to_email', email)
 
-  // Also try to insert into a dedicated unsubscribes list
-  // This will fail silently if table doesn't exist yet — that's fine
+  // Also insert into dedicated unsubscribes list
   try {
     await supabase
       .from('unsubscribes')
       .upsert({ email, unsubscribed_at: new Date().toISOString() }, { onConflict: 'email' })
-  } catch { /* table may not exist yet */ }
+  } catch (err) {
+    // Log but don't block — unsubscribes table may not exist yet
+    console.warn('[unsubscribe] Failed to upsert into unsubscribes table:', err)
+  }
 
+  const safeEmail = escapeHtml(email)
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unsubscribed | AutoLocal</title>
@@ -82,7 +96,7 @@ export async function POST(req: NextRequest) {
 <div class="card">
   <div class="check">✅</div>
   <h1>You've Been Unsubscribed</h1>
-  <p><strong style="color:#fff">${email}</strong> has been removed from all future emails. You won't hear from us again.</p>
+  <p><strong style="color:#fff">${safeEmail}</strong> has been removed from all future emails. You won't hear from us again.</p>
   <p style="margin-top: 24px; font-size: 13px; color: #666;">If this was a mistake, email brian@autolocal.ai and we'll re-add you.</p>
 </div>
 </body></html>`

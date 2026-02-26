@@ -36,6 +36,20 @@ import { selectApproach, type SalesApproach } from './approach-selector'
 import { buildOutboundEmail } from './outbound-templates'
 
 // ============================================================
+// Logger (env-gated — silent in production unless DEBUG=true)
+// ============================================================
+
+const DEBUG = process.env.NODE_ENV !== 'production' || process.env.DEBUG === 'true'
+
+function log(...args: unknown[]): void {
+  if (DEBUG) console.log(...args)
+}
+
+function warn(...args: unknown[]): void {
+  warn(...args)
+}
+
+// ============================================================
 // Config
 // ============================================================
 
@@ -47,13 +61,12 @@ function getResendApiKey(): string {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require('fs')
-    const secrets = JSON.parse(fs.readFileSync(
-      process.env.RESEND_SECRETS_PATH || '/Users/ble/.openclaw/workspace/.secrets/resend.json',
-      'utf-8'
-    ))
+    const secretsPath = process.env.RESEND_SECRETS_PATH
+    if (!secretsPath) throw new Error('No secrets path configured')
+    const secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf-8'))
     return secrets.resend_api_key
   } catch {
-    throw new Error('RESEND_API_KEY not found in env or secrets file')
+    throw new Error('RESEND_API_KEY not found — set env var RESEND_API_KEY or RESEND_SECRETS_PATH')
   }
 }
 
@@ -214,7 +227,7 @@ export async function sendAuditEmail(
     try {
       audit.id = await storeAudit(audit)
     } catch (err) {
-      console.warn('Could not store audit in Supabase:', err)
+      warn('Could not store audit in Supabase:', err)
       audit.id = `local-${Date.now()}`
     }
   }
@@ -224,7 +237,7 @@ export async function sendAuditEmail(
   email.html = email.html.replace(/\/audit\/preview/g, `/audit/${audit.id}`)
 
   if (dryRun) {
-    console.log(`[DRY RUN] Would send to ${recipientEmail}: "${email.subject}"`)
+    log(`[DRY RUN] Would send to ${recipientEmail}: "${email.subject}"`)
     return { success: true, audit, approach }
   }
 
@@ -349,13 +362,13 @@ export async function runOutboundCampaign(
   limit = 10,
   dryRun = false
 ): Promise<CampaignResult> {
-  console.log(`\n🚀 Starting outbound campaign: ${city}, ${state}`)
-  console.log(`   Categories: ${categories?.join(', ') || 'all'}`)
-  console.log(`   Limit: ${limit} | Dry run: ${dryRun}\n`)
+  log(`\n🚀 Starting outbound campaign: ${city}, ${state}`)
+  log(`   Categories: ${categories?.join(', ') || 'all'}`)
+  log(`   Limit: ${limit} | Dry run: ${dryRun}\n`)
 
   // 1. Find prospects
   const prospects = await findProspects({ city, state, categories, limit })
-  console.log(`📋 Found ${prospects.length} prospects`)
+  log(`📋 Found ${prospects.length} prospects`)
 
   const campaignResult: CampaignResult = {
     city,
@@ -370,24 +383,24 @@ export async function runOutboundCampaign(
 
   // 2. For each prospect: audit → approach → email
   for (const prospect of prospects) {
-    console.log(`\n--- ${prospect.businessName} (${prospect.category}) ---`)
+    log(`\n--- ${prospect.businessName} (${prospect.category}) ---`)
 
     // Rate limit check before doing work
     if (!dryRun && !checkRateLimit()) {
-      console.log('⏸️  Rate limit reached. Stopping campaign.')
+      log('⏸️  Rate limit reached. Stopping campaign.')
       break
     }
 
     try {
       // Run audit
-      console.log('  🔍 Running audit...')
+      log('  🔍 Running audit...')
       const audit = await runAudit(prospect)
       campaignResult.auditsRun++
-      console.log(`  📊 Score: ${audit.overallScore}/100`)
+      log(`  📊 Score: ${audit.overallScore}/100`)
 
       // Select approach
       const approach = selectApproach(audit)
-      console.log(`  🎯 Approach: ${approach.type} — "${approach.headline}"`)
+      log(`  🎯 Approach: ${approach.type} — "${approach.headline}"`)
 
       // Generate a fake email for the prospect (in real usage, you'd have real emails)
       const recipientEmail = prospect.phone
@@ -400,25 +413,25 @@ export async function runOutboundCampaign(
 
       if (result.success) {
         campaignResult.emailsSent++
-        console.log(`  ✅ ${dryRun ? '[DRY RUN] ' : ''}Email sent to ${recipientEmail}`)
+        log(`  ✅ ${dryRun ? '[DRY RUN] ' : ''}Email sent to ${recipientEmail}`)
       } else {
         campaignResult.emailsFailed++
-        console.log(`  ❌ Failed: ${result.error}`)
+        log(`  ❌ Failed: ${result.error}`)
       }
 
       // Small delay between sends to be polite
       if (!dryRun) await sleep(2000)
     } catch (err) {
-      console.error(`  ❌ Error processing ${prospect.businessName}:`, err)
+      warn(`  ❌ Error processing ${prospect.businessName}:`, err)
       campaignResult.emailsFailed++
     }
   }
 
-  console.log(`\n📈 Campaign complete:`)
-  console.log(`   Prospects: ${campaignResult.prospectsFound}`)
-  console.log(`   Audits: ${campaignResult.auditsRun}`)
-  console.log(`   Sent: ${campaignResult.emailsSent}`)
-  console.log(`   Failed: ${campaignResult.emailsFailed}\n`)
+  log(`\n📈 Campaign complete:`)
+  log(`   Prospects: ${campaignResult.prospectsFound}`)
+  log(`   Audits: ${campaignResult.auditsRun}`)
+  log(`   Sent: ${campaignResult.emailsSent}`)
+  log(`   Failed: ${campaignResult.emailsFailed}\n`)
 
   return campaignResult
 }
@@ -427,8 +440,27 @@ export async function runOutboundCampaign(
 // Get Recent Outbound Activity
 // ============================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getRecentOutbound(limit = 50): Promise<any[]> {
+export interface OutboundEmailRecord {
+  id: string
+  audit_id: string | null
+  business_name: string
+  recipient_email: string
+  subject: string | null
+  approach_type: string | null
+  status: string
+  sent_at: string | null
+  opened_at: string | null
+  clicked_at: string | null
+  report_viewed_at: string | null
+  converted: boolean
+  follow_up_day: number | null
+  parent_email_id: string | null
+  scheduled_for: string | null
+  error_message: string | null
+  created_at: string
+}
+
+export async function getRecentOutbound(limit = 50): Promise<OutboundEmailRecord[]> {
   const supabase = getSupabase()
   const { data, error } = await supabase
     .from('outbound_emails')
