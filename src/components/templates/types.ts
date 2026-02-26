@@ -31,7 +31,7 @@ export interface TemplateProps {
   data: PreviewData
 }
 
-export type TemplateName = 'bold' | 'elegant' | 'professional'
+export type TemplateName = 'bold' | 'elegant' | 'professional' | 'clutch' | 'artika' | 'bde'
 
 /** Get the correct CTA button text based on URL type */
 export function getCtaButtonText(data: PreviewData): string {
@@ -45,11 +45,13 @@ export function getCtaButtonText(data: PreviewData): string {
 export function categoryToTemplate(category: string): TemplateName {
   switch (category) {
     case 'salon':
-      return 'elegant'
+      return 'artika'
     case 'dental':
     case 'contractor':
-      return 'professional'
+      return 'clutch'
+    case 'fitness':
+      return 'bde'
     default:
-      return 'bold'
+      return 'bde'
   }
 }

@@ -6,24 +6,30 @@ import { type PreviewData, type TemplateName, categoryToTemplate } from '@/compo
 import BoldTemplate from '@/components/templates/BoldTemplate'
 import ElegantTemplate from '@/components/templates/ElegantTemplate'
 import ProfessionalTemplate from '@/components/templates/ProfessionalTemplate'
+import ClutchTemplate from '@/components/templates/ClutchTemplate'
+import ArtikaTemplate from '@/components/templates/ArtikaTemplate'
+import BDETemplate from '@/components/templates/BDETemplate'
 
 const TEMPLATE_MAP: Record<TemplateName, React.ComponentType<{ data: PreviewData }>> = {
   bold: BoldTemplate,
   elegant: ElegantTemplate,
   professional: ProfessionalTemplate,
+  clutch: ClutchTemplate,
+  artika: ArtikaTemplate,
+  bde: BDETemplate,
 }
 
 const TEMPLATE_OPTIONS: { key: TemplateName; label: string; icon: string }[] = [
-  { key: 'bold', label: 'Bold', icon: '⚡' },
-  { key: 'elegant', label: 'Elegant', icon: '✨' },
-  { key: 'professional', label: 'Professional', icon: '🏢' },
+  { key: 'clutch', label: 'Classic', icon: '🔧' },
+  { key: 'artika', label: 'Elegant', icon: '✨' },
+  { key: 'bde', label: 'Bold', icon: '⚡' },
 ]
 
 function resolveTemplate(data: PreviewData): TemplateName {
   const t = data.template?.toLowerCase()
-  if (t === 'bold' || t === 'elegant' || t === 'professional') return t
-  if (t === 'modern_clean' || t === 'modern-clean') return 'bold'
-  if (t === 'salon_spa' || t === 'salon-spa') return 'elegant'
+  if (t && t in TEMPLATE_MAP) return t as TemplateName
+  if (t === 'modern_clean' || t === 'modern-clean') return 'clutch'
+  if (t === 'salon_spa' || t === 'salon-spa') return 'artika'
   return categoryToTemplate(data.category)
 }
 
