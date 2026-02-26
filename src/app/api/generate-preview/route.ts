@@ -15,7 +15,8 @@ const TYPE_MAP: Record<string, string> = {
   gym: 'fitness', fitness_center: 'fitness', yoga_studio: 'fitness',
   plumber: 'contractor', electrician: 'contractor', roofing_contractor: 'contractor',
   general_contractor: 'contractor', painter: 'contractor',
-  store: 'retail', clothing_store: 'retail',
+  store: 'general', clothing_store: 'general',
+  school: 'general', music_school: 'general', university: 'general',
 }
 
 const COLORS: Record<string, [string, string, string]> = {
@@ -24,7 +25,6 @@ const COLORS: Record<string, [string, string, string]> = {
   restaurant: ['#1a1a2e', '#2d1b0e', '#c05621'],
   fitness: ['#1a1a2e', '#1a202c', '#e53e3e'],
   contractor: ['#1a365d', '#2c5282', '#dd6b20'],
-  retail: ['#1a1a2e', '#16213e', '#8b5cf6'],
   general: ['#1a1a2e', '#16213e', '#6366f1'],
 }
 
@@ -34,7 +34,6 @@ const TEMPLATE_MAP: Record<string, string> = {
   contractor: 'clutch',
   fitness: 'bde',
   restaurant: 'bde',
-  retail: 'bde',
   general: 'bde',
 }
 
@@ -107,10 +106,13 @@ export async function POST(req: NextRequest) {
     }).filter(Boolean)
 
     // Detect category
+    const VALID_CATEGORIES = new Set(['salon', 'dental', 'fitness', 'restaurant', 'contractor', 'general'])
     let category = 'general'
     for (const t of types) {
       if (TYPE_MAP[t]) { category = TYPE_MAP[t]; break }
     }
+    // Safety: ensure category passes DB constraint
+    if (!VALID_CATEGORIES.has(category)) category = 'general'
 
     // Generate slug
     const slug = name
