@@ -1,12 +1,54 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+// ============================================================
+// Config — fail fast on missing credentials
+// ============================================================
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!SUPABASE_KEY) {
+  console.warn('[generate-preview] SUPABASE_SERVICE_ROLE_KEY not set — using anon key (may have insufficient permissions)')
+}
+
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  SUPABASE_URL!,
+  SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const GOOGLE_PLACES_KEY = process.env.GOOGLE_PLACES_API_KEY || ''
+const GOOGLE_PLACES_KEY = process.env.GOOGLE_PLACES_API_KEY
+if (!GOOGLE_PLACES_KEY) {
+  console.error('[generate-preview] GOOGLE_PLACES_API_KEY not set — Google Places lookups will fail')
+}
+
+// ============================================================
+// Rate limiter (in-memory, per-IP, resets on restart)
+// ============================================================
+
+const rateLimitMap = new Map<string, number[]>()
+const RATE_LIMIT_MAX = 10 // requests per window
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1 hour
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const timestamps = rateLimitMap.get(ip) || []
+  const recent = timestamps.filter(t => t > now - RATE_LIMIT_WINDOW_MS)
+  rateLimitMap.set(ip, recent)
+  if (recent.length >= RATE_LIMIT_MAX) return true
+  recent.push(now)
+  return false
+}
+
+// ============================================================
+// Input sanitization
+// ============================================================
+
+function sanitizeInput(str: string): string {
+  return str
+    .replace(/[<>"'`;\\]/g, '')
+    .trim()
+    .slice(0, 200)
+}
 
 const TYPE_MAP: Record<string, string> = {
   hair_care: 'salon', beauty_salon: 'salon', barber_shop: 'salon', spa: 'salon',
@@ -37,9 +79,27 @@ const TEMPLATE_MAP: Record<string, string> = {
   general: 'bde',
 }
 
+const DEBUG = process.env.NODE_ENV !== 'production' || process.env.DEBUG === 'true'
+function log(...args: unknown[]) { if (DEBUG) console.log(...args) }
+
 export async function POST(req: NextRequest) {
   try {
-    const { businessName, city, state, email } = await req.json()
+    // Rate limiting
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown'
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
+    }
+
+    // Fail fast if Google Places key is missing
+    if (!GOOGLE_PLACES_KEY) {
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 })
+    }
+
+    const body = await req.json()
+    const businessName = sanitizeInput(body.businessName || '')
+    const city = sanitizeInput(body.city || '')
+    const state = sanitizeInput(body.state || '')
+    const email = sanitizeInput(body.email || '')
 
     if (!businessName) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 })
@@ -209,7 +269,7 @@ export async function POST(req: NextRequest) {
       reviewCount,
     })
   } catch (err) {
-    console.error('Generate preview error:', err)
+    log('Generate preview error:', err)
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }
 }
