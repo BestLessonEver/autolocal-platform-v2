@@ -46,7 +46,7 @@ function log(...args: unknown[]): void {
 }
 
 function warn(...args: unknown[]): void {
-  warn(...args)
+  console.warn(...args)
 }
 
 // ============================================================
