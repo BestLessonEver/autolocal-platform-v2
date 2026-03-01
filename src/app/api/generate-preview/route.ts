@@ -269,7 +269,7 @@ export async function POST(req: NextRequest) {
       reviewCount,
     })
   } catch (err) {
-    log('Generate preview error:', err)
+    console.error('[generate-preview] Error:', err)
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }
 }
