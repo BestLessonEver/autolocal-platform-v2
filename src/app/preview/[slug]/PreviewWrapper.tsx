@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Component, type ErrorInfo, type ReactNode } from 'react'
 import { type PreviewData, type TemplateName, categoryToTemplate } from '@/components/templates/types'
 import BoldTemplate from '@/components/templates/BoldTemplate'
 import ElegantTemplate from '@/components/templates/ElegantTemplate'
@@ -9,6 +9,35 @@ import ProfessionalTemplate from '@/components/templates/ProfessionalTemplate'
 import ClutchTemplate from '@/components/templates/ClutchTemplate'
 import ArtikaTemplate from '@/components/templates/ArtikaTemplate'
 import BDETemplate from '@/components/templates/BDETemplate'
+
+class TemplateErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('[Template Error]', error, info.componentStack)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-8">
+            <p className="text-red-600 font-bold mb-2">Template Error</p>
+            <p className="text-gray-600 text-sm">{this.state.error?.message}</p>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 const TEMPLATE_MAP: Record<TemplateName, React.ComponentType<{ data: PreviewData }>> = {
   bold: BoldTemplate,
@@ -101,7 +130,9 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
       </div>
 
       {/* Template content — no forced top padding, let the site breathe */}
-      <Template data={data} />
+      <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
+        <Template data={data} />
+      </TemplateErrorBoundary>
 
       {/* Powered by AutoLocal */}
       <div className="fixed bottom-4 right-4 z-50">
