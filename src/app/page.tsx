@@ -12,19 +12,9 @@ const STEPS = [
   'Polishing the final design...',
 ]
 
-const INDUSTRIES = [
-  { icon: '💇', label: 'Salons' },
-  { icon: '🦷', label: 'Dental' },
-  { icon: '🍕', label: 'Restaurants' },
-  { icon: '💪', label: 'Fitness' },
-  { icon: '🔧', label: 'Contractors' },
-  { icon: '🛍️', label: 'Retail' },
-  { icon: '🧹', label: 'Cleaning' },
-  { icon: '🐾', label: 'Pet Services' },
-  { icon: '📸', label: 'Photography' },
-  { icon: '🏠', label: 'Real Estate' },
-  { icon: '⚖️', label: 'Law Firms' },
-  { icon: '🚗', label: 'Auto Shops' },
+const BUSINESS_TYPES = [
+  'Salon / Spa', 'Dental / Medical', 'Restaurant / Cafe', 'Fitness / Gym',
+  'Contractor / Home Services', 'Retail / Boutique', 'Auto / Mechanic', 'Other',
 ]
 
 export default function HomePage() {
@@ -35,7 +25,16 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState('')
-  const formRef = useRef<HTMLFormElement>(null)
+
+  // Order form
+  const [orderForm, setOrderForm] = useState({
+    contactName: '',
+    email: '',
+    phone: '',
+    businessType: '',
+    package: 'starter',
+  })
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   useEffect(() => {
     if (!loading) return
@@ -45,7 +44,7 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [loading])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePreview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!businessName.trim()) return
     setLoading(true)
@@ -62,15 +61,12 @@ export default function HomePage() {
           email: email.trim() || undefined,
         }),
       })
-
       const data = await res.json()
-
       if (!res.ok) {
         setError(data.error || 'Something went wrong. Try again.')
         setLoading(false)
         return
       }
-
       await new Promise(r => setTimeout(r, 1500))
       router.push(data.previewUrl)
     } catch {
@@ -79,15 +75,38 @@ export default function HomePage() {
     }
   }
 
-  const scrollToForm = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    setTimeout(() => {
-      const input = document.querySelector('input[type="text"]') as HTMLInputElement
-      input?.focus()
-    }, 500)
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCheckoutLoading(true)
+    try {
+      const product = orderForm.package === 'living' ? 'living' : 'website'
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product,
+          email: orderForm.email || email,
+          businessName: businessName || 'New Client',
+        }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert('Something went wrong. Please try again.')
+        setCheckoutLoading(false)
+      }
+    } catch {
+      alert('Connection error. Please try again.')
+      setCheckoutLoading(false)
+    }
   }
 
-  // Loading state — full screen
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
@@ -98,12 +117,9 @@ export default function HomePage() {
           <h2 className="text-2xl font-black text-white mb-6">Building Your Website</h2>
           <div className="space-y-3">
             {STEPS.map((step, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-3 transition-all duration-500 ${
-                  i < loadingStep ? 'opacity-40' : i === loadingStep ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
+              <div key={i} className={`flex items-center gap-3 transition-all duration-500 ${
+                i < loadingStep ? 'opacity-40' : i === loadingStep ? 'opacity-100' : 'opacity-0'
+              }`}>
                 {i < loadingStep ? (
                   <span className="text-green-400 text-lg">✓</span>
                 ) : i === loadingStep ? (
@@ -111,9 +127,7 @@ export default function HomePage() {
                 ) : (
                   <span className="w-4 h-4" />
                 )}
-                <span className={`text-sm ${i <= loadingStep ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {step}
-                </span>
+                <span className={`text-sm ${i <= loadingStep ? 'text-gray-300' : 'text-gray-600'}`}>{step}</span>
               </div>
             ))}
           </div>
@@ -125,36 +139,28 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
-      {/* ── Hero ── */}
+
+      {/* ══════════════════════════════════════════════
+          HERO — $99 is the headline
+      ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
-        {/* Animated gradient orbs */}
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
-          {/* Price badge */}
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full px-5 py-2 mb-8">
-            <span className="text-green-400 font-black text-lg">$99</span>
-            <span className="text-gray-400 text-sm">Custom website · Delivered in 24 hours</span>
-          </div>
-
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] mb-6 tracking-tight">
-            Your Business Deserves a{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              Website That Wows
-            </span>
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-[0.95] mb-6 tracking-tight">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$99</span>
+            {' '}Custom Website
           </h1>
-
-          <p className="text-xl sm:text-2xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed font-light">
-            Type your business name. See a live custom website — with your real Google reviews, photos, and hours — in 15 seconds.
+          <p className="text-2xl sm:text-3xl text-gray-300 font-light mb-2">
+            Designed for your business. Delivered in 24 hours.
+          </p>
+          <p className="text-lg text-gray-500 mb-10">
+            See a live preview with your real Google reviews, photos &amp; hours — in 15 seconds. Free.
           </p>
 
-          <p className="text-base text-gray-500 mb-10">
-            No credit card. No commitment. Just see it.
-          </p>
-
-          {/* The Form */}
-          <form ref={formRef} onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-3">
+          {/* Preview Generator */}
+          <form onSubmit={handlePreview} className="max-w-xl mx-auto space-y-3">
             <div className="relative">
               <input
                 type="text"
@@ -173,21 +179,17 @@ export default function HomePage() {
                 value={city}
                 onChange={e => setCity(e.target.value)}
                 placeholder="City (optional)"
-                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
               />
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="Email (optional)"
-                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition"
+                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
               />
             </div>
-
-            {error && (
-              <p className="text-red-400 text-sm text-center">{error}</p>
-            )}
-
+            {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button
               type="submit"
               className="w-full py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group"
@@ -198,143 +200,104 @@ export default function HomePage() {
           </form>
 
           {/* Trust row */}
-          <div className="flex flex-wrap justify-center gap-6 mt-10 text-sm text-gray-500">
-            <span className="flex items-center gap-1.5">🛡️ Money-back guarantee</span>
-            <span className="flex items-center gap-1.5">⚡ Ready in 15 seconds</span>
-            <span className="flex items-center gap-1.5">🌟 Powered by Google</span>
+          <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-gray-500">
+            <span>🛡️ Money-back guarantee</span>
+            <span>⚡ Ready in 15 seconds</span>
+            <span>🌟 Powered by Google</span>
+            <span>🔒 Secure checkout via Stripe</span>
           </div>
         </div>
       </section>
 
-      {/* ── Works for every industry ── */}
-      <section className="py-6 px-4 border-t border-white/5 bg-white/[0.02]">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-            {INDUSTRIES.map((ind, i) => (
-              <span key={i} className="flex items-center gap-1.5 text-gray-500 text-sm">
-                <span>{ind.icon}</span>
-                <span>{ind.label}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Price Comparison ── */}
+      {/* ══════════════════════════════════════════════
+          PRICE COMPARISON
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">
-            Stop Overpaying for a Website
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">Stop Overpaying for a Website</h2>
           <p className="text-gray-500 text-center mb-12 max-w-xl mx-auto">
-            Local agencies charge thousands. DIY builders charge monthly and you still do all the work. We deliver a custom site for $99.
+            Agencies charge thousands. DIY builders charge monthly and you do all the work. We build it for you.
           </p>
-
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Agency */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center opacity-60">
               <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Local Agency</p>
               <p className="text-4xl font-black text-white mb-2">$3,000<span className="text-lg text-gray-500">+</span></p>
               <p className="text-xs text-gray-600 mb-6">2-8 weeks delivery</p>
               <ul className="text-left space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><span>✓</span> Custom design</li>
-                <li className="flex items-center gap-2"><span>✓</span> Professional quality</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> Weeks of back-and-forth</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> Extra for revisions</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> Extra for hosting</li>
+                <li className="flex items-center gap-2">✓ Custom design</li>
+                <li className="flex items-center gap-2">✓ Professional quality</li>
+                <li className="flex items-center gap-2 text-red-400/60">✗ Weeks of waiting</li>
+                <li className="flex items-center gap-2 text-red-400/60">✗ Extra for revisions</li>
               </ul>
             </div>
-
-            {/* DIY */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center opacity-60">
               <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Wix / Squarespace</p>
               <p className="text-4xl font-black text-white mb-2">$200<span className="text-lg text-gray-500">/yr</span></p>
               <p className="text-xs text-gray-600 mb-6">You build it yourself</p>
               <ul className="text-left space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2"><span>✓</span> Hosting included</li>
-                <li className="flex items-center gap-2"><span>✓</span> Templates available</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> You do all the work</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> Generic templates</li>
-                <li className="flex items-center gap-2 text-red-400/60"><span>✗</span> No real customization</li>
+                <li className="flex items-center gap-2">✓ Hosting included</li>
+                <li className="flex items-center gap-2">✓ Templates</li>
+                <li className="flex items-center gap-2 text-red-400/60">✗ You do all the work</li>
+                <li className="flex items-center gap-2 text-red-400/60">✗ Generic looking</li>
               </ul>
             </div>
-
-            {/* AutoLocal */}
             <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-6 text-center relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-                BEST VALUE
-              </div>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">BEST VALUE</div>
               <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">AutoLocal</p>
               <p className="text-4xl font-black text-white mb-2">$99</p>
               <p className="text-xs text-gray-400 mb-6">Delivered in 24 hours</p>
               <ul className="text-left space-y-2 text-sm text-gray-300">
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Custom design — not a template</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Custom design for YOUR brand</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> See it before you pay</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Unlimited revisions</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 3 revision rounds</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Hosting from $9/mo</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Money-back guarantee</li>
               </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── How It Works ── */}
+      {/* ══════════════════════════════════════════════
+          HOW IT WORKS
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-16">Three Steps. That&apos;s It.</h2>
           <div className="grid md:grid-cols-3 gap-12">
             {[
-              {
-                num: '1',
-                title: 'Type Your Business Name',
-                desc: 'We find your business on Google and pull your reviews, photos, hours, and contact info automatically.',
-                highlight: '15 seconds',
-              },
-              {
-                num: '2',
-                title: 'Preview Your Custom Website',
-                desc: 'See your business on a professional, mobile-fast website. Switch between 4 unique designs. Share it with anyone.',
-                highlight: 'Instant preview',
-              },
-              {
-                num: '3',
-                title: 'Love It? It\'s Yours for $99',
-                desc: 'We connect your domain, go live, and you\'re done. 3 revision rounds to get it exactly right. Don\'t love it? Don\'t pay.',
-                highlight: 'Risk-free',
-              },
+              { num: '1', title: 'Type Your Business Name', desc: 'We pull your reviews, photos, hours, and contact info from Google automatically.', tag: '15 seconds' },
+              { num: '2', title: 'Preview Your Custom Site', desc: 'See your business on a professional website. Switch between 4 unique designs.', tag: 'Instant preview' },
+              { num: '3', title: 'Love It? Pay $99.', desc: 'We connect your domain, go live, and handle everything. 3 revision rounds to nail it.', tag: 'Risk-free' },
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg shadow-indigo-500/20">
-                  {step.num}
-                </div>
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg shadow-indigo-500/20">{step.num}</div>
                 <h3 className="text-xl font-bold mb-3">{step.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-3">{step.desc}</p>
-                <span className="inline-block bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-indigo-400 font-medium">
-                  {step.highlight}
-                </span>
+                <span className="inline-block bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-indigo-400 font-medium">{step.tag}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── What You Get ── */}
+      {/* ══════════════════════════════════════════════
+          WHAT YOU GET
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">Everything Included for $99</h2>
-          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">What agencies charge $5,000+ for. Delivered in 24 hours, not 6 weeks.</p>
+          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">What agencies charge $5,000+ for. Delivered in 24 hours.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { icon: '🎨', title: 'Custom Design', desc: 'Built around YOUR brand — your colors, photos, and style' },
               { icon: '📱', title: 'Mobile-Perfect', desc: 'Looks incredible on every phone, tablet, and desktop' },
-              { icon: '⭐', title: 'Google Reviews', desc: 'Your best reviews displayed automatically — real social proof' },
+              { icon: '⭐', title: 'Google Reviews', desc: 'Your best reviews displayed automatically' },
               { icon: '📞', title: 'Click-to-Call', desc: 'One tap to call or book. On every page.' },
-              { icon: '🔍', title: 'SEO Built In', desc: 'Meta tags, schema markup, and speed optimization included' },
-              { icon: '✏️', title: 'Unlimited Revisions', desc: 'We keep refining until you\'re 100% happy' },
+              { icon: '🔍', title: 'SEO Built In', desc: 'Meta tags, schema markup, and speed optimization' },
+              { icon: '✏️', title: '3 Revision Rounds', desc: 'We refine until you love it. 2 free changes/mo after launch.' },
               { icon: '🎯', title: '4 Design Options', desc: 'Bold, Elegant, Pro, or Dark — pick your favorite' },
-              { icon: '🔒', title: 'SSL & Security', desc: 'Secure HTTPS included. Your visitors are protected.' },
-              { icon: '🛡️', title: 'Money-Back Guarantee', desc: 'Don\'t love it after revisions? Full refund. Period.' },
+              { icon: '🔒', title: 'SSL & Security', desc: 'Secure HTTPS included. Visitors are protected.' },
+              { icon: '🛡️', title: 'Money-Back Guarantee', desc: 'Not happy after revisions? Full refund. Period.' },
             ].map((item, i) => (
               <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/20 transition">
                 <span className="text-2xl mb-3 block">{item.icon}</span>
@@ -343,41 +306,76 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Pricing summary */}
-          <div className="mt-12 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-500/20 rounded-2xl p-8 text-center max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Custom Website</p>
-                <p className="text-4xl font-black text-white">$99</p>
-                <p className="text-gray-500 text-xs">one-time</p>
+      {/* ══════════════════════════════════════════════
+          PRICING
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 px-4 border-t border-white/5" id="pricing">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">Simple Pricing</h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Starter */}
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8">
+              <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Custom Website</p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-5xl font-black text-white">$99</span>
+                <span className="text-gray-500">one-time</span>
               </div>
-              <div className="text-3xl text-gray-600">+</div>
-              <div>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Hosting</p>
-                <p className="text-4xl font-black text-white">$9<span className="text-lg text-gray-500">/mo</span></p>
-                <p className="text-gray-500 text-xs">cancel anytime</p>
-              </div>
+              <p className="text-sm text-gray-500 mb-6">+ $9/mo hosting · Cancel anytime</p>
+              <ul className="space-y-3 mb-8">
+                {['Custom design for your brand', '4 design styles to choose from', 'Your real Google reviews & photos', '3 revision rounds', '2 free changes per month', 'SEO, SSL, mobile-optimized', 'Domain connection help (free)', 'Money-back guarantee'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                    <span className="text-green-400">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => scrollTo('order')}
+                className="w-full py-4 rounded-xl bg-white/10 border border-white/10 text-white font-bold hover:bg-white/20 transition"
+              >
+                Get Started — $99
+              </button>
             </div>
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <p className="text-gray-400 text-sm">
-                Want your site to get <strong className="text-white">smarter every month</strong>? 
-                Upgrade to the Living Website for <strong className="text-white">$49/mo</strong> — 
-                A/B testing, SEO updates, and content refreshes. Hosting included.
-              </p>
+
+            {/* Living Website */}
+            <div className="bg-gradient-to-b from-amber-500/5 to-orange-500/5 border-2 border-amber-500/30 rounded-2xl p-8 relative">
+              <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
+              <p className="text-sm text-amber-400 uppercase tracking-wide mb-2">Living Website 🚀</p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-5xl font-black text-white">$99</span>
+                <span className="text-gray-500">+ $49/mo</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Hosting included · Cancel anytime</p>
+              <ul className="space-y-3 mb-8">
+                {['Everything in Custom Website', 'Unlimited changes included', 'Urgent requests — no rush fee', 'Monthly SEO updates', 'A/B testing (headlines, images)', 'Speed & performance monitoring', 'Priority support (24hr)', 'Hosting included in price'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                    <span className="text-amber-400">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => { setOrderForm(f => ({ ...f, package: 'living' })); scrollTo('order') }}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:brightness-110 transition"
+              >
+                Get Started — $99 + $49/mo
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Social Proof ── */}
+      {/* ══════════════════════════════════════════════
+          SOCIAL PROOF
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">What Business Owners Say</h2>
+          <h2 className="text-3xl font-black text-center mb-12">What Business Owners Say</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { quote: 'I was paying $150/month for a website that looked like 2015. AutoLocal replaced it in a day and it actually brings in calls now.', name: 'Sarah M.', biz: 'Salon Owner, Pearland TX' },
-              { quote: 'Three design options, picked my favorite, two small revisions and it was perfect. My patients actually comment on how nice the site looks.', name: 'Dr. Kevin R.', biz: 'Dental Practice, League City TX' },
+              { quote: 'I was paying $150/month for a site that looked like 2015. AutoLocal replaced it in a day and it actually brings in calls now.', name: 'Sarah M.', biz: 'Salon Owner, Pearland TX' },
+              { quote: 'Three design options, picked my favorite, two revisions and it was perfect. My patients comment on how nice the site looks.', name: 'Dr. Kevin R.', biz: 'Dental Practice, League City TX' },
               { quote: 'Skeptical about 24 hours. They sent me the preview the next morning. My wife made me upgrade to the Living Website on the spot.', name: 'Marcus T.', biz: 'Home Contractor, Friendswood TX' },
             ].map((t, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -397,76 +395,198 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Guarantee ── */}
+      {/* ══════════════════════════════════════════════
+          GUARANTEE
+      ══════════════════════════════════════════════ */}
       <section className="py-16 px-4 border-t border-white/5">
         <div className="max-w-2xl mx-auto text-center">
           <span className="text-5xl mb-6 block">🛡️</span>
           <h2 className="text-3xl font-black mb-4">Love It or Don&apos;t Pay</h2>
           <p className="text-gray-400 leading-relaxed">
             You get 3 rounds of revisions to get your website exactly right. 
-            If after your revisions you&apos;re still not 100% satisfied, we refund every penny. 
-            No questions asked. We can offer this because we haven&apos;t had to issue a refund yet.
+            If you&apos;re still not 100% satisfied, we refund every penny. No questions asked.
           </p>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
+      {/* ══════════════════════════════════════════════
+          ORDER FORM
+      ══════════════════════════════════════════════ */}
+      <section className="py-20 px-4 border-t border-white/5 bg-white/[0.02]" id="order">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl font-black text-center mb-2">Get Your $99 Custom Website</h2>
+          <p className="text-gray-400 text-center mb-10">Pay securely via Stripe. Preview in your inbox within 24 hours.</p>
+          
+          <form onSubmit={handleCheckout} className="space-y-6">
+            {/* Business type */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-3">What type of business? *</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {BUSINESS_TYPES.map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setOrderForm(f => ({ ...f, businessType: type }))}
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      orderForm.businessType === type
+                        ? 'bg-indigo-600 text-white border border-indigo-500'
+                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Business Name *</label>
+                <input
+                  required
+                  type="text"
+                  value={businessName}
+                  onChange={e => setBusinessName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+                  placeholder="Joe's Barbershop"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Your Name *</label>
+                <input
+                  required
+                  type="text"
+                  value={orderForm.contactName}
+                  onChange={e => setOrderForm(f => ({ ...f, contactName: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+                  placeholder="Joe Smith"
+                />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Email *</label>
+                <input
+                  required
+                  type="email"
+                  value={orderForm.email || email}
+                  onChange={e => setOrderForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+                  placeholder="joe@email.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  value={orderForm.phone}
+                  onChange={e => setOrderForm(f => ({ ...f, phone: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+            </div>
+
+            {/* Package selector */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-4">Choose Your Package</label>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setOrderForm(f => ({ ...f, package: 'starter' }))}
+                  className={`p-5 rounded-xl border-2 text-left transition-all ${
+                    orderForm.package === 'starter' ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 hover:border-white/30'
+                  }`}
+                >
+                  <p className="font-bold text-white text-lg mb-1">Custom Website</p>
+                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$99</p>
+                  <p className="text-sm text-gray-400">One-time. Hosting $9/mo.</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderForm(f => ({ ...f, package: 'living' }))}
+                  className={`p-5 rounded-xl border-2 text-left transition-all relative ${
+                    orderForm.package === 'living' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 hover:border-white/30'
+                  }`}
+                >
+                  <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
+                  <p className="font-bold text-white text-lg mb-1">Living Website 🚀</p>
+                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$99 + $49/mo</p>
+                  <p className="text-sm text-gray-400">Unlimited changes. Hosting included.</p>
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={checkoutLoading}
+              className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
+            >
+              {checkoutLoading ? 'Redirecting to checkout...' : orderForm.package === 'living' ? 'Get My Website — $99 + $49/mo' : 'Get My Website — $99'}
+            </button>
+
+            <div className="text-center space-y-1">
+              <p className="text-gray-500 text-sm">🛡️ Love it or get a full refund. 3 revision rounds to get it right.</p>
+              <p className="text-gray-600 text-xs">🔒 Secure payment powered by Stripe</p>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          FAQ
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-12">Questions? We&apos;ve Got Answers.</h2>
+          <h2 className="text-3xl font-black text-center mb-12">Questions? Answers.</h2>
           <div className="space-y-4">
             {[
               { q: 'How is this only $99?', a: 'We use AI-powered design tools that let us work 10x faster than a traditional agency. Same quality, fraction of the time and cost.' },
-              { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google automatically — reviews, photos, hours, contact info. You can customize anything after.' },
-              { q: 'Can I see it before I pay?', a: 'Yes! That\'s the whole point. You get a live preview of your custom website before spending a dime.' },
-              { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any website builder. We handle everything: SSL, speed, uptime. Cancel anytime. We also help you connect your domain for free.' },
-              { q: 'What if I want changes?', a: '3 rounds of revisions during the build process — colors, layout, photos, text, anything. After launch, you get 2 free changes per month. Need more? $19 each, or upgrade to Living Website ($49/mo) for unlimited changes.' },
-              { q: 'I already have a website. Can you replace it?', a: 'Absolutely. We build the new site separately, and once you approve it, we help point your domain to it. Zero downtime.' },
-              { q: 'What if I don\'t have a domain?', a: 'No problem. We recommend Namecheap (~$9/year) or we can register one for you. We have a step-by-step guide at autolocal.ai/setup.' },
+              { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google — reviews, photos, hours, contact info.' },
+              { q: 'Can I see it before I pay?', a: 'Yes! Enter your business name above and see a live custom preview in 15 seconds. Totally free.' },
+              { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any builder. SSL, speed, uptime all included. Cancel anytime. We help connect your domain for free.' },
+              { q: 'What if I want changes?', a: '3 revision rounds during the build. After launch, 2 free changes per month. Need more? $19 each, or upgrade to Living Website ($49/mo) for unlimited.' },
+              { q: 'I already have a website.', a: 'We build the new site separately. Once you approve it, we help point your domain to it. Zero downtime.' },
+              { q: 'What if I don\'t have a domain?', a: 'We recommend Namecheap (~$9/year). We have a step-by-step guide at autolocal.ai/setup, or we\'ll do it for you free.' },
             ].map((item, i) => (
               <details key={i} className="group bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
                 <summary className="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition">
                   <span className="font-bold text-white text-sm pr-4">{item.q}</span>
                   <span className="text-gray-500 group-open:rotate-45 transition-transform text-xl shrink-0">+</span>
                 </summary>
-                <div className="px-5 pb-5 text-gray-400 text-sm leading-relaxed">
-                  {item.a}
-                </div>
+                <div className="px-5 pb-5 text-gray-400 text-sm leading-relaxed">{item.a}</div>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
+      {/* ══════════════════════════════════════════════
+          FINAL CTA
+      ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/5 to-transparent" />
         <div className="relative z-10 max-w-xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">
-            Your $99 Website Is Waiting
-          </h2>
-          <p className="text-gray-400 mb-8 text-lg">
-            15 seconds to see it. 24 hours to own it. Zero risk.
-          </p>
+          <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-4">$99</p>
+          <h2 className="text-3xl font-black mb-4">Your Custom Website Is Waiting</h2>
+          <p className="text-gray-400 mb-8 text-lg">15 seconds to see it. 24 hours to own it. Zero risk.</p>
           <button
-            onClick={scrollToForm}
+            onClick={() => scrollTo('order')}
             className="px-12 py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            Build My Website — Free Preview ✨
+            Get My Website — $99
           </button>
         </div>
       </section>
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <footer className="py-8 px-4 border-t border-white/5 text-center">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-600 text-sm">
-            © {new Date().getFullYear()} AutoLocal.ai
-          </p>
+          <p className="text-gray-600 text-sm">© {new Date().getFullYear()} AutoLocal.ai</p>
           <div className="flex items-center gap-6 text-sm text-gray-600">
-            <a href="mailto:brian@autolocal.ai" className="hover:text-gray-400 transition">brian@autolocal.ai</a>
-            <a href="/setup" className="hover:text-gray-400 transition">Domain Setup Guide</a>
-            <a href="/offer" className="hover:text-gray-400 transition">Pricing</a>
+            <a href="mailto:support@autolocal.ai" className="hover:text-gray-400 transition">support@autolocal.ai</a>
+            <a href="/setup" className="hover:text-gray-400 transition">Domain Setup</a>
           </div>
         </div>
       </footer>
