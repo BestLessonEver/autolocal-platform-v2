@@ -24,6 +24,10 @@ interface SiteData {
   preview_url: string
   view_count: number
   created_at: string
+  plan: 'starter' | 'living'
+  changes_this_month: number
+  free_changes_remaining: number
+  unlimited_changes: boolean
 }
 
 const CHANGE_TYPES = [
@@ -168,6 +172,39 @@ export default function ClientDashboard() {
               </div>
             </div>
 
+            {/* Plan + Changes Bar */}
+            <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
+              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                data.plan === 'living'
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20'
+                  : 'bg-white/10 text-gray-400 border border-white/10'
+              }`}>
+                {data.plan === 'living' ? '🚀 Living Website' : '📄 Starter Plan'}
+              </span>
+              <span className="text-gray-600">·</span>
+              {data.unlimited_changes ? (
+                <span className="text-sm text-gray-400">
+                  <span className="text-green-400 font-semibold">Unlimited</span> changes included
+                </span>
+              ) : (
+                <span className="text-sm text-gray-400">
+                  <span className={`font-semibold ${data.free_changes_remaining > 0 ? 'text-white' : 'text-red-400'}`}>
+                    {data.free_changes_remaining}
+                  </span>
+                  {' '}free change{data.free_changes_remaining !== 1 ? 's' : ''} remaining this month
+                  <span className="text-gray-600"> · {data.changes_this_month} used</span>
+                </span>
+              )}
+              {data.plan !== 'living' && (
+                <a
+                  href="/offer?upgrade=living"
+                  className="ml-auto text-xs font-bold text-amber-400 hover:text-amber-300 transition"
+                >
+                  Upgrade to Unlimited →
+                </a>
+              )}
+            </div>
+
             {/* Quick Info Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white/[0.03] rounded-xl p-4">
@@ -268,11 +305,52 @@ export default function ClientDashboard() {
           </div>
         </div>
 
+        {/* Out of free changes — upgrade prompt */}
+        {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white mb-1">You&apos;ve used your 2 free changes this month</h3>
+                <p className="text-gray-400 text-sm">
+                  Additional changes are <strong className="text-white">$19 each</strong>, or upgrade to the 
+                  Living Website for <strong className="text-white">$49/mo</strong> and get <strong className="text-white">unlimited changes</strong> — 
+                  plus A/B testing, SEO updates, and priority support.
+                </p>
+              </div>
+              <div className="flex gap-3 shrink-0">
+                <a
+                  href="/offer?upgrade=living"
+                  className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition"
+                >
+                  Upgrade — $49/mo
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Request Changes Form */}
         <div id="changes" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-          <h2 className="text-lg font-bold mb-2">Request Changes</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-bold">Request Changes</h2>
+            {!data.unlimited_changes && (
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                data.free_changes_remaining > 0
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-red-500/20 text-red-400'
+              }`}>
+                {data.free_changes_remaining > 0
+                  ? `${data.free_changes_remaining} free left`
+                  : '$19 per change'}
+              </span>
+            )}
+          </div>
           <p className="text-gray-500 text-sm mb-6">
-            Need something updated on your site? Tell us what you&apos;d like changed and we&apos;ll handle it — usually within 24 hours.
+            {data.unlimited_changes
+              ? 'Unlimited changes included with your Living Website plan. We\'ll handle it within 24 hours.'
+              : data.free_changes_remaining > 0
+                ? `You have ${data.free_changes_remaining} free change${data.free_changes_remaining !== 1 ? 's' : ''} remaining this month. Tell us what you'd like updated.`
+                : 'You\'ve used your free changes this month. Additional changes are $19 each, or upgrade to unlimited for $49/mo.'}
           </p>
 
           {submitted ? (
@@ -359,8 +437,19 @@ export default function ClientDashboard() {
                 disabled={submitting || !changeMessage.trim()}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-xl hover:shadow-indigo-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Submitting...' : 'Submit Change Request'}
+                {submitting
+                  ? 'Submitting...'
+                  : data.unlimited_changes
+                    ? 'Submit Change Request'
+                    : data.free_changes_remaining > 0
+                      ? `Submit Change Request (${data.free_changes_remaining} free left)`
+                      : 'Submit Change Request — $19'}
               </button>
+              {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
+                <p className="text-center text-xs text-gray-500 mt-2">
+                  This change will be billed at $19. <a href="/offer?upgrade=living" className="text-amber-400 hover:underline">Upgrade to unlimited for $49/mo →</a>
+                </p>
+              )}
             </form>
           )}
         </div>

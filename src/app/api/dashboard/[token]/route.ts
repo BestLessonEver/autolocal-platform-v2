@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -35,7 +36,27 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Don't expose full ID or sensitive fields
+  // Count changes this month
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  let changesThisMonth = 0
+
+  const { data: changes, error: changesError } = await supabase
+    .from('change_requests')
+    .select('id', { count: 'exact' })
+    .eq('preview_slug', slug)
+    .gte('created_at', monthStart)
+
+  if (!changesError && changes) {
+    changesThisMonth = changes.length
+  }
+
+  // Determine plan — for now default to 'starter', upgrade to 'living' stored in preview metadata
+  // TODO: Link to Stripe subscription status
+  const plan = (data as any).plan || 'starter'
+  const FREE_CHANGES_PER_MONTH = plan === 'living' ? 999 : 2
+  const freeChangesRemaining = Math.max(0, FREE_CHANGES_PER_MONTH - changesThisMonth)
+
   return NextResponse.json({
     business_name: data.business_name,
     slug: data.slug,
@@ -56,5 +77,9 @@ export async function GET(
     preview_url: `https://autolocal.ai/preview/${data.slug}`,
     view_count: data.view_count,
     created_at: data.created_at,
+    plan,
+    changes_this_month: changesThisMonth,
+    free_changes_remaining: freeChangesRemaining,
+    unlimited_changes: plan === 'living',
   })
 }
