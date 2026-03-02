@@ -80,6 +80,7 @@ const TEMPLATE_MAP: Record<string, string> = {
 }
 
 const DEBUG = process.env.NODE_ENV !== 'production' || process.env.DEBUG === 'true'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function log(...args: unknown[]) { if (DEBUG) console.log(...args) }
 
 export async function POST(req: NextRequest) {
