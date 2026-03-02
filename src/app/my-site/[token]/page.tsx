@@ -650,28 +650,39 @@ export default function ClientDashboard() {
               {/* Priority */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">Priority</label>
-                <div className="flex gap-2">
-                  {[
-                    { value: 'low', label: 'Low', desc: 'Whenever you get to it' },
-                    { value: 'normal', label: 'Normal', desc: 'Within 24 hours' },
-                    { value: 'urgent', label: 'Urgent', desc: 'ASAP please!' },
-                  ].map(p => (
-                    <button
-                      key={p.value}
-                      type="button"
-                      onClick={() => setChangePriority(p.value)}
-                      className={`flex-1 p-3 rounded-xl border text-sm text-center transition ${
-                        changePriority === p.value
-                          ? p.value === 'urgent'
-                            ? 'bg-red-600/20 border-red-500/40 text-red-400'
-                            : 'bg-indigo-600/20 border-indigo-500/40 text-white'
-                          : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
-                      }`}
-                    >
-                      <p className="font-semibold">{p.label}</p>
-                      <p className="text-xs mt-0.5 opacity-60">{p.desc}</p>
-                    </button>
-                  ))}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setChangePriority('normal')}
+                    className={`flex-1 p-4 rounded-xl border text-sm text-center transition ${
+                      changePriority === 'normal'
+                        ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
+                        : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
+                    }`}
+                  >
+                    <p className="font-semibold">Normal</p>
+                    <p className="text-xs mt-1 opacity-60">Within 24 hours</p>
+                    <p className="text-xs mt-1 text-green-400 font-medium">Included</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChangePriority('urgent')}
+                    className={`flex-1 p-4 rounded-xl border text-sm text-center transition relative ${
+                      changePriority === 'urgent'
+                        ? 'bg-red-600/20 border-red-500/40 text-red-400'
+                        : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
+                    }`}
+                  >
+                    {data.plan !== 'living' && (
+                      <span className="absolute -top-2 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">+$29</span>
+                    )}
+                    <p className="font-semibold">🚨 Urgent</p>
+                    <p className="text-xs mt-1 opacity-60">Within 2 hours</p>
+                    {data.plan === 'living'
+                      ? <p className="text-xs mt-1 text-green-400 font-medium">Included with plan</p>
+                      : <p className="text-xs mt-1 text-red-400 font-medium">$29 rush fee</p>
+                    }
+                  </button>
                 </div>
               </div>
 
@@ -682,11 +693,15 @@ export default function ClientDashboard() {
               >
                 {submitting
                   ? 'Submitting...'
-                  : data.unlimited_changes
-                    ? 'Submit Change Request'
-                    : data.free_changes_remaining > 0
-                      ? `Submit Change Request (${data.free_changes_remaining} free left)`
-                      : 'Submit Change Request — $19'}
+                  : changePriority === 'urgent' && data.plan !== 'living'
+                    ? data.free_changes_remaining > 0
+                      ? 'Submit Urgent Request — $29 rush fee'
+                      : 'Submit Urgent Request — $19 + $29 rush'
+                    : data.unlimited_changes
+                      ? 'Submit Change Request'
+                      : data.free_changes_remaining > 0
+                        ? `Submit Change Request (${data.free_changes_remaining} free left)`
+                        : 'Submit Change Request — $19'}
               </button>
               {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
                 <p className="text-center text-xs text-gray-500 mt-2">
