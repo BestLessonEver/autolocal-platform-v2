@@ -58,7 +58,7 @@ function OfferContent() {
     changes: '',
     package: 'starter',
   })
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted] = useState(false)
   const [spotsLeft] = useState(() => {
     // Consistent per-month: derive from current month so it doesn't change on refresh
     const now = new Date()
@@ -82,9 +82,13 @@ function OfferContent() {
     }))
   }, [searchParams])
 
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setCheckoutLoading(true)
     try {
+      // Also save the audit request for our records
       await fetch('/api/audit-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,10 +99,30 @@ function OfferContent() {
           state: '',
           email: formData.email,
         }),
+      }).catch(() => {}) // Don't block on this
+
+      // Create Stripe checkout
+      const product = formData.package === 'living' ? 'living' : 'website'
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product,
+          email: formData.email,
+          businessName: formData.businessName,
+          slug: '', // Will be linked after payment
+        }),
       })
-      setSubmitted(true)
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert('Something went wrong. Please try again.')
+        setCheckoutLoading(false)
+      }
     } catch {
-      setSubmitted(true)
+      alert('Connection error. Please try again.')
+      setCheckoutLoading(false)
     }
   }
 
@@ -471,13 +495,17 @@ function OfferContent() {
 
             <button
               type="submit"
-              className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              disabled={checkoutLoading}
+              className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Get My Custom Website →
+              {checkoutLoading ? 'Redirecting to checkout...' : 'Get My Custom Website →'}
             </button>
 
             <p className="text-center text-gray-500 text-sm">
               🛡️ Love it or get a full refund. Unlimited revisions until it&apos;s perfect.
+            </p>
+            <p className="text-center text-gray-600 text-xs">
+              🔒 Secure payment powered by Stripe
             </p>
           </form>
         </div>
