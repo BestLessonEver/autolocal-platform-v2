@@ -121,7 +121,7 @@ export function selectApproach(audit: AuditResult): SalesApproach {
         ].slice(0, 4),
         solution: 'We\'ll take over your social media and post 5x/week starting tomorrow. AI-generated content in your brand voice, scheduled across all your platforms.',
         package: 'social_revive',
-        packagePrice: '$499',
+        packagePrice: '$99',
         urgency: `It's been ${lastPost ? Math.round((Date.now() - new Date(lastPost).getTime()) / (1000 * 60 * 60 * 24 * 30)) + ' months' : 'too long'} since your last post. Your audience has forgotten you. Every day of silence is a day your competitors build the relationships you're missing.`,
       }
 

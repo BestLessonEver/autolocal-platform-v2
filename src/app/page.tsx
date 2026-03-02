@@ -184,7 +184,7 @@ export default function HomePage() {
             {[
               { num: '1', title: 'Enter Your Business Name', desc: 'That\'s literally it. We find everything else from Google.' },
               { num: '2', title: 'See Your Custom Website', desc: 'In 15 seconds, your business is live on a professional site with your real reviews, photos, and hours.' },
-              { num: '3', title: 'Love It? It\'s Yours for $499', desc: 'Unlimited revisions until it\'s perfect. Don\'t love it? Don\'t pay. Simple.' },
+              { num: '3', title: 'Love It? It\'s Yours for $99', desc: 'Unlimited revisions until it\'s perfect. Don\'t love it? Don\'t pay. Simple.' },
             ].map((step, i) => (
               <div key={i} className="text-center">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center text-xl font-black mx-auto mb-4">
@@ -201,7 +201,7 @@ export default function HomePage() {
       {/* What You Get */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-black mb-4">What You Get for $499</h2>
+          <h2 className="text-3xl font-black mb-4">What You Get for $99</h2>
           <p className="text-gray-500 mb-12">What agencies charge $5,000+ for. Delivered in 24 hours.</p>
           <div className="grid sm:grid-cols-2 gap-4 text-left">
             {[

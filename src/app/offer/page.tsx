@@ -24,8 +24,8 @@ function PackageSelector({ selected, onChange }: { selected: string; onChange: (
           }`}
         >
           <p className="font-bold text-white text-lg mb-1">Custom Website</p>
-          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$499</p>
-          <p className="text-sm text-gray-400">One-time. Yours forever. 1 year hosting included.</p>
+          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$99</p>
+          <p className="text-sm text-gray-400">One-time. Yours forever. Hosting just $9/mo.</p>
         </button>
         <button
           type="button"
@@ -38,8 +38,8 @@ function PackageSelector({ selected, onChange }: { selected: string; onChange: (
         >
           <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
           <p className="font-bold text-white text-lg mb-1">Living Website 🚀</p>
-          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$499 + $99/mo</p>
-          <p className="text-sm text-gray-400">Gets smarter every month. A/B testing. SEO. Updates.</p>
+          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$99 + $49/mo</p>
+          <p className="text-sm text-gray-400">Gets smarter every month. A/B testing. SEO. Updates. Hosting included.</p>
         </button>
       </div>
     </div>
@@ -150,7 +150,7 @@ function OfferContent() {
             onClick={scrollToOrder}
             className="px-10 py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            Get My Custom Website — $499
+            Get My Custom Website — $99
           </button>
         </div>
       </section>
@@ -194,7 +194,7 @@ function OfferContent() {
               { title: 'Professional Copywriting', desc: 'We write every headline, service description, and call-to-action on your site — optimized to turn visitors into customers.', value: '$600' },
               { title: 'Google Reviews Integration', desc: 'Your best Google reviews displayed automatically. Real social proof that builds trust before they ever call you.', value: '$300' },
               { title: 'Click-to-Call & Contact Forms', desc: 'One tap to call. One tap to book. Every page makes it effortless for customers to reach you.', value: '$250' },
-              { title: 'Hosting & Security (1 Year)', desc: 'Fast hosting, SSL certificate, backups, and maintenance included for a full year. Nothing extra to pay.', value: '$350' },
+              { title: 'Hosting & Security', desc: 'Fast hosting, SSL certificate, and maintenance for just $9/mo. Cancel anytime — the site is yours.', value: '$350' },
               { title: '3 Custom Designs Built For Your Brand', desc: 'Choose between Bold, Elegant, or Professional — see your actual business in all three before you pick.', value: '$400' },
               { title: 'Unlimited Revisions', desc: 'We keep refining until you&apos;re 100% happy. Change the colors, move the sections, swap the photos — no extra charge.', value: 'Included' },
             ].map((item, i) => (
@@ -217,8 +217,8 @@ function OfferContent() {
             <p className="text-gray-500 text-sm mb-1">Typical Agency Cost</p>
             <p className="text-3xl font-black text-white mb-2 line-through opacity-40">$5,150+</p>
             <p className="text-gray-400 text-sm mb-3">Your Price</p>
-            <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$499</p>
-            <p className="text-gray-500 text-sm mb-6">One-time payment. No contracts. No surprises.</p>
+            <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$99</p>
+            <p className="text-gray-500 text-sm mb-6">One-time. Then just $9/mo hosting. No contracts. Cancel anytime.</p>
             <button
               onClick={scrollToOrder}
               className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -257,11 +257,11 @@ function OfferContent() {
               ))}
             </ul>
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-3xl font-black text-white">+$99/mo</span>
-              <span className="text-gray-500">after your site launches</span>
+              <span className="text-3xl font-black text-white">+$49/mo</span>
+              <span className="text-gray-500">after your site launches (hosting included)</span>
             </div>
             <p className="text-gray-600 text-sm">
-              That&apos;s less than one lost customer per month. Cancel anytime — the $499 site is yours either way.
+              That&apos;s less than one lost customer per month. Cancel anytime — the $99 site is yours either way.
             </p>
           </div>
         </div>
@@ -299,8 +299,8 @@ function OfferContent() {
                 a: 'Absolutely. We build your new site separately, and once you approve it, we help you point your existing domain to the new site. Zero downtime. Your old site stays live until the new one is ready.',
               },
               {
-                q: 'What happens after the first year of hosting?',
-                a: 'Hosting renews at $20/month ($240/year). You can also export your site and host it anywhere you want — we don\'t lock you in. The site is yours.',
+                q: 'How does hosting work?',
+                a: 'Hosting is $9/month — cheaper than almost any provider out there. Cancel anytime. We also provide a simple guide to connect your domain, or we\'ll do it for you. The site is yours — you can export and host it anywhere if you ever want to leave.',
               },
               {
                 q: 'What if I need changes after the site launches?',

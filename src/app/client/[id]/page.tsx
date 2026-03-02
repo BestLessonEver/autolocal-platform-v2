@@ -24,7 +24,7 @@ const VOICE_OPTIONS = [
 const PACKAGES: Record<string, { name: string; price: string; features: string[] }> = {
   social_revive: {
     name: 'Social Media Revive',
-    price: '$499',
+    price: '$99',
     features: ['AI-generated posts', '5x/week posting for 30 days', 'Platform optimization', 'Hashtag strategy', 'Engagement monitoring'],
   },
   digital_cleanup: {

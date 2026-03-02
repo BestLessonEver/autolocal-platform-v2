@@ -5,15 +5,15 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Custom Websites for Local Businesses — $499, Delivered in 24 Hours | AutoLocal.ai",
-  description: "Get a professional, mobile-fast website for your local business in 24 hours. Custom design, real Google reviews, SEO built in. $499 one-time — love it or don't pay. Serving Friendswood, League City, Pearland & Houston TX.",
-  keywords: "local business website, small business web design, website for local business, web design Friendswood TX, cheap website for small business, $499 website, custom website design, local business marketing",
+  title: "Custom Websites for Local Businesses — $99, Delivered in 24 Hours | AutoLocal.ai",
+  description: "Get a professional, mobile-fast website for your local business in 24 hours. Custom design, real Google reviews, SEO built in. $99 one-time — love it or don't pay. Serving Friendswood, League City, Pearland & Houston TX.",
+  keywords: "local business website, small business web design, website for local business, web design Friendswood TX, cheap website for small business, $99 website, custom website design, local business marketing",
   metadataBase: new URL("https://autolocal.ai"),
   alternates: {
     canonical: "https://autolocal.ai",
   },
   openGraph: {
-    title: "Custom Websites for Local Businesses — $499 | AutoLocal.ai",
+    title: "Custom Websites for Local Businesses — $99 | AutoLocal.ai",
     description: "Professional website for your business in 24 hours. Custom design with your real Google reviews. Love it or don't pay.",
     url: "https://autolocal.ai",
     siteName: "AutoLocal.ai",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Custom Websites for Local Businesses — $499 | AutoLocal.ai",
+    title: "Custom Websites for Local Businesses — $99 | AutoLocal.ai",
     description: "Professional website for your business in 24 hours. Custom design with your real Google reviews. Love it or don't pay.",
   },
   robots: {
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "ProfessionalService",
               name: "AutoLocal.ai",
-              description: "Custom websites for local businesses — designed, built, and delivered in 24 hours for $499.",
+              description: "Custom websites for local businesses — designed, built, and delivered in 24 hours for $99.",
               url: "https://autolocal.ai",
               telephone: "+12813937551",
               email: "brian@autolocal.ai",
@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 { "@type": "City", name: "Clear Lake" },
                 { "@type": "City", name: "Houston" },
               ],
-              priceRange: "$499",
+              priceRange: "$99",
               serviceType: ["Web Design", "Website Development", "Local Business Marketing", "SEO"],
               offers: {
                 "@type": "Offer",
