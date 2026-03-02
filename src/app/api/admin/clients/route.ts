@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -6,8 +6,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export async function GET() {
-  // TODO: Add auth check here before production
+const ADMIN_KEY = process.env.ADMIN_API_KEY
+
+function isAuthorized(req: NextRequest): boolean {
+  if (!ADMIN_KEY) return false
+  const header = req.headers.get('x-admin-key')
+  return header === ADMIN_KEY
+}
+
+export async function GET(req: NextRequest) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const { data, error } = await supabase
     .from('clients')
     .select('*')

@@ -70,10 +70,20 @@ export default function AdminClientsPage() {
   async function loadData() {
     setLoading(true)
     try {
+      const adminKey = sessionStorage.getItem('adminKey') || prompt('Admin API Key:')
+      if (!adminKey) { setLoading(false); return }
+      sessionStorage.setItem('adminKey', adminKey)
+      const headers = { 'x-admin-key': adminKey }
       const [clientsRes, previewsRes] = await Promise.all([
-        fetch('/api/admin/clients'),
-        fetch('/api/admin/previews'),
+        fetch('/api/admin/clients', { headers }),
+        fetch('/api/admin/previews', { headers }),
       ])
+      if (clientsRes.status === 401 || previewsRes.status === 401) {
+        sessionStorage.removeItem('adminKey')
+        alert('Invalid admin key')
+        setLoading(false)
+        return
+      }
       if (clientsRes.ok) setClients(await clientsRes.json())
       if (previewsRes.ok) setPreviews(await previewsRes.json())
     } catch (e) {
