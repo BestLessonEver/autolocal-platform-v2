@@ -81,5 +81,9 @@ export async function GET(
     changes_this_month: changesThisMonth,
     free_changes_remaining: freeChangesRemaining,
     unlimited_changes: plan === 'living',
+    logo_url: data.logo_url,
+    brand_color_primary: data.brand_color_primary || '#1a1a2e',
+    brand_color_secondary: data.brand_color_secondary || '#16213e',
+    brand_color_accent: data.brand_color_accent || '#6366f1',
   })
 }

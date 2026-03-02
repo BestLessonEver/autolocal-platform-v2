@@ -28,6 +28,10 @@ interface SiteData {
   changes_this_month: number
   free_changes_remaining: number
   unlimited_changes: boolean
+  logo_url: string | null
+  brand_color_primary: string
+  brand_color_secondary: string
+  brand_color_accent: string
 }
 
 const CHANGE_TYPES = [
@@ -38,6 +42,242 @@ const CHANGE_TYPES = [
   { value: 'hours', label: '🕐 Hours / Contact', desc: 'Update business hours, phone, or address' },
   { value: 'other', label: '💬 Other', desc: 'Anything else — just describe what you need' },
 ]
+
+const COLOR_PALETTES = [
+  { name: 'Ocean', primary: '#0f172a', secondary: '#1e293b', accent: '#3b82f6' },
+  { name: 'Forest', primary: '#14532d', secondary: '#166534', accent: '#22c55e' },
+  { name: 'Sunset', primary: '#7c2d12', secondary: '#9a3412', accent: '#f97316' },
+  { name: 'Royal', primary: '#1e1b4b', secondary: '#312e81', accent: '#8b5cf6' },
+  { name: 'Rose', primary: '#4c0519', secondary: '#881337', accent: '#f43f5e' },
+  { name: 'Slate', primary: '#1e293b', secondary: '#334155', accent: '#94a3b8' },
+  { name: 'Gold', primary: '#1a1a2e', secondary: '#16213e', accent: '#c8a97e' },
+  { name: 'Teal', primary: '#134e4a', secondary: '#115e59', accent: '#14b8a6' },
+  { name: 'Cherry', primary: '#1c1917', secondary: '#292524', accent: '#dc2626' },
+  { name: 'Midnight', primary: '#09090b', secondary: '#18181b', accent: '#6366f1' },
+]
+
+function BrandCustomizer({ token, data, onUpdate }: { token: string; data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [colorSaving, setColorSaving] = useState(false)
+  const [colorSaved, setColorSaved] = useState(false)
+  const [primary, setPrimary] = useState(data.brand_color_primary)
+  const [secondary, setSecondary] = useState(data.brand_color_secondary)
+  const [accent, setAccent] = useState(data.brand_color_accent)
+  const [expanded, setExpanded] = useState(false)
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploading(true)
+
+    const formData = new FormData()
+    formData.append('logo', file)
+
+    try {
+      const res = await fetch(`/api/dashboard/${token}/brand`, {
+        method: 'POST',
+        body: formData,
+      })
+      const result = await res.json()
+      if (res.ok && result.logo_url) {
+        onUpdate({ ...data, logo_url: result.logo_url })
+      } else {
+        alert(result.error || 'Upload failed')
+      }
+    } catch {
+      alert('Upload failed. Please try again.')
+    }
+    setLogoUploading(false)
+  }
+
+  const handleColorSave = async () => {
+    setColorSaving(true)
+    try {
+      const res = await fetch(`/api/dashboard/${token}/brand`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand_color_primary: primary,
+          brand_color_secondary: secondary,
+          brand_color_accent: accent,
+        }),
+      })
+      if (res.ok) {
+        onUpdate({ ...data, brand_color_primary: primary, brand_color_secondary: secondary, brand_color_accent: accent })
+        setColorSaved(true)
+        setTimeout(() => setColorSaved(false), 3000)
+      } else {
+        const result = await res.json()
+        alert(result.error || 'Save failed')
+      }
+    } catch {
+      alert('Save failed. Please try again.')
+    }
+    setColorSaving(false)
+  }
+
+  const applyPalette = (p: typeof COLOR_PALETTES[0]) => {
+    setPrimary(p.primary)
+    setSecondary(p.secondary)
+    setAccent(p.accent)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🎨</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Customize Your Brand</h2>
+            <p className="text-gray-500 text-sm">Upload your logo and choose your colors</p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 space-y-8 border-t border-white/[0.06] pt-6">
+
+          {/* Logo Upload */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 mb-3">Your Logo</h3>
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                {data.logo_url ? (
+                  <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-3xl text-gray-600">📷</span>
+                )}
+              </div>
+              <div>
+                <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer">
+                  {logoUploading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>📤 {data.logo_url ? 'Replace Logo' : 'Upload Logo'}</>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                    disabled={logoUploading}
+                  />
+                </label>
+                <p className="text-xs text-gray-600 mt-2">PNG, JPG, WebP, or SVG. Max 5MB.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Color Palettes */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 mb-3">Color Palette</h3>
+            <p className="text-xs text-gray-500 mb-4">Choose a preset or customize your own colors below.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
+              {COLOR_PALETTES.map(p => (
+                <button
+                  key={p.name}
+                  onClick={() => applyPalette(p)}
+                  className={`flex items-center gap-2 p-2.5 rounded-lg border text-xs font-medium transition ${
+                    primary === p.primary && accent === p.accent
+                      ? 'border-indigo-500/50 bg-indigo-500/10 text-white'
+                      : 'border-white/[0.06] bg-white/[0.02] text-gray-400 hover:border-white/10'
+                  }`}
+                >
+                  <div className="flex gap-0.5 shrink-0">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.primary }} />
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.accent }} />
+                  </div>
+                  {p.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom Color Pickers */}
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-2">Primary</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={primary}
+                    onChange={e => setPrimary(e.target.value)}
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-white/10 bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={primary}
+                    onChange={e => setPrimary(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:border-indigo-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-2">Secondary</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={secondary}
+                    onChange={e => setSecondary(e.target.value)}
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-white/10 bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={secondary}
+                    onChange={e => setSecondary(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:border-indigo-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-2">Accent</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={accent}
+                    onChange={e => setAccent(e.target.value)}
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-white/10 bg-transparent"
+                  />
+                  <input
+                    type="text"
+                    value={accent}
+                    onChange={e => setAccent(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:border-indigo-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Preview strip */}
+            <div className="mt-4 rounded-xl overflow-hidden flex h-12">
+              <div className="flex-[3]" style={{ backgroundColor: primary }} />
+              <div className="flex-[2]" style={{ backgroundColor: secondary }} />
+              <div className="flex-[1]" style={{ backgroundColor: accent }} />
+            </div>
+
+            {/* Save button */}
+            <div className="mt-4 flex items-center gap-3">
+              <button
+                onClick={handleColorSave}
+                disabled={colorSaving || (primary === data.brand_color_primary && secondary === data.brand_color_secondary && accent === data.brand_color_accent)}
+                className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {colorSaving ? 'Saving...' : colorSaved ? '✓ Saved!' : 'Save Colors'}
+              </button>
+              {colorSaved && <span className="text-green-400 text-sm">Colors updated! Refresh your site preview to see changes.</span>}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function ClientDashboard() {
   const params = useParams()
@@ -304,6 +544,9 @@ export default function ClientDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Brand Customization */}
+        <BrandCustomizer token={token} data={data} onUpdate={setData} />
 
         {/* Out of free changes — upgrade prompt */}
         {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
