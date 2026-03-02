@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 name: "Custom Local Business Website",
                 price: "499",
                 priceCurrency: "USD",
-                description: "Custom-designed, mobile-fast website delivered in 24 hours with unlimited revisions and a money-back guarantee.",
+                description: "Custom-designed, mobile-fast website delivered in 24 hours with 3 revision rounds and a money-back guarantee.",
               },
             }),
           }}

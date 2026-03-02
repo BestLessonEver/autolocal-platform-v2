@@ -300,7 +300,7 @@ export default function HomePage() {
               {
                 num: '3',
                 title: 'Love It? It\'s Yours for $99',
-                desc: 'We connect your domain, go live, and you\'re done. Unlimited revisions until it\'s exactly right. Don\'t love it? Don\'t pay.',
+                desc: 'We connect your domain, go live, and you\'re done. 3 revision rounds to get it exactly right. Don\'t love it? Don\'t pay.',
                 highlight: 'Risk-free',
               },
             ].map((step, i) => (
@@ -403,8 +403,8 @@ export default function HomePage() {
           <span className="text-5xl mb-6 block">🛡️</span>
           <h2 className="text-3xl font-black mb-4">Love It or Don&apos;t Pay</h2>
           <p className="text-gray-400 leading-relaxed">
-            We&apos;ll keep revising until your website is exactly what you want. 
-            If after all revisions you&apos;re still not 100% satisfied, we refund every penny. 
+            You get 3 rounds of revisions to get your website exactly right. 
+            If after your revisions you&apos;re still not 100% satisfied, we refund every penny. 
             No questions asked. We can offer this because we haven&apos;t had to issue a refund yet.
           </p>
         </div>
@@ -420,7 +420,7 @@ export default function HomePage() {
               { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google automatically — reviews, photos, hours, contact info. You can customize anything after.' },
               { q: 'Can I see it before I pay?', a: 'Yes! That\'s the whole point. You get a live preview of your custom website before spending a dime.' },
               { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any website builder. We handle everything: SSL, speed, uptime. Cancel anytime. We also help you connect your domain for free.' },
-              { q: 'What if I want changes?', a: 'Unlimited revisions during the build process — colors, layout, photos, text, anything. After launch, Living Website customers ($49/mo) get ongoing changes included.' },
+              { q: 'What if I want changes?', a: '3 rounds of revisions during the build process — colors, layout, photos, text, anything. After launch, you get 2 free changes per month. Need more? $19 each, or upgrade to Living Website ($49/mo) for unlimited changes.' },
               { q: 'I already have a website. Can you replace it?', a: 'Absolutely. We build the new site separately, and once you approve it, we help point your domain to it. Zero downtime.' },
               { q: 'What if I don\'t have a domain?', a: 'No problem. We recommend Namecheap (~$9/year) or we can register one for you. We have a step-by-step guide at autolocal.ai/setup.' },
             ].map((item, i) => (

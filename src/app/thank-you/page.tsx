@@ -40,7 +40,7 @@ function ThankYouContent() {
             </div>
             <div className="flex items-start gap-3">
               <span className="text-gray-600 mt-0.5">○</span>
-              <p className="text-gray-400 text-sm">Request any changes — unlimited revisions until you love it</p>
+              <p className="text-gray-400 text-sm">Request any changes — 3 revision rounds to get it exactly right</p>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-gray-600 mt-0.5">○</span>

@@ -168,7 +168,7 @@ function OfferContent() {
           </p>
           {/* Risk reversal right at the top */}
           <p className="text-base text-gray-300 max-w-xl mx-auto mb-10">
-            🛡️ <strong className="text-white">Love it or don&apos;t pay.</strong> Unlimited revisions until it&apos;s exactly what you want — or get a full refund.
+            🛡️ <strong className="text-white">Love it or don&apos;t pay.</strong> 3 rounds of revisions to get it exactly right — love it or get a full refund.
           </p>
           <button
             onClick={scrollToOrder}
@@ -220,7 +220,7 @@ function OfferContent() {
               { title: 'Click-to-Call & Contact Forms', desc: 'One tap to call. One tap to book. Every page makes it effortless for customers to reach you.', value: '$250' },
               { title: 'Hosting & Security', desc: 'Fast hosting, SSL certificate, and maintenance for just $9/mo. Cancel anytime — the site is yours.', value: '$350' },
               { title: '3 Custom Designs Built For Your Brand', desc: 'Choose between Bold, Elegant, or Professional — see your actual business in all three before you pick.', value: '$400' },
-              { title: 'Unlimited Revisions', desc: 'We keep refining until you&apos;re 100% happy. Change the colors, move the sections, swap the photos — no extra charge.', value: 'Included' },
+              { title: '3 Revision Rounds', desc: '3 rounds of revisions during the build to get it exactly right. After launch, 2 free changes per month included.', value: 'Included' },
             ].map((item, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-indigo-500/30 transition">
                 <div className="flex justify-between items-start mb-2">
@@ -297,8 +297,8 @@ function OfferContent() {
           <div className="text-6xl mb-6">🛡️</div>
           <h2 className="text-3xl font-black mb-4">The &quot;Love It or Leave It&quot; Guarantee</h2>
           <p className="text-xl text-gray-400 leading-relaxed mb-4">
-            We&apos;ll keep revising until your website is <strong className="text-white">exactly</strong> what you want. 
-            If after all revisions you&apos;re still not 100% satisfied, we&apos;ll refund every penny. 
+            You get 3 rounds of revisions to get your website <strong className="text-white">exactly</strong> right. 
+            If after your revisions you&apos;re still not 100% satisfied, we&apos;ll refund every penny. 
             No questions asked. No hard feelings.
           </p>
           <p className="text-gray-500">
@@ -328,7 +328,7 @@ function OfferContent() {
               },
               {
                 q: 'What if I need changes after the site launches?',
-                a: 'During the build process, revisions are unlimited. After launch, you can make simple changes yourself or reach out to us. Living Website customers get priority changes included in their monthly plan.',
+                a: '3 rounds of revisions during the build process — colors, layout, photos, anything. After launch, you get 2 free changes per month. Need more? $19 each, or upgrade to Living Website ($49/mo) for unlimited changes and priority support.',
               },
               {
                 q: 'Why is this so much cheaper than other agencies?',
@@ -502,7 +502,7 @@ function OfferContent() {
             </button>
 
             <p className="text-center text-gray-500 text-sm">
-              🛡️ Love it or get a full refund. Unlimited revisions until it&apos;s perfect.
+              🛡️ Love it or get a full refund. 3 revision rounds included. Love it or get a full refund..
             </p>
             <p className="text-center text-gray-600 text-xs">
               🔒 Secure payment powered by Stripe
