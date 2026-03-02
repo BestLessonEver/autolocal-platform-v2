@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Custom Websites for Local Businesses — $99, Delivered in 24 Hours | AutoLocal.ai",
   description: "Get a professional, mobile-fast website for your local business in 24 hours. Custom design, real Google reviews, SEO built in. $99 one-time — love it or don't pay. Serving Friendswood, League City, Pearland & Houston TX.",
-  keywords: "local business website, small business web design, website for local business, web design Friendswood TX, cheap website for small business, $99 website, custom website design, local business marketing",
+  keywords: "cheap website, $99 website, affordable website design, cheap website for small business, local business website, small business web design, website for local business, custom website $99, get a website fast, cheap web design, small business website cost, web design near me",
   metadataBase: new URL("https://autolocal.ai"),
   alternates: {
     canonical: "https://autolocal.ai",
