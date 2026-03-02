@@ -42,14 +42,18 @@ function gradientTextStyle(accent: string) {
 
 export default function BDETemplate({ data }: TemplateProps) {
   const [reviewIdx, setReviewIdx] = useState(0)
+  const services = data.services ?? []
+  const reviews = data.reviews ?? []
+  const galleryImages = data.gallery_images ?? []
+  const hours = data.hours ?? {}
 
   useEffect(() => {
-    if (!data.reviews || data.reviews.length <= 1) return
+    if (reviews.length <= 1) return
     const interval = setInterval(() => {
-      setReviewIdx(prev => (prev + 1) % data.reviews.length)
+      setReviewIdx(prev => (prev + 1) % reviews.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [data.reviews])
+  }, [reviews.length])
 
   const accent = data.brand_color_accent || '#6366f1'
   const ctaText = getCtaButtonText(data)
@@ -131,14 +135,14 @@ export default function BDETemplate({ data }: TemplateProps) {
       )}
 
       {/* ════════ SERVICES ════════ */}
-      {data.services.length > 0 && (
+      {services.length > 0 && (
         <section id="services" className="py-24">
           <div className="max-w-5xl mx-auto px-6">
             <FadeIn>
               <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-16 text-center">Services</h2>
             </FadeIn>
             <div className="grid sm:grid-cols-2 gap-4">
-              {data.services.map((s, i) => (
+              {services.map((s, i) => (
                 <FadeIn key={i}>
                   <div className="group border border-white/10 rounded-2xl p-8 hover:border-white/25 transition-all duration-300 bg-white/[0.02]">
                     <h3 className="text-xl font-bold text-white mb-3">{s.name}</h3>
@@ -155,7 +159,7 @@ export default function BDETemplate({ data }: TemplateProps) {
       )}
 
       {/* ════════ GALLERY ════════ */}
-      {data.gallery_images.length > 0 && (
+      {galleryImages.length > 0 && (
         <section className="py-24">
           <div className="max-w-7xl mx-auto px-6">
             <FadeIn>
@@ -163,7 +167,7 @@ export default function BDETemplate({ data }: TemplateProps) {
             </FadeIn>
             {/* Mobile: horizontal scroll, Desktop: grid */}
             <div className="flex gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible snap-x snap-mandatory">
-              {data.gallery_images.map((img, i) => (
+              {galleryImages.map((img, i) => (
                 <FadeIn key={i} className="flex-shrink-0 w-[80vw] sm:w-auto snap-center">
                   <div className="overflow-hidden rounded-xl aspect-[4/3]">
                     <img
@@ -180,21 +184,21 @@ export default function BDETemplate({ data }: TemplateProps) {
       )}
 
       {/* ════════ REVIEWS ════════ */}
-      {data.reviews.length > 0 && (
+      {reviews.length > 0 && (
         <section id="reviews" className="py-24">
           <div className="max-w-3xl mx-auto px-6 text-center">
             <FadeIn>
               <div className="text-8xl font-black leading-none mb-4" style={gradientTextStyle(accent)}>&ldquo;</div>
               <p className="text-2xl sm:text-3xl text-white leading-relaxed font-normal mb-8">
-                {data.reviews[reviewIdx]?.text}
+                {reviews[reviewIdx]?.text}
               </p>
               <p className="text-gray-500 text-sm">
-                — {data.reviews[reviewIdx]?.author}
-                {data.reviews[reviewIdx]?.date && `, ${data.reviews[reviewIdx].date}`}
+                — {reviews[reviewIdx]?.author}
+                {reviews[reviewIdx]?.date && `, ${reviews[reviewIdx].date}`}
               </p>
-              {data.reviews.length > 1 && (
+              {reviews.length > 1 && (
                 <div className="flex justify-center gap-2 mt-8">
-                  {data.reviews.map((_, i) => (
+                  {reviews.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setReviewIdx(i)}
@@ -210,20 +214,20 @@ export default function BDETemplate({ data }: TemplateProps) {
       )}
 
       {/* ════════ HOURS + CONTACT ════════ */}
-      {(Object.keys(data.hours || {}).length > 0 || data.phone || data.email || data.address) && (
+      {(Object.keys(hours).length > 0 || data.phone || data.email || data.address) && (
         <section id="contact" className="py-24 border-t border-white/5">
           <div className="max-w-5xl mx-auto px-6">
             <FadeIn>
               <div className="grid md:grid-cols-2 gap-16">
                 {/* Hours */}
-                {Object.keys(data.hours || {}).length > 0 && (
+                {Object.keys(hours).length > 0 && (
                   <div>
                     <h3 className="text-2xl font-black mb-8">Hours</h3>
                     <div className="space-y-3">
-                      {daysOrder.map(day => data.hours?.[day] ? (
+                      {daysOrder.map(day => hours[day] ? (
                         <div key={day} className="flex justify-between py-2 border-b border-white/5 text-gray-400">
                           <span>{dayLabels[day]}</span>
-                          <span>{data.hours[day]}</span>
+                          <span>{hours[day]}</span>
                         </div>
                       ) : null)}
                     </div>

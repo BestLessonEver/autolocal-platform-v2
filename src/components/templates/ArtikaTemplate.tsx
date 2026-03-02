@@ -30,14 +30,18 @@ const fadeUpStyle = `
 
 export default function ArtikaTemplate({ data }: TemplateProps) {
   const [reviewIdx, setReviewIdx] = useState(0)
+  const services = data.services ?? []
+  const reviews = data.reviews ?? []
+  const galleryImages = data.gallery_images ?? []
+  const hours = data.hours ?? {}
 
   useEffect(() => {
-    if (!data.reviews || data.reviews.length <= 1) return
+    if (reviews.length <= 1) return
     const interval = setInterval(() => {
-      setReviewIdx(prev => (prev + 1) % data.reviews.length)
+      setReviewIdx(prev => (prev + 1) % reviews.length)
     }, 7000)
     return () => clearInterval(interval)
-  }, [data.reviews])
+  }, [reviews.length])
 
   const heroImg = data.hero_image_url || HERO_IMAGES[data.category] || HERO_IMAGES.general
   const accent = data.brand_color_accent || '#b8860b'
@@ -49,9 +53,9 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
     fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
   }
 
-  const hasGallery = data.gallery_images && data.gallery_images.length > 0
-  const hasReviews = data.reviews && data.reviews.length > 0
-  const hasHours = data.hours && Object.keys(data.hours).length > 0
+  const hasGallery = galleryImages.length > 0
+  const hasReviews = reviews.length > 0
+  const hasHours = Object.keys(hours).length > 0
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#faf9f6', color: '#3a3a3a' }}>
@@ -109,14 +113,14 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       </section>
 
       {/* ── Services ─────────────────────────────────────────── */}
-      {data.services.length > 0 && (
+      {services.length > 0 && (
         <section id="services" className="py-24 px-6">
           <div className="max-w-2xl mx-auto">
             <p className="text-center text-xs font-light tracking-[0.35em] uppercase mb-16" style={{ color: accent }}>
               Services
             </p>
             <div className="space-y-0">
-              {data.services.map((s, i) => (
+              {services.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-3 py-4 border-b" style={{ borderColor: '#e8e5df' }}>
                   <span className="font-serif text-lg sm:text-xl font-light whitespace-nowrap" style={{ color: '#2a2a2a' }}>
                     {s.name}
@@ -130,9 +134,9 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
                 </div>
               ))}
             </div>
-            {data.services.some(s => s.description) && (
+            {services.some(s => s.description) && (
               <div className="mt-12 space-y-4">
-                {data.services.filter(s => s.description).map((s, i) => (
+                {services.filter(s => s.description).map((s, i) => (
                   <p key={i} className="text-sm font-light" style={{ color: '#8a8a8a' }}>
                     <span className="font-normal" style={{ color: '#5a5a5a' }}>{s.name}:</span> {s.description}
                   </p>
@@ -153,7 +157,7 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
             <div
               className="grid grid-cols-2 md:grid-cols-3 gap-3 auto-rows-[200px] md:auto-rows-[260px]"
             >
-              {data.gallery_images.map((img, i) => (
+              {galleryImages.map((img, i) => (
                 <div
                   key={i}
                   className={`overflow-hidden rounded-sm ${
@@ -180,14 +184,14 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
               className="font-serif font-light italic text-2xl sm:text-3xl lg:text-4xl leading-relaxed transition-opacity duration-500"
               style={{ color: '#3a3a3a' }}
             >
-              &ldquo;{data.reviews[reviewIdx].text}&rdquo;
+              &ldquo;{reviews[reviewIdx].text}&rdquo;
             </p>
             <p className="mt-8 text-xs tracking-[0.3em] uppercase font-light" style={{ color: '#8a8a8a' }}>
-              — {data.reviews[reviewIdx].author}
+              — {reviews[reviewIdx].author}
             </p>
-            {data.reviews.length > 1 && (
+            {reviews.length > 1 && (
               <div className="flex justify-center gap-2 mt-10">
-                {data.reviews.map((_, i) => (
+                {reviews.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setReviewIdx(i)}
@@ -213,7 +217,7 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
               Hours
             </p>
             <div className="space-y-3">
-              {daysOrder.map(day => data.hours?.[day] ? (
+              {daysOrder.map(day => hours[day] ? (
                 <div key={day} className="flex justify-between text-sm font-light">
                   <span style={{ color: '#5a5a5a' }}>{dayLabels[day]}</span>
                   <span style={{ color: '#8a8a8a' }}>{data.hours[day]}</span>
