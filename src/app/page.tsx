@@ -219,38 +219,52 @@ export default function HomePage() {
             Agencies charge thousands. DIY builders charge monthly and you do all the work. We build it for you.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center opacity-60">
-              <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Local Agency</p>
-              <p className="text-4xl font-black text-white mb-2">$3,000<span className="text-lg text-gray-500">+</span></p>
-              <p className="text-xs text-gray-600 mb-6">2-8 weeks delivery</p>
-              <ul className="text-left space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">✓ Custom design</li>
-                <li className="flex items-center gap-2">✓ Professional quality</li>
-                <li className="flex items-center gap-2 text-red-400/60">✗ Weeks of waiting</li>
-                <li className="flex items-center gap-2 text-red-400/60">✗ Extra for revisions</li>
-              </ul>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center opacity-60">
-              <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Wix / Squarespace</p>
-              <p className="text-4xl font-black text-white mb-2">$200<span className="text-lg text-gray-500">/yr</span></p>
-              <p className="text-xs text-gray-600 mb-6">You build it yourself</p>
-              <ul className="text-left space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">✓ Hosting included</li>
-                <li className="flex items-center gap-2">✓ Templates</li>
-                <li className="flex items-center gap-2 text-red-400/60">✗ You do all the work</li>
-                <li className="flex items-center gap-2 text-red-400/60">✗ Generic looking</li>
-              </ul>
-            </div>
-            <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-6 text-center relative">
+            {/* AutoLocal — FIRST */}
+            <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-6 text-center relative md:order-first">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">BEST VALUE</div>
               <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">AutoLocal</p>
-              <p className="text-4xl font-black text-white mb-2">$99</p>
+              <p className="text-5xl font-black text-white mb-2">$99</p>
               <p className="text-xs text-gray-400 mb-6">Delivered in 24 hours</p>
-              <ul className="text-left space-y-2 text-sm text-gray-300">
+              <ul className="text-left space-y-2.5 text-sm text-gray-200">
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Custom design for YOUR brand</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> See it before you pay</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 3 revision rounds</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Hosting from $9/mo</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Money-back guarantee</li>
+              </ul>
+              <button
+                onClick={() => scrollTo('order')}
+                className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition"
+              >
+                Get Started →
+              </button>
+            </div>
+
+            {/* Local Agency */}
+            <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 text-center">
+              <p className="text-sm text-gray-400 uppercase tracking-wide mb-2">Local Agency</p>
+              <p className="text-4xl font-black text-gray-300 mb-2">$3,000<span className="text-lg text-gray-500">+</span></p>
+              <p className="text-xs text-gray-500 mb-6">2-8 weeks delivery</p>
+              <ul className="text-left space-y-2 text-sm text-gray-400">
+                <li className="flex items-center gap-2"><span className="text-gray-500">✓</span> Custom design</li>
+                <li className="flex items-center gap-2"><span className="text-gray-500">✓</span> Professional quality</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> Weeks of waiting</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> Extra for revisions</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> Can&apos;t preview first</li>
+              </ul>
+            </div>
+
+            {/* Wix / Squarespace */}
+            <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 text-center">
+              <p className="text-sm text-gray-400 uppercase tracking-wide mb-2">Wix / Squarespace</p>
+              <p className="text-4xl font-black text-gray-300 mb-2">$200<span className="text-lg text-gray-500">/yr</span></p>
+              <p className="text-xs text-gray-500 mb-6">You build it yourself</p>
+              <ul className="text-left space-y-2 text-sm text-gray-400">
+                <li className="flex items-center gap-2"><span className="text-gray-500">✓</span> Hosting included</li>
+                <li className="flex items-center gap-2"><span className="text-gray-500">✓</span> Templates available</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> You do all the work</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> Generic looking</li>
+                <li className="flex items-center gap-2"><span className="text-red-400/70">✗</span> No real customization</li>
               </ul>
             </div>
           </div>
@@ -349,7 +363,7 @@ export default function HomePage() {
               </div>
               <p className="text-sm text-gray-500 mb-6">Hosting included · Cancel anytime</p>
               <ul className="space-y-3 mb-8">
-                {['Everything in Custom Website', 'Unlimited changes included', 'Urgent requests — no rush fee', 'Monthly SEO updates', 'A/B testing (headlines, images)', 'Speed & performance monitoring', 'Priority support (24hr)', 'Hosting included in price'].map((f, i) => (
+                {['Everything in Custom Website', 'Unlimited changes included', 'Urgent requests — no rush fee', 'Priority support (24hr)', 'Hosting included in price', 'Monthly SEO updates (coming soon)', 'A/B testing (coming soon)', 'Speed monitoring (coming soon)'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
                     <span className="text-amber-400">✓</span> {f}
                   </li>
