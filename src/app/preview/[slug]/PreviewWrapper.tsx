@@ -49,9 +49,12 @@ const TEMPLATE_MAP: Record<TemplateName, React.ComponentType<{ data: PreviewData
 }
 
 const TEMPLATE_OPTIONS: { key: TemplateName; label: string; icon: string }[] = [
-  { key: 'clutch', label: 'Classic', icon: '🔧' },
-  { key: 'artika', label: 'Elegant', icon: '✨' },
-  { key: 'bde', label: 'Bold', icon: '⚡' },
+  { key: 'bold', label: 'Bold', icon: '⚡' },
+  { key: 'elegant', label: 'Elegant', icon: '✨' },
+  { key: 'professional', label: 'Pro', icon: '🏢' },
+  { key: 'clutch', label: 'Contractor', icon: '🔧' },
+  { key: 'artika', label: 'Salon', icon: '💇' },
+  { key: 'bde', label: 'Dark', icon: '🖤' },
 ]
 
 function resolveTemplate(data: PreviewData): TemplateName {
