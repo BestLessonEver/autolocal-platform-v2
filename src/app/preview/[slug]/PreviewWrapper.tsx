@@ -95,12 +95,28 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
               ✨ This is a preview of your new website
             </p>
             <div className="flex items-center gap-3 shrink-0">
-              <a
-                href="https://autolocal.ai/offer"
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        product: 'website',
+                        email: filteredData.email || '',
+                        businessName: filteredData.business_name || '',
+                      }),
+                    })
+                    const d = await res.json()
+                    if (d.url) window.location.href = d.url
+                  } catch {
+                    window.location.href = `https://autolocal.ai/offer?business=${encodeURIComponent(filteredData.business_name || '')}&e=${encodeURIComponent(filteredData.email || '')}`
+                  }
+                }}
                 className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
               >
                 Get Started — $99
-              </a>
+              </button>
               <button
                 onClick={() => setBannerVisible(false)}
                 className="text-white/70 hover:text-white transition text-xl leading-none"
@@ -115,7 +131,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
         {/* Choose Your Style — directly below banner */}
         <div className="bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-3">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mr-2">Choose your style</span>
+            <span className="hidden sm:inline text-xs font-medium text-gray-500 uppercase tracking-wide mr-2">Choose your style</span>
             <div className="flex items-center gap-1 bg-gray-100 rounded-full p-0.5">
               {TEMPLATE_OPTIONS.map(opt => (
                 <button
@@ -141,8 +157,8 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
         <Template data={filteredData} />
       </TemplateErrorBoundary>
 
-      {/* Powered by AutoLocal */}
-      <div className="fixed bottom-4 right-4 z-50">
+      {/* Powered by AutoLocal — above sticky call bar on mobile */}
+      <div className="fixed bottom-20 sm:bottom-4 right-4 z-50">
         <a
           href="https://autolocal.ai"
           target="_blank"
