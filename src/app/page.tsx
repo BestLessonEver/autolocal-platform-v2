@@ -87,6 +87,9 @@ export default function HomePage() {
           product,
           email: orderForm.email || email,
           businessName: businessName || 'New Client',
+          contactName: orderForm.contactName || '',
+          phone: orderForm.phone || '',
+          businessType: orderForm.businessType || '',
         }),
       })
       const data = await res.json()
