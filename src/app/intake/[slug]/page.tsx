@@ -164,10 +164,10 @@ export default function IntakePage() {
         }),
       })
 
-      // Redirect to live preview immediately
+      // Redirect to building animation → then preview
       const result = await submitRes.json()
       const previewSlug = result.slug || slug
-      window.location.href = `/preview/${previewSlug}`
+      window.location.href = `/building/${previewSlug}`
     } catch {
       alert('Something went wrong. Please try again.')
       setSubmitting(false)
