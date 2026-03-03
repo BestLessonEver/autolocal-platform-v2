@@ -42,8 +42,15 @@ export async function POST(req: Request) {
       cancel_url: `https://autolocal.ai/offer${businessName ? `?business=${encodeURIComponent(businessName)}` : ''}`,
       customer_email: email || undefined,
       metadata,
-      payment_intent_data: price.mode === 'payment' ? { metadata } : undefined,
-      subscription_data: price.mode === 'subscription' ? { metadata } : undefined,
+      payment_intent_data: price.mode === 'payment' ? {
+        metadata,
+        statement_descriptor: 'AUTOLOCAL.AI',
+        statement_descriptor_suffix: 'WEBSITE',
+      } : undefined,
+      subscription_data: price.mode === 'subscription' ? {
+        metadata,
+        description: `AutoLocal.ai - ${businessName || 'Website'}`,
+      } : undefined,
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)
