@@ -65,5 +65,6 @@ export async function GET() {
     brand_color_secondary: site.brand_color_secondary || '#1e293b',
     brand_color_accent: site.brand_color_accent || '#3b82f6',
     preview_id: site.id,
+    gallery_images: site.gallery_images || [],
   })
 }

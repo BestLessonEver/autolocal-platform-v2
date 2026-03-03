@@ -60,7 +60,7 @@ function generateHtml(data: PreviewData): string {
   const ctaText = data.cta_url?.startsWith('tel:') ? 'Call Now' : (data.cta_text || 'Get Started')
   const heroImg = data.hero_image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&h=900&fit=crop'
   const services = data.services || []
-  const reviews = data.reviews || []
+  const reviews = (data.reviews || []).filter((r: { rating: number }) => r.rating >= 4)
   const gallery = data.gallery_images || []
   const hours = data.hours || {}
   const showReviewCount = (data.google_review_count ?? 0) >= 20

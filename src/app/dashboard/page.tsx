@@ -58,6 +58,147 @@ const COLOR_PALETTES = [
   { name: 'Midnight', primary: '#09090b', secondary: '#18181b', accent: '#6366f1' },
 ]
 
+function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [gallery, setGallery] = useState<string[]>((data as any).gallery_images || [])
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'hero' | 'gallery') => {
+    const files = e.target.files
+    if (!files?.length) return
+    setUploading(true)
+
+    for (let i = 0; i < files.length; i++) {
+      const formData = new FormData()
+      formData.append('photo', files[i])
+      formData.append('target', target)
+
+      try {
+        const res = await fetch('/api/dashboard/me/photos', { method: 'POST', body: formData })
+        const result = await res.json()
+        if (res.ok) {
+          if (target === 'hero') {
+            onUpdate({ ...data, hero_image_url: result.url })
+          } else {
+            setGallery(prev => [...prev, result.url])
+          }
+        }
+      } catch { /* ignore */ }
+    }
+    setUploading(false)
+    e.target.value = '' // reset input
+  }
+
+  const setAsHero = async (url: string) => {
+    const res = await fetch('/api/dashboard/me/photos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set_hero', url }),
+    })
+    if (res.ok) onUpdate({ ...data, hero_image_url: url })
+  }
+
+  const removePhoto = async (url: string) => {
+    const res = await fetch('/api/dashboard/me/photos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'remove', url }),
+    })
+    if (res.ok) {
+      setGallery(prev => prev.filter(u => u !== url))
+      if (data.hero_image_url === url) {
+        const remaining = gallery.filter(u => u !== url)
+        onUpdate({ ...data, hero_image_url: remaining[0] || null })
+      }
+    }
+  }
+
+  const allPhotos = Array.from(new Set([data.hero_image_url, ...gallery].filter(Boolean))) as string[]
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">📸</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Manage Photos</h2>
+            <p className="text-gray-500 text-sm">Set your hero image, add gallery photos</p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 space-y-6 border-t border-white/[0.06] pt-6">
+          {/* Hero Image */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 mb-3">Hero Image</h3>
+            <p className="text-xs text-gray-500 mb-3">This is the main banner at the top of your site.</p>
+            <div className="relative rounded-xl overflow-hidden bg-white/5 border border-white/10" style={{ height: 200 }}>
+              {data.hero_image_url ? (
+                <img src={data.hero_image_url} alt="Hero" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-600">No hero image set</div>
+              )}
+            </div>
+            <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer mt-3">
+              {uploading ? (
+                <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
+              ) : (
+                <>📤 Upload Hero Image</>
+              )}
+              <input type="file" accept="image/*" onChange={e => handleUpload(e, 'hero')} className="hidden" disabled={uploading} />
+            </label>
+          </div>
+
+          {/* Gallery */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 mb-3">Site Photos ({allPhotos.length})</h3>
+            <p className="text-xs text-gray-500 mb-3">Click any photo to set it as hero. Click ✕ to remove.</p>
+
+            {allPhotos.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {allPhotos.map((url, i) => (
+                  <div key={i} className="relative group rounded-lg overflow-hidden bg-white/5 border border-white/10 aspect-square">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    {url === data.hero_image_url && (
+                      <div className="absolute top-1.5 left-1.5 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">HERO</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                      {url !== data.hero_image_url && (
+                        <button onClick={() => setAsHero(url)} className="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition">
+                          Set Hero
+                        </button>
+                      )}
+                      <button onClick={() => removePhoto(url)} className="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500 transition">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-600">No photos yet</div>
+            )}
+
+            <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer mt-3">
+              {uploading ? (
+                <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
+              ) : (
+                <>📤 Add Photos</>
+              )}
+              <input type="file" accept="image/*" multiple onChange={e => handleUpload(e, 'gallery')} className="hidden" disabled={uploading} />
+            </label>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function BrandCustomizer({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
   const [logoUploading, setLogoUploading] = useState(false)
   const [colorSaving, setColorSaving] = useState(false)
@@ -460,6 +601,10 @@ export default function ClientDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Brand Customization */}
+        {/* Photo Manager */}
+        <PhotoManager data={data} onUpdate={setData} />
 
         {/* Brand Customization */}
         <BrandCustomizer data={data} onUpdate={setData} />

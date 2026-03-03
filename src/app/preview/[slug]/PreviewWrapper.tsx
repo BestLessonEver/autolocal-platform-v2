@@ -73,6 +73,12 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     return () => clearTimeout(timer)
   }, [])
 
+  // Filter out reviews below 4 stars
+  const filteredData = {
+    ...data,
+    reviews: (data.reviews || []).filter(r => r.rating >= 4),
+  }
+
   const Template = TEMPLATE_MAP[activeTemplate]
 
   return (
@@ -132,7 +138,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
 
       {/* Template content — no forced top padding, let the site breathe */}
       <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
-        <Template data={data} />
+        <Template data={filteredData} />
       </TemplateErrorBoundary>
 
       {/* Powered by AutoLocal */}
