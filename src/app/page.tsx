@@ -23,6 +23,7 @@ export default function HomePage() {
   const [businessName, setBusinessName] = useState('')
   const [city, setCity] = useState('')
   const [email, setEmail] = useState('')
+  const [contactName, setContactName] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState('')
@@ -91,6 +92,7 @@ export default function HomePage() {
           businessName: businessName.trim(),
           city: city.trim() || undefined,
           email: email.trim() || undefined,
+          contactName: contactName.trim() || undefined,
           placeId,
         }),
       })
@@ -110,7 +112,7 @@ export default function HomePage() {
 
   const handleNewBusiness = () => {
     setShowResults(false)
-    router.push(`/intake/new?name=${encodeURIComponent(businessName.trim())}&city=${encodeURIComponent(city.trim())}&email=${encodeURIComponent(email.trim())}`)
+    router.push(`/intake/new?name=${encodeURIComponent(businessName.trim())}&city=${encodeURIComponent(city.trim())}&email=${encodeURIComponent(email.trim())}&contact=${encodeURIComponent(contactName.trim())}`)
   }
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -235,17 +237,25 @@ export default function HomePage() {
                 type="text"
                 value={city}
                 onChange={e => setCity(e.target.value)}
-                placeholder="City (optional)"
+                placeholder="City"
                 className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
               />
               <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="Email (optional)"
+                type="text"
+                value={contactName}
+                onChange={e => setContactName(e.target.value)}
+                placeholder="Your name"
                 className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
               />
             </div>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email — we'll send your preview link"
+              required
+              className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+            />
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button
               type="submit"

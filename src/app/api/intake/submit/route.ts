@@ -155,7 +155,10 @@ export async function PATCH(req: Request) {
 
     const updates: Record<string, unknown> = {}
     if (logoUrl) updates.logo_url = logoUrl
-    if (photoUrls?.length) updates.photo_urls = photoUrls
+    if (photoUrls?.length) {
+      updates.gallery_images = photoUrls
+      updates.hero_image_url = photoUrls[0]
+    }
 
     if (Object.keys(updates).length > 0) {
       await supabase.from('website_previews').update(updates).eq('slug', slug)
