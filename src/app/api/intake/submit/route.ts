@@ -10,6 +10,19 @@ function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
 }
 
+const VALID_CATEGORIES = ['salon', 'fitness', 'restaurant', 'contractor', 'general']
+
+function mapCategory(cat: string): string {
+  if (!cat) return 'general'
+  const lower = cat.toLowerCase()
+  if (VALID_CATEGORIES.includes(lower)) return lower
+  if (lower.includes('hair') || lower.includes('barber') || lower.includes('spa') || lower.includes('beauty') || lower.includes('nail')) return 'salon'
+  if (lower.includes('gym') || lower.includes('fitness') || lower.includes('train') || lower.includes('yoga') || lower.includes('exercise')) return 'fitness'
+  if (lower.includes('food') || lower.includes('restaurant') || lower.includes('cafe') || lower.includes('bar') || lower.includes('grill') || lower.includes('pizza') || lower.includes('sushi')) return 'restaurant'
+  if (lower.includes('plumb') || lower.includes('electric') || lower.includes('roof') || lower.includes('hvac') || lower.includes('construct') || lower.includes('paint') || lower.includes('landscap') || lower.includes('auto') || lower.includes('mechanic')) return 'contractor'
+  return 'general'
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -55,7 +68,7 @@ export async function POST(req: Request) {
           business_name: businessName,
           tagline: tagline || null,
           description: description || null,
-          category: category || 'business',
+          category: mapCategory(category),
           phone: phone || null,
           email,
           address: address || null,
@@ -67,17 +80,17 @@ export async function POST(req: Request) {
           logo_url: logoUrl || null,
           hero_image_url: photoUrls?.[0] || null,
           gallery_images: photoUrls || [],
-          status: 'intake_complete',
+          status: 'published',
         })
         .eq('id', existing.id)
     } else {
       // Create new preview record
-      await supabase.from('website_previews').insert({
+      const { error: insertError } = await supabase.from('website_previews').insert({
         slug: finalSlug,
         business_name: businessName,
         tagline: tagline || null,
         description: description || null,
-        category: category || 'business',
+        category: mapCategory(category),
         phone: phone || null,
         email,
         address: address || null,
@@ -90,17 +103,21 @@ export async function POST(req: Request) {
         hero_image_url: photoUrls?.[0] || null,
         gallery_images: photoUrls || [],
         template: 'bold',
-        status: 'intake_complete',
+        status: 'published',
         brand_color_primary: '#0f172a',
         brand_color_secondary: '#1e293b',
         brand_color_accent: '#3b82f6',
         view_count: 0,
       })
+
+      if (insertError) {
+        console.error('Insert error:', insertError)
+        return NextResponse.json({ error: 'Failed to create preview', detail: insertError.message }, { status: 500 })
+      }
     }
 
-    // Notify Brian via internal email
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://autolocal.ai'}/api/send-email`, {
+    // Notify Brian via internal email (fire-and-forget, don't await)
+    fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://autolocal.ai'}/api/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,10 +139,7 @@ export async function POST(req: Request) {
             <p><a href="https://autolocal.ai/admin/clients">View in Admin →</a></p>
           `,
         }),
-      })
-    } catch {
-      // Non-blocking
-    }
+      }).catch(() => { /* non-blocking */ })
 
     return NextResponse.json({ success: true, slug: finalSlug })
   } catch (err) {

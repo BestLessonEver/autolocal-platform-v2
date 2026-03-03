@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .from('website_previews')
     .select('business_name, tagline, description, city, state')
     .eq('slug', params.slug)
-    .in('status', ['published', 'intake_complete'])
+    .eq('status', 'published')
     .single()
 
   if (!data) return { title: 'Preview Not Found' }
@@ -42,7 +42,7 @@ export default async function PreviewPage({ params }: Props) {
     .from('website_previews')
     .select('*')
     .eq('slug', params.slug)
-    .in('status', ['published', 'intake_complete'])
+    .eq('status', 'published')
     .single()
 
   if (!data || error) {
