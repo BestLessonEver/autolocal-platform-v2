@@ -9,8 +9,8 @@ function ThankYouContent() {
   const product = params.get('product') || 'website'
   const slug = params.get('slug') || ''
 
-  const isWebsite = product === 'website'
-  const isHosting = product === 'hosting' || product === 'living'
+  const isWebsite = product === 'website' || product === 'living'
+  const isHosting = product === 'hosting'
 
   return (
     <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
@@ -63,6 +63,15 @@ function ThankYouContent() {
             Back to Home
           </a>
         </div>
+
+        {isWebsite && (
+          <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-xl p-5 mt-8 text-left">
+            <p className="text-white font-bold mb-2">🆕 New business without a Google profile?</p>
+            <p className="text-gray-400 text-sm mb-3">
+              No worries — check your email for a link to tell us about your business, upload photos, and list your services. Takes about 5 minutes.
+            </p>
+          </div>
+        )}
 
         <p className="text-gray-600 text-sm mt-10">
           Questions? Email <a href="mailto:support@autolocal.ai" className="text-indigo-400 hover:underline">support@autolocal.ai</a>

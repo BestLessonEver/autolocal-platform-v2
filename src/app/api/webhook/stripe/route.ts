@@ -19,7 +19,7 @@ function slugify(name: string): string {
     .trim()
 }
 
-async function sendWelcomeEmail(to: string, contactName: string, businessName: string) {
+async function sendWelcomeEmail(to: string, contactName: string, businessName: string, hasGoogleData: boolean = false) {
   const firstName = contactName?.split(' ')[0] || 'there'
 
   // Use Supabase's built-in magic link generation
@@ -60,11 +60,12 @@ async function sendWelcomeEmail(to: string, contactName: string, businessName: s
           <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 8px;">
             We've received your order for a custom website for <strong style="color:#ffffff;">${businessName}</strong>.
           </p>
+          ${hasGoogleData ? `
           <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
-            Here's what happens next:
+            We already pulled your business info from Google and started building. Here's what happens next:
           </p>
           <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">We build your custom site (within 24 hours)</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">We finalize your custom site (within 24 hours)</span></td></tr>
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">You'll get an email with your live preview</span></td></tr>
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Request any changes from your dashboard</span></td></tr>
             <tr><td><span style="color:#6366f1;font-weight:700;">4.</span> <span style="color:#d4d4d8;">We launch it live on your domain</span></td></tr>
@@ -73,6 +74,18 @@ async function sendWelcomeEmail(to: string, contactName: string, businessName: s
             Your dashboard is ready — you can access it anytime:
           </p>
           <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Go to My Dashboard →</a>
+          ` : `
+          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
+            To build the best possible website, we need a few details from you. It takes about 5 minutes:
+          </p>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Fill out your business details (5 min)</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Upload your photos and logo</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">We build your site within 24 hours</span></td></tr>
+            <tr><td><span style="color:#6366f1;font-weight:700;">4.</span> <span style="color:#d4d4d8;">Review, request changes, and go live</span></td></tr>
+          </table>
+          <a href="https://autolocal.ai/intake/${slugify(businessName)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Complete Your Details →</a>
+          `}
           <p style="color:#52525b;font-size:13px;margin:24px 0 0;">
             You can also sign in anytime at <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> using this email address.
           </p>
@@ -166,8 +179,9 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Send welcome email with magic link
-  await sendWelcomeEmail(email, contactName, businessName)
+  // Send welcome email — check if we have Google data
+  const hasGoogleData = existing !== null && existing !== undefined
+  await sendWelcomeEmail(email, contactName, businessName, hasGoogleData)
 
   console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
 }
