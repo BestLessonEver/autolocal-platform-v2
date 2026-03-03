@@ -242,34 +242,39 @@ export default function HomePage() {
 
           {/* Search Results */}
           {showResults && (
-            <div className="max-w-xl mx-auto mt-6 space-y-3">
-              <p className="text-sm text-gray-400 text-center mb-4">Is this your business? Select one below, or start fresh.</p>
-              {searchResults.map((r) => (
-                <button
-                  key={r.placeId}
-                  onClick={() => handleSelectBusiness(r.placeId)}
-                  className="w-full text-left p-4 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-500/40 hover:bg-indigo-600/10 transition group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white font-bold group-hover:text-indigo-400 transition">{r.name}</p>
-                      <p className="text-gray-500 text-sm">{r.address}</p>
-                    </div>
-                    {r.rating && (
-                      <div className="text-right shrink-0 ml-4">
-                        <span className="text-yellow-400 font-bold">★ {r.rating}</span>
-                        {r.reviewCount > 0 && <p className="text-gray-600 text-xs">{r.reviewCount} reviews</p>}
+            <div className="max-w-xl mx-auto mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-white text-center mb-1">We found some matches</h3>
+              <p className="text-sm text-gray-500 text-center mb-5">Select your business to generate a free preview</p>
+              <div className="space-y-2">
+                {searchResults.map((r) => (
+                  <button
+                    key={r.placeId}
+                    onClick={() => handleSelectBusiness(r.placeId)}
+                    className="w-full text-left p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-indigo-600/10 transition group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-bold group-hover:text-indigo-400 transition">{r.name}</p>
+                        <p className="text-gray-500 text-sm">{r.address}</p>
                       </div>
-                    )}
-                  </div>
+                      {r.rating && (
+                        <div className="text-right shrink-0 ml-4">
+                          <span className="text-yellow-400 font-bold">★ {r.rating}</span>
+                          {r.reviewCount > 0 && <p className="text-gray-600 text-xs">{r.reviewCount} reviews</p>}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                <button
+                  onClick={handleNewBusiness}
+                  className="w-full p-3 rounded-xl text-gray-400 hover:text-white transition text-center text-sm font-medium"
+                >
+                  🆕 I&apos;m a new business / My business isn&apos;t listed →
                 </button>
-              ))}
-              <button
-                onClick={handleNewBusiness}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 text-gray-400 hover:text-white hover:border-indigo-500/30 transition text-center"
-              >
-                🆕 I&apos;m a new business / My business isn&apos;t listed
-              </button>
+              </div>
             </div>
           )}
 
