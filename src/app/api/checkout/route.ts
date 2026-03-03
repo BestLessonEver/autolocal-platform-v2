@@ -14,48 +14,36 @@ const PRICES: Record<string, { id: string; mode: 'payment' | 'subscription' }> =
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { product, slug, email, businessName } = body
+    const { product, email, businessName, contactName, phone, businessType } = body
 
     if (!product || !PRICES[product]) {
       return NextResponse.json({ error: 'Invalid product' }, { status: 400 })
     }
 
     const price = PRICES[product]
-    
-    // Build line items — for website purchase, bundle with hosting
+
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
       { price: price.id, quantity: 1 },
     ]
 
-    // If buying website, also show hosting as a separate subscription
-    // We'll handle this with two separate checkouts for simplicity
-    // Website = one-time, then redirect to hosting subscription
+    const metadata = {
+      product,
+      business_name: businessName || '',
+      contact_name: contactName || '',
+      email: email || '',
+      phone: phone || '',
+      business_type: businessType || '',
+    }
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: price.mode,
       line_items: lineItems,
-      success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=${product}&slug=${slug || ''}`,
-      cancel_url: `https://autolocal.ai/offer${slug ? `?business=${encodeURIComponent(businessName || '')}` : ''}`,
+      success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=${product}`,
+      cancel_url: `https://autolocal.ai/offer${businessName ? `?business=${encodeURIComponent(businessName)}` : ''}`,
       customer_email: email || undefined,
-      metadata: {
-        product,
-        slug: slug || '',
-        business_name: businessName || '',
-      },
-      payment_intent_data: price.mode === 'payment' ? {
-        metadata: {
-          product,
-          slug: slug || '',
-          business_name: businessName || '',
-        },
-      } : undefined,
-      subscription_data: price.mode === 'subscription' ? {
-        metadata: {
-          product,
-          slug: slug || '',
-          business_name: businessName || '',
-        },
-      } : undefined,
+      metadata,
+      payment_intent_data: price.mode === 'payment' ? { metadata } : undefined,
+      subscription_data: price.mode === 'subscription' ? { metadata } : undefined,
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)

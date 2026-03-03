@@ -50,14 +50,12 @@ function ThankYouContent() {
         )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          {slug && (
-            <a
-              href={`/preview/${slug}`}
-              className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition"
-            >
-              View Your Preview
-            </a>
-          )}
+          <a
+            href="/login"
+            className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition"
+          >
+            Go to My Dashboard →
+          </a>
           <a
             href="/"
             className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-medium hover:text-white hover:border-white/20 transition"

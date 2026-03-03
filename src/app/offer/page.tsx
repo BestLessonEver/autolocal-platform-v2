@@ -110,7 +110,9 @@ function OfferContent() {
           product,
           email: formData.email,
           businessName: formData.businessName,
-          slug: '', // Will be linked after payment
+          contactName: formData.contactName,
+          phone: formData.phone,
+          businessType: formData.businessType,
         }),
       })
       const data = await res.json()
