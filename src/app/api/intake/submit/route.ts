@@ -133,3 +133,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to submit' }, { status: 500 })
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const { slug, logoUrl, photoUrls } = await req.json()
+    if (!slug) return NextResponse.json({ error: 'Missing slug' }, { status: 400 })
+
+    const updates: Record<string, unknown> = {}
+    if (logoUrl) updates.logo_url = logoUrl
+    if (photoUrls?.length) updates.photo_urls = photoUrls
+
+    if (Object.keys(updates).length > 0) {
+      await supabase.from('website_previews').update(updates).eq('slug', slug)
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('Intake PATCH error:', err)
+    return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+  }
+}

@@ -22,7 +22,7 @@ export default function IntakePage() {
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [submitted] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  const [uploading] = useState(false)
 
   const [form, setForm] = useState({
     businessName: '',
@@ -114,38 +114,9 @@ export default function IntakePage() {
 
   const handleSubmit = async () => {
     setSubmitting(true)
-    setUploading(true)
 
     try {
-      // Upload logo
-      let logoUrl = ''
-      if (logo) {
-        const fd = new FormData()
-        fd.append('file', logo.file)
-        fd.append('slug', slug as string)
-        fd.append('type', 'logo')
-        const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
-        const data = await res.json()
-        if (data.url) logoUrl = data.url
-        else console.error('Logo upload failed:', data)
-      }
-
-      // Upload photos
-      const photoUrls: string[] = []
-      for (const photo of photos) {
-        const fd = new FormData()
-        fd.append('file', photo.file)
-        fd.append('slug', slug as string)
-        fd.append('type', 'photo')
-        const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
-        const data = await res.json()
-        if (data.url) photoUrls.push(data.url)
-        else console.error('Photo upload failed:', data)
-      }
-
-      setUploading(false)
-
-      // Submit form data
+      // Submit form data FIRST (fast, no file uploads)
       const hours: Record<string, string> = {}
       for (const [day, h] of Object.entries(form.hours)) {
         hours[day] = h.closed ? 'Closed' : `${h.open} - ${h.close}`
@@ -159,14 +130,48 @@ export default function IntakePage() {
           ...form,
           hours,
           services: form.services.filter(s => s.name.trim()),
-          logoUrl,
-          photoUrls,
+          logoUrl: '',
+          photoUrls: [],
         }),
       })
 
-      // Redirect to building animation → then preview
       const result = await submitRes.json()
       const previewSlug = result.slug || slug
+
+      // Redirect to building page IMMEDIATELY
+      // Upload files in background (fire-and-forget)
+      const uploadFiles = async () => {
+        let logoUrl = ''
+        if (logo) {
+          const fd = new FormData()
+          fd.append('file', logo.file)
+          fd.append('slug', previewSlug as string)
+          fd.append('type', 'logo')
+          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
+          const data = await res.json()
+          if (data.url) logoUrl = data.url
+        }
+        const photoUrls: string[] = []
+        for (const photo of photos) {
+          const fd = new FormData()
+          fd.append('file', photo.file)
+          fd.append('slug', previewSlug as string)
+          fd.append('type', 'photo')
+          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
+          const data = await res.json()
+          if (data.url) photoUrls.push(data.url)
+        }
+        // Update the preview record with uploaded URLs
+        if (logoUrl || photoUrls.length) {
+          await fetch('/api/intake/submit', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug: previewSlug, logoUrl, photoUrls }),
+          })
+        }
+      }
+      uploadFiles() // fire-and-forget — don't await
+
       window.location.href = `/building/${previewSlug}`
     } catch {
       alert('Something went wrong. Please try again.')
