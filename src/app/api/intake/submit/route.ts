@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       city,
       state,
       website,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       instagram,
       hours,
       services,
