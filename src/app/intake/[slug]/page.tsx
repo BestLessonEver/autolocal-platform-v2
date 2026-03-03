@@ -21,7 +21,7 @@ export default function IntakePage() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted] = useState(false)
   const [uploading, setUploading] = useState(false)
 
   const [form, setForm] = useState({
