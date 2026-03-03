@@ -127,6 +127,7 @@ export default function IntakePage() {
         const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
         const data = await res.json()
         if (data.url) logoUrl = data.url
+        else console.error('Logo upload failed:', data)
       }
 
       // Upload photos
@@ -139,6 +140,7 @@ export default function IntakePage() {
         const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
         const data = await res.json()
         if (data.url) photoUrls.push(data.url)
+        else console.error('Photo upload failed:', data)
       }
 
       setUploading(false)

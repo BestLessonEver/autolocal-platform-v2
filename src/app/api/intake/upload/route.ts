@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
+export const maxDuration = 30
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
