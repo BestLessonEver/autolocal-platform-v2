@@ -4,11 +4,11 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PRICES: Record<string, { id: string; mode: 'payment' | 'subscription' }> = {
-  website:  { id: 'price_1T6ZJQDUy51dXIls0gwIFnK1', mode: 'payment' },
-  hosting:  { id: 'price_1T6ZJRDUy51dXIlsLecL1Gkt', mode: 'subscription' },
-  living:   { id: 'price_1T6ZJRDUy51dXIlsfXqIRv8H', mode: 'subscription' },
-  change:   { id: 'price_1T6ZJSDUy51dXIlsnmxQS6MX', mode: 'payment' },
-  rush:     { id: 'price_1T6ZJSDUy51dXIlsC4uy5LH8', mode: 'payment' },
+  website:  { id: 'price_1T6ks96rjk1X08jTmlFFzV5k', mode: 'payment' },
+  hosting:  { id: 'price_1T6ksA6rjk1X08jT7oK5ebY3', mode: 'subscription' },
+  living:   { id: 'price_1T6ksA6rjk1X08jTHqC2DjC6', mode: 'subscription' },
+  change:   { id: 'price_1T6ksB6rjk1X08jTZBgOJ20p', mode: 'payment' },
+  rush:     { id: 'price_1T6ksB6rjk1X08jTk506zhin', mode: 'payment' },
 }
 
 export async function POST(req: Request) {
