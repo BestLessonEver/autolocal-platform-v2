@@ -151,7 +151,7 @@ export default function IntakePage() {
         hours[day] = h.closed ? 'Closed' : `${h.open} - ${h.close}`
       }
 
-      await fetch('/api/intake/submit', {
+      const submitRes = await fetch('/api/intake/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -164,11 +164,14 @@ export default function IntakePage() {
         }),
       })
 
-      setSubmitted(true)
+      // Redirect to live preview immediately
+      const result = await submitRes.json()
+      const previewSlug = result.slug || slug
+      window.location.href = `/preview/${previewSlug}`
     } catch {
       alert('Something went wrong. Please try again.')
+      setSubmitting(false)
     }
-    setSubmitting(false)
   }
 
   const photoTips = INDUSTRY_STOCK[form.category] || INDUSTRY_STOCK.default
@@ -459,7 +462,7 @@ export default function IntakePage() {
               </button>
               <button onClick={handleSubmit} disabled={submitting}
                 className="flex-1 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50">
-                {submitting ? (uploading ? 'Uploading photos...' : 'Submitting...') : 'Submit & Build My Site 🚀'}
+                {submitting ? (uploading ? 'Uploading photos...' : 'Building your preview...') : 'See My Website Preview 🚀'}
               </button>
             </div>
           </div>
