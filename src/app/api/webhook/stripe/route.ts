@@ -155,19 +155,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .single()
 
   if (!existingClient) {
-    await supabase.from('clients').insert({
+    const { error: clientErr } = await supabase.from('clients').insert({
       business_name: businessName,
       email,
       phone: phone || null,
       status: 'paid',
-      plan: product === 'living' ? 'living' : 'starter',
-      stripe_customer_id: session.customer as string || null,
-      stripe_session_id: session.id,
-      contact_name: contactName || null,
-    }).catch(err => {
-      // clients table might not have all these columns yet — that's ok
-      console.error('Client insert error (non-fatal):', err)
     })
+    if (clientErr) {
+      console.error('Client insert error (non-fatal):', clientErr.message)
+    }
   }
 
   // Send welcome email with magic link
