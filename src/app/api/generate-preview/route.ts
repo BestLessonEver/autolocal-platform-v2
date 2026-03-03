@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -108,20 +109,33 @@ export async function POST(req: NextRequest) {
 
     const searchCity = city || 'Friendswood'
     const searchState = state || 'TX'
+    const placeId = sanitizeInput(body.placeId || '')
 
     // Step 1: Google Places lookup
-    const placesRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.regularOpeningHours,places.nationalPhoneNumber,places.websiteUri,places.reviews,places.photos,places.types,places.editorialSummary',
-      },
-      body: JSON.stringify({ textQuery: `${businessName} ${searchCity} ${searchState}` }),
-    })
+    let place: any = null
 
-    const placesData = await placesRes.json()
-    const place = placesData?.places?.[0]
+    if (placeId) {
+      // Direct lookup by place ID
+      const placeRes = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+        headers: {
+          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
+          'X-Goog-FieldMask': 'id,displayName,formattedAddress,rating,userRatingCount,regularOpeningHours,nationalPhoneNumber,websiteUri,reviews,photos,types,editorialSummary',
+        },
+      })
+      place = await placeRes.json()
+    } else {
+      const placesRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.regularOpeningHours,places.nationalPhoneNumber,places.websiteUri,places.reviews,places.photos,places.types,places.editorialSummary',
+        },
+        body: JSON.stringify({ textQuery: `${businessName} ${searchCity} ${searchState}` }),
+      })
+      const placesData = await placesRes.json()
+      place = placesData?.places?.[0]
+    }
 
     if (!place) {
       return NextResponse.json({ error: 'Business not found on Google. Try a more specific name.' }, { status: 404 })

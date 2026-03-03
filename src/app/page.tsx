@@ -25,6 +25,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState('')
+  const [searchResults, setSearchResults] = useState<{ placeId: string; name: string; address: string; rating: number | null; reviewCount: number }[]>([])
+  const [showResults, setShowResults] = useState(false)
+  const [searching, setSearching] = useState(false)
 
   // Order form
   const [orderForm, setOrderForm] = useState({
@@ -47,8 +50,36 @@ export default function HomePage() {
   const handlePreview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!businessName.trim()) return
-    setLoading(true)
+    setSearching(true)
     setError('')
+    setShowResults(false)
+
+    try {
+      const res = await fetch('/api/search-business', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName: businessName.trim(),
+          city: city.trim() || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (data.results?.length > 0) {
+        setSearchResults(data.results)
+        setShowResults(true)
+      } else {
+        // No results — go straight to intake
+        router.push(`/intake/new?name=${encodeURIComponent(businessName.trim())}&city=${encodeURIComponent(city.trim())}`)
+      }
+    } catch {
+      setError('Connection error. Please try again.')
+    }
+    setSearching(false)
+  }
+
+  const handleSelectBusiness = async (placeId: string) => {
+    setShowResults(false)
+    setLoading(true)
     setLoadingStep(0)
 
     try {
@@ -59,6 +90,7 @@ export default function HomePage() {
           businessName: businessName.trim(),
           city: city.trim() || undefined,
           email: email.trim() || undefined,
+          placeId,
         }),
       })
       const data = await res.json()
@@ -73,6 +105,11 @@ export default function HomePage() {
       setError('Connection error. Please try again.')
       setLoading(false)
     }
+  }
+
+  const handleNewBusiness = () => {
+    setShowResults(false)
+    router.push(`/intake/new?name=${encodeURIComponent(businessName.trim())}&city=${encodeURIComponent(city.trim())}&email=${encodeURIComponent(email.trim())}`)
   }
 
   const handleCheckout = async (e: React.FormEvent) => {
@@ -195,12 +232,46 @@ export default function HomePage() {
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button
               type="submit"
-              className="w-full py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group"
+              disabled={searching}
+              className="w-full py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group disabled:opacity-70"
             >
-              <span className="relative z-10">See My Website — Free Preview ✨</span>
+              <span className="relative z-10">{searching ? 'Searching...' : 'See My Website — Free Preview ✨'}</span>
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           </form>
+
+          {/* Search Results */}
+          {showResults && (
+            <div className="max-w-xl mx-auto mt-6 space-y-3">
+              <p className="text-sm text-gray-400 text-center mb-4">Is this your business? Select one below, or start fresh.</p>
+              {searchResults.map((r) => (
+                <button
+                  key={r.placeId}
+                  onClick={() => handleSelectBusiness(r.placeId)}
+                  className="w-full text-left p-4 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-500/40 hover:bg-indigo-600/10 transition group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-bold group-hover:text-indigo-400 transition">{r.name}</p>
+                      <p className="text-gray-500 text-sm">{r.address}</p>
+                    </div>
+                    {r.rating && (
+                      <div className="text-right shrink-0 ml-4">
+                        <span className="text-yellow-400 font-bold">★ {r.rating}</span>
+                        {r.reviewCount > 0 && <p className="text-gray-600 text-xs">{r.reviewCount} reviews</p>}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              ))}
+              <button
+                onClick={handleNewBusiness}
+                className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 text-gray-400 hover:text-white hover:border-indigo-500/30 transition text-center"
+              >
+                🆕 I&apos;m a new business / My business isn&apos;t listed
+              </button>
+            </div>
+          )}
 
           {/* Trust row */}
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-gray-500">

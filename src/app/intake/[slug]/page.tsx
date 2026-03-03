@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -18,6 +18,7 @@ const INDUSTRY_STOCK: Record<string, string[]> = {
 
 export default function IntakePage() {
   const { slug } = useParams()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -39,6 +40,21 @@ export default function IntakePage() {
     hours: Object.fromEntries(DAYS.map(d => [d, { open: '09:00', close: '17:00', closed: false }])) as Record<string, { open: string; close: string; closed: boolean }>,
     services: [{ name: '', description: '', price: '' }],
   })
+
+  // Pre-fill from query params
+  useEffect(() => {
+    const name = searchParams.get('name')
+    const city = searchParams.get('city')
+    const email = searchParams.get('email')
+    if (name || city || email) {
+      setForm(f => ({
+        ...f,
+        businessName: name || f.businessName,
+        city: city || f.city,
+        email: email || f.email,
+      }))
+    }
+  }, [searchParams])
 
   const [photos, setPhotos] = useState<{ file: File; preview: string; label: string }[]>([])
   const [logo, setLogo] = useState<{ file: File; preview: string } | null>(null)
