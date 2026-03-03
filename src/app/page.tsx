@@ -243,7 +243,7 @@ export default function HomePage() {
           {/* Search Results */}
           {showResults && (
             <div className="max-w-xl mx-auto mt-8 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
-              <h3 className="text-lg font-bold text-white text-center mb-1">We found some matches</h3>
+              <h3 className="text-lg font-bold text-white text-center mb-1">Claim Your Business</h3>
               <p className="text-sm text-gray-500 text-center mb-5">Select your business to generate a free preview</p>
               <div className="space-y-2">
                 {searchResults.map((r) => (
