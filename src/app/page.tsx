@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 const STEPS = [
   'Finding your business on Google...',
@@ -179,6 +180,22 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
+
+      {/* Nav */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+          <a href="/" className="flex items-center gap-2.5">
+            <Image src="/logo.png" alt="AutoLocal.ai" width={32} height={32} className="rounded-lg" />
+            <span className="text-lg font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AutoLocal.ai</span>
+          </a>
+          <div className="flex items-center gap-4">
+            <a href="/login" className="text-sm text-gray-400 hover:text-white transition hidden sm:block">Client Login</a>
+            <a href="#order" onClick={(e) => { e.preventDefault(); scrollTo('order') }} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
+              Get Started
+            </a>
+          </div>
+        </div>
+      </header>
 
       {/* ══════════════════════════════════════════════
           HERO — $99 is the headline
