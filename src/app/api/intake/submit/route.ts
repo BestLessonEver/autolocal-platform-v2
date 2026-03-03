@@ -7,12 +7,7 @@ const supabase = createClient(
 )
 
 function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
+  return name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
 }
 
 export async function POST(req: Request) {
@@ -37,13 +32,13 @@ export async function POST(req: Request) {
       photoUrls,
     } = body
 
-    if (!businessName) {
-      return NextResponse.json({ error: 'Business name is required' }, { status: 400 })
+    if (!businessName || !email) {
+      return NextResponse.json({ error: 'Business name and email required' }, { status: 400 })
     }
 
-    const finalSlug = slug || slugify(businessName)
+    const finalSlug = slug || slugify(`${businessName}-${city || ''}`)
 
-    // Check if preview already exists (from payment flow)
+    // Check if preview already exists (e.g. from payment webhook)
     const { data: existing } = await supabase
       .from('website_previews')
       .select('id')
@@ -61,7 +56,7 @@ export async function POST(req: Request) {
           description: description || null,
           category: category || 'business',
           phone: phone || null,
-          email: email || null,
+          email,
           address: address || null,
           city: city || null,
           state: state || null,
@@ -75,7 +70,7 @@ export async function POST(req: Request) {
         })
         .eq('id', existing.id)
     } else {
-      // Create new preview from intake
+      // Create new preview record
       await supabase.from('website_previews').insert({
         slug: finalSlug,
         business_name: businessName,
@@ -83,7 +78,7 @@ export async function POST(req: Request) {
         description: description || null,
         category: category || 'business',
         phone: phone || null,
-        email: email || null,
+        email,
         address: address || null,
         city: city || null,
         state: state || null,
@@ -98,12 +93,11 @@ export async function POST(req: Request) {
         brand_color_primary: '#0f172a',
         brand_color_secondary: '#1e293b',
         brand_color_accent: '#3b82f6',
-        reviews: [],
         view_count: 0,
       })
     }
 
-    // Send notification to Brian
+    // Notify Brian via internal email
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://autolocal.ai'}/api/send-email`, {
         method: 'POST',
@@ -113,22 +107,23 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           to: 'brian@autolocal.ai',
-          subject: `🆕 New intake submission: ${businessName}`,
+          subject: `🚀 New intake: ${businessName}`,
           html: `
-            <h2>New Intake: ${businessName}</h2>
+            <h2>New client intake submitted</h2>
+            <p><strong>Business:</strong> ${businessName}</p>
             <p><strong>Category:</strong> ${category}</p>
             <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>City:</strong> ${city}, ${state}</p>
-            <p><strong>Services:</strong> ${(services || []).map((s: any) => s.name).join(', ')}</p>
-            <p><strong>Photos:</strong> ${(photoUrls || []).length}</p>
+            <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+            <p><strong>City:</strong> ${city || 'N/A'}, ${state || ''}</p>
+            <p><strong>Photos uploaded:</strong> ${photoUrls?.length || 0}</p>
+            <p><strong>Services:</strong> ${services?.length || 0}</p>
             <p><strong>Logo:</strong> ${logoUrl ? 'Yes' : 'No'}</p>
             <p><a href="https://autolocal.ai/admin/clients">View in Admin →</a></p>
           `,
         }),
       })
     } catch {
-      // Non-fatal
+      // Non-blocking
     }
 
     return NextResponse.json({ success: true, slug: finalSlug })
