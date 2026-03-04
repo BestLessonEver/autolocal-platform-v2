@@ -64,6 +64,12 @@ function generateStaticHtml(data: SiteData): string {
   const primary = data.brand_color_primary || '#1a1a2e'
   const accent = data.brand_color_accent || '#6366f1'
   const year = new Date().getFullYear()
+  const isIndividual = (data as any).site_mode === 'individual'
+  const aboutLabel = isIndividual ? 'About Me' : 'About Us'
+  const servicesLabel = isIndividual ? 'My Services' : 'Our Services'
+  const offerLabel = isIndividual ? 'What I Offer' : 'What We Offer'
+  const galleryLabel = isIndividual ? 'See My Work' : 'See Our Work'
+  const reviewsLabel = isIndividual ? 'What My Customers Say' : 'What Our Customers Say'
   const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
   const dayLabels: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
 
@@ -141,13 +147,13 @@ function generateStaticHtml(data: SiteData): string {
     </div>
   </section>
   <section class="section">
-    <p class="section-label">About Us</p>
+    <p class="section-label>${aboutLabel}</p>
     <h2 class="section-title">${name}</h2>
     <p style="max-width:700px;margin:0 auto;text-align:center;color:#9ca3af;line-height:1.8;font-size:1.1rem">${description}</p>
   </section>
-  ${services.length > 0 ? `<section class="section" id="services"><p class="section-label">What We Offer</p><h2 class="section-title">Our Services</h2><div class="services-grid">${services.map(s => `<div class="service-card"><h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.description || '')}</p>${s.price ? `<p class="price">${escapeHtml(s.price)}</p>` : ''}</div>`).join('')}</div></section>` : ''}
-  ${gallery.length > 0 ? `<section class="section"><p class="section-label">Gallery</p><h2 class="section-title">See Our Work</h2><div class="gallery-grid">${gallery.map((img, i) => `<img src="${img}" alt="${name} photo ${i + 1}" loading="lazy">`).join('')}</div></section>` : ''}
-  ${reviews.length > 0 ? `<section class="section" id="reviews"><p class="section-label">Testimonials</p><h2 class="section-title">What Our Customers Say</h2><div class="reviews-container"><div id="review-text" class="review-text">"${escapeHtml(reviews[0].text)}"</div><div style="display:flex;align-items:center;justify-content:center;gap:0.5rem">${generateStarsSvg(reviews[0].rating)}</div><p id="review-author" class="review-author" style="margin-top:0.75rem">— ${escapeHtml(reviews[0].author)}</p>${reviews.length > 1 ? `<div class="review-dots">${reviews.map((_, i) => `<button class="review-dot${i === 0 ? ' active' : ''}" data-idx="${i}" aria-label="Review ${i + 1}"></button>`).join('')}</div>` : ''}</div></section>` : ''}
+  ${services.length > 0 ? `<section class="section" id="services"><p class="section-label>${offerLabel}</p><h2 class="section-title>${servicesLabel}</h2><div class="services-grid">${services.map(s => `<div class="service-card"><h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.description || '')}</p>${s.price ? `<p class="price">${escapeHtml(s.price)}</p>` : ''}</div>`).join('')}</div></section>` : ''}
+  ${gallery.length > 0 ? `<section class="section"><p class="section-label">Gallery</p><h2 class="section-title>${galleryLabel}</h2><div class="gallery-grid">${gallery.map((img, i) => `<img src="${img}" alt="${name} photo ${i + 1}" loading="lazy">`).join('')}</div></section>` : ''}
+  ${reviews.length > 0 ? `<section class="section" id="reviews"><p class="section-label">Testimonials</p><h2 class="section-title>${reviewsLabel}</h2><div class="reviews-container"><div id="review-text" class="review-text">"${escapeHtml(reviews[0].text)}"</div><div style="display:flex;align-items:center;justify-content:center;gap:0.5rem">${generateStarsSvg(reviews[0].rating)}</div><p id="review-author" class="review-author" style="margin-top:0.75rem">— ${escapeHtml(reviews[0].author)}</p>${reviews.length > 1 ? `<div class="review-dots">${reviews.map((_, i) => `<button class="review-dot${i === 0 ? ' active' : ''}" data-idx="${i}" aria-label="Review ${i + 1}"></button>`).join('')}</div>` : ''}</div></section>` : ''}
   <section class="section" id="contact">
     <p class="section-label">Get In Touch</p>
     <h2 class="section-title">Hours & Contact</h2>
