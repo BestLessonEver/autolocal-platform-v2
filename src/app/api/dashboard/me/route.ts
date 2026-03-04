@@ -65,6 +65,8 @@ export async function GET() {
     brand_color_primary: site.brand_color_primary || '#0f172a',
     brand_color_secondary: site.brand_color_secondary || '#1e293b',
     brand_color_accent: site.brand_color_accent || '#3b82f6',
+    description: site.description || null,
+    contact_email: site.contact_email || null,
     preview_id: site.id,
     gallery_images: site.gallery_images || [],
     hero_crop: site.hero_crop ?? 50,
