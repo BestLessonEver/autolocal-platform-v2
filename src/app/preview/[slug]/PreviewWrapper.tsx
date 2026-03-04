@@ -114,6 +114,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     ...liveData,
     reviews: (data.reviews || []).filter(r => r.rating >= 4),
     hero_crop: edits.hero_crop,
+    site_mode: (data as any).site_mode || 'business',
   }
 
   const Template = TEMPLATE_MAP[activeTemplate]

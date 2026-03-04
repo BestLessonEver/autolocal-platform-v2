@@ -38,6 +38,9 @@ export async function PATCH(req: Request) {
       state,
       services,
       hours,
+      hero_crop,
+      template,
+      site_mode,
     } = body
 
     // Find user's preview by email
@@ -63,6 +66,9 @@ export async function PATCH(req: Request) {
     if (city !== undefined) updates.city = city || null
     if (state !== undefined) updates.state = state || null
     if (display_email !== undefined) updates.contact_email = display_email || null
+    if (hero_crop !== undefined) updates.hero_crop = hero_crop
+    if (template !== undefined) updates.template = template
+    if (site_mode !== undefined) updates.site_mode = site_mode
     if (services !== undefined) updates.services = services
     if (hours !== undefined) updates.hours = hours
 

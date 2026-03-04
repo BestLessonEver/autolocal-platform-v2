@@ -67,5 +67,7 @@ export async function GET() {
     brand_color_accent: site.brand_color_accent || '#3b82f6',
     preview_id: site.id,
     gallery_images: site.gallery_images || [],
+    hero_crop: site.hero_crop ?? 50,
+    site_mode: site.site_mode || 'business',
   })
 }

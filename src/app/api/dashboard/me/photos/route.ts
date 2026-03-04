@@ -114,5 +114,18 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ success: true })
   }
 
+  // Reorder gallery images
+  if (body.action === 'reorder' && Array.isArray(body.gallery_images)) {
+    const { error: reorderErr } = await adminSupabase
+      .from('website_previews')
+      .update({ gallery_images: body.gallery_images })
+      .eq('id', preview.id)
+
+    if (reorderErr) {
+      return NextResponse.json({ error: 'Failed to reorder' }, { status: 500 })
+    }
+    return NextResponse.json({ success: true })
+  }
+
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 }

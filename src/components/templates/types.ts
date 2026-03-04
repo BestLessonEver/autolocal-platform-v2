@@ -11,6 +11,7 @@ export interface PreviewData {
   logo_url: string | null
   hero_image_url: string | null
   hero_crop?: number
+  site_mode?: 'business' | 'individual'
   gallery_images: string[]
   services: { name: string; description: string; price?: string }[]
   hours: Record<string, string>

@@ -224,6 +224,11 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
   const [expanded, setExpanded] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [gallery, setGallery] = useState<string[]>((data as any).gallery_images || [])
+  const [showCrop, setShowCrop] = useState(false)
+  const [heroCrop, setHeroCrop] = useState((data as any).hero_crop ?? 50)
+  const [cropSaving, setCropSaving] = useState(false)
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'hero' | 'gallery') => {
     const files = e.target.files
@@ -248,7 +253,7 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
       } catch { /* ignore */ }
     }
     setUploading(false)
-    e.target.value = '' // reset input
+    e.target.value = ''
   }
 
   const setAsHero = async (url: string) => {
@@ -275,6 +280,39 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
     }
   }
 
+  const saveCrop = async () => {
+    setCropSaving(true)
+    try {
+      await fetch('/api/dashboard/me/details', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hero_crop: heroCrop }),
+      })
+      onUpdate({ ...data, hero_crop: heroCrop } as any)
+      setShowCrop(false)
+    } catch { /* ignore */ }
+    setCropSaving(false)
+  }
+
+  // Drag-to-reorder
+  const handleDragStart = (i: number) => setDragIdx(i)
+  const handleDragOver = (e: React.DragEvent, i: number) => { e.preventDefault(); setDragOverIdx(i) }
+  const handleDrop = async (i: number) => {
+    if (dragIdx === null || dragIdx === i) { setDragIdx(null); setDragOverIdx(null); return }
+    const newGallery = [...gallery]
+    const [moved] = newGallery.splice(dragIdx, 1)
+    newGallery.splice(i, 0, moved)
+    setGallery(newGallery)
+    setDragIdx(null)
+    setDragOverIdx(null)
+    // Save new order
+    await fetch('/api/dashboard/me/photos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reorder', gallery_images: newGallery }),
+    })
+  }
+
   const allPhotos = Array.from(new Set([data.hero_image_url, ...gallery].filter(Boolean))) as string[]
 
   return (
@@ -287,7 +325,7 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
           <span className="text-2xl">📸</span>
           <div className="text-left">
             <h2 className="text-lg font-bold text-white">Manage Photos</h2>
-            <p className="text-gray-500 text-sm">Set your hero image, add gallery photos</p>
+            <p className="text-gray-500 text-sm">Set your hero image, add gallery photos, drag to reorder</p>
           </div>
         </div>
         <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
@@ -295,17 +333,52 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
 
       {expanded && (
         <div className="px-6 pb-6 space-y-6 border-t border-white/[0.06] pt-6">
-          {/* Hero Image */}
+          {/* Hero Image with crop */}
           <div>
             <h3 className="text-sm font-semibold text-gray-300 mb-3">Hero Image</h3>
-            <p className="text-xs text-gray-500 mb-3">This is the main banner at the top of your site.</p>
-            <div className="relative rounded-xl overflow-hidden bg-white/5 border border-white/10" style={{ height: 200 }}>
+            <p className="text-xs text-gray-500 mb-3">Click the image to adjust cropping.</p>
+            <div
+              className="relative rounded-xl overflow-hidden bg-white/5 border border-white/10 cursor-pointer group"
+              style={{ height: 200 }}
+              onClick={() => data.hero_image_url && setShowCrop(!showCrop)}
+            >
               {data.hero_image_url ? (
-                <img src={data.hero_image_url} alt="Hero" className="w-full h-full object-cover" />
+                <>
+                  <img src={data.hero_image_url} alt="Hero" className="w-full h-full object-cover" style={{ objectPosition: `center ${heroCrop}%` }} />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
+                    <span className="opacity-0 group-hover:opacity-100 transition text-white text-sm font-bold flex items-center gap-2">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 2v4M18 2v4M6 18v4M18 18v4M2 6h4M2 18h4M18 6h4M18 18h4"/><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                      Adjust Crop
+                    </span>
+                  </div>
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-600">No hero image set</div>
               )}
             </div>
+
+            {/* Crop slider */}
+            {showCrop && data.hero_image_url && (
+              <div className="mt-3 p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-20 rounded-lg overflow-hidden border border-white/10 shrink-0">
+                    <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${heroCrop}%` }} />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs text-gray-500 mb-2">Image Position</label>
+                    <input type="range" min="0" max="100" value={heroCrop} onChange={e => setHeroCrop(parseInt(e.target.value))} className="w-full accent-indigo-600" />
+                    <div className="flex justify-between text-[10px] text-gray-500 mt-1"><span>Top</span><span>Center</span><span>Bottom</span></div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={saveCrop} disabled={cropSaving} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition disabled:opacity-50">
+                    {cropSaving ? 'Saving...' : 'Save Crop'}
+                  </button>
+                  <button onClick={() => setShowCrop(false)} className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">Cancel</button>
+                </div>
+              </div>
+            )}
+
             <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer mt-3">
               {uploading ? (
                 <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
@@ -316,19 +389,32 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
             </label>
           </div>
 
-          {/* Gallery */}
+          {/* Gallery with drag-to-reorder */}
           <div>
             <h3 className="text-sm font-semibold text-gray-300 mb-3">Site Photos ({allPhotos.length})</h3>
-            <p className="text-xs text-gray-500 mb-3">Click any photo to set it as hero. Click ✕ to remove.</p>
+            <p className="text-xs text-gray-500 mb-3">Drag to reorder. Click to set as hero or remove.</p>
 
             {allPhotos.length > 0 ? (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {allPhotos.map((url, i) => (
-                  <div key={i} className="relative group rounded-lg overflow-hidden bg-white/5 border border-white/10 aspect-square">
+                  <div
+                    key={url}
+                    draggable
+                    onDragStart={() => handleDragStart(i)}
+                    onDragOver={e => handleDragOver(e, i)}
+                    onDrop={() => handleDrop(i)}
+                    onDragEnd={() => { setDragIdx(null); setDragOverIdx(null) }}
+                    className={`relative group rounded-lg overflow-hidden bg-white/5 border aspect-square cursor-grab active:cursor-grabbing transition-all ${
+                      dragOverIdx === i ? 'border-indigo-500 scale-105' : dragIdx === i ? 'opacity-50 border-white/10' : 'border-white/10'
+                    }`}
+                  >
                     <img src={url} alt="" className="w-full h-full object-cover" />
                     {url === data.hero_image_url && (
                       <div className="absolute top-1.5 left-1.5 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">HERO</div>
                     )}
+                    <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition">
+                      <span className="text-white/60 text-xs">⠿</span>
+                    </div>
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                       {url !== data.hero_image_url && (
                         <button onClick={() => setAsHero(url)} className="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition">
@@ -509,6 +595,186 @@ function BrandCustomizer({ data, onUpdate }: { data: SiteData; onUpdate: (d: Sit
               </button>
               {colorSaved && <span className="text-green-400 text-sm">Colors updated! Refresh your site preview to see changes.</span>}
             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const TEMPLATE_OPTIONS = [
+  { key: 'bold', label: 'Bold', icon: '⚡', desc: 'High-contrast, attention-grabbing design' },
+  { key: 'elegant', label: 'Elegant', icon: '✨', desc: 'Refined and sophisticated' },
+  { key: 'professional', label: 'Professional', icon: '🏢', desc: 'Clean corporate look' },
+  { key: 'clutch', label: 'Clutch', icon: '🔥', desc: 'Modern and edgy' },
+  { key: 'artika', label: 'Artika', icon: '🎨', desc: 'Creative and artistic' },
+  { key: 'bde', label: 'Dark', icon: '🖤', desc: 'Sleek dark theme' },
+]
+
+function TemplateSelector({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
+  const [pendingTemplate, setPendingTemplate] = useState<string | null>(null)
+
+  const handleSelect = (key: string) => {
+    if (key === data.template) return
+    setPendingTemplate(key)
+    setShowWarning(true)
+  }
+
+  const confirmChange = async () => {
+    if (!pendingTemplate) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/dashboard/me/details', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template: pendingTemplate }),
+      })
+      if (res.ok) {
+        onUpdate({ ...data, template: pendingTemplate })
+      }
+    } catch { /* ignore */ }
+    setSaving(false)
+    setShowWarning(false)
+    setPendingTemplate(null)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🎭</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Design Template</h2>
+            <p className="text-gray-500 text-sm">Currently using: <span className="text-white capitalize">{data.template}</span></p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {TEMPLATE_OPTIONS.map(t => (
+              <button
+                key={t.key}
+                onClick={() => handleSelect(t.key)}
+                className={`text-left p-4 rounded-xl border transition ${
+                  data.template === t.key
+                    ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
+                    : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
+                }`}
+              >
+                <span className="text-xl">{t.icon}</span>
+                <p className="font-bold mt-2">{t.label}</p>
+                <p className="text-xs opacity-60 mt-0.5">{t.desc}</p>
+                {data.template === t.key && (
+                  <span className="text-xs text-indigo-400 font-bold mt-2 block">● Current</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Warning modal */}
+      {showWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="bg-[#18181b] border border-white/10 rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-white mb-3">⚠️ Change Template?</h3>
+            <p className="text-gray-400 text-sm mb-2">
+              Switching to <strong className="text-white capitalize">{pendingTemplate}</strong> will change your site&apos;s design.
+            </p>
+            <p className="text-amber-400 text-sm mb-6">
+              If you&apos;ve previously requested custom edits, those changes may not carry over to the new template.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={confirmChange} disabled={saving} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition disabled:opacity-50">
+                {saving ? 'Switching...' : 'Yes, Switch Template'}
+              </button>
+              <button onClick={() => { setShowWarning(false); setPendingTemplate(null) }} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-bold hover:text-white transition">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SiteModeToggle({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const currentMode = (data as any).site_mode || 'business'
+
+  const handleToggle = async (mode: string) => {
+    if (mode === currentMode) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/dashboard/me/details', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site_mode: mode }),
+      })
+      if (res.ok) {
+        onUpdate({ ...data, site_mode: mode } as any)
+      }
+    } catch { /* ignore */ }
+    setSaving(false)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">👤</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Site Type</h2>
+            <p className="text-gray-500 text-sm">How should your site read? <span className="text-white capitalize">{currentMode === 'individual' ? 'Individual (My/I)' : 'Business (Our/We)'}</span></p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6">
+          <p className="text-xs text-gray-500 mb-4">This changes headings like &quot;Our Story&quot; → &quot;My Story&quot; and &quot;Our Work&quot; → &quot;My Work&quot; throughout your site.</p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleToggle('business')}
+              disabled={saving}
+              className={`flex-1 p-4 rounded-xl border text-center transition ${
+                currentMode === 'business'
+                  ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
+                  : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
+              }`}
+            >
+              <span className="text-2xl block mb-2">🏢</span>
+              <p className="font-bold">Business</p>
+              <p className="text-xs opacity-60 mt-1">&quot;Our Story&quot; · &quot;Our Work&quot; · &quot;We&quot;</p>
+            </button>
+            <button
+              onClick={() => handleToggle('individual')}
+              disabled={saving}
+              className={`flex-1 p-4 rounded-xl border text-center transition ${
+                currentMode === 'individual'
+                  ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
+                  : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
+              }`}
+            >
+              <span className="text-2xl block mb-2">👤</span>
+              <p className="font-bold">Individual</p>
+              <p className="text-xs opacity-60 mt-1">&quot;My Story&quot; · &quot;My Work&quot; · &quot;I&quot;</p>
+            </button>
           </div>
         </div>
       )}
@@ -730,6 +996,12 @@ export default function ClientDashboard() {
 
         {/* Brand Customization */}
         <BrandCustomizer data={data} onUpdate={setData} />
+
+        {/* Template Selector */}
+        <TemplateSelector data={data} onUpdate={setData} />
+
+        {/* Business vs Individual */}
+        <SiteModeToggle data={data} onUpdate={setData} />
 
         {/* Custom Change Request */}
         <div id="changes" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">

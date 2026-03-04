@@ -158,7 +158,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
         <section id="services" className="py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>Our Services</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>{data.site_mode === 'individual' ? 'My Services' : 'Our Services'}</h2>
               <p className="text-gray-600 text-lg max-w-2xl mx-auto">Professional solutions tailored to your needs.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -202,7 +202,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
         <section id="reviews" className="py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>What Our Clients Say</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: primary }}>{data.site_mode === 'individual' ? 'What My Clients Say' : 'What Our Clients Say'}</h2>
               {data.google_rating && (
                 <div className="flex items-center justify-center gap-3">
                   <StarRating rating={Math.round(data.google_rating)} />

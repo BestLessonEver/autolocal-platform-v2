@@ -118,7 +118,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
               <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>What We Do</p>
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight">Our Services</h2>
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tight">{data.site_mode === 'individual' ? 'My Services' : 'Our Services'}</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {data.services.map((s, i) => (
@@ -144,7 +144,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>About Us</p>
+              <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>{data.site_mode === 'individual' ? 'About Me' : 'About Us'}</p>
               <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-8" style={{ color: primary }}>
                 {data.business_name}
               </h2>
@@ -166,7 +166,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
                 {data.gallery_images[0] ? (
                   <img src={data.gallery_images[0]} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <img src={heroImg} alt="" className="w-full h-full object-cover" />
+                  <img src={heroImg} alt="" className="w-full h-full object-cover"  style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
                 )}
               </div>
               <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-2xl" style={{ backgroundColor: primary, opacity: 0.15 }} />

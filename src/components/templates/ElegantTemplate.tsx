@@ -106,8 +106,8 @@ export default function ElegantTemplate({ data }: TemplateProps) {
         <section id="services" className="py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
-              <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>What We Offer</p>
-              <h2 className="text-3xl sm:text-4xl font-bold" style={{ color: primary }}>Our Services</h2>
+              <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>{data.site_mode === 'individual' ? 'What I Offer' : 'What We Offer'}</p>
+              <h2 className="text-3xl sm:text-4xl font-bold" style={{ color: primary }}>{data.site_mode === 'individual' ? 'My Services' : 'Our Services'}</h2>
               <div className="w-16 h-[2px] mx-auto mt-6" style={{ backgroundColor: accent }} />
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -131,7 +131,7 @@ export default function ElegantTemplate({ data }: TemplateProps) {
         <section id="gallery" className="py-28 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
-              <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>Our Work</p>
+              <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>{data.site_mode === 'individual' ? 'My Work' : 'Our Work'}</p>
               <h2 className="text-3xl sm:text-4xl font-bold" style={{ color: primary }}>Gallery</h2>
               <div className="w-16 h-[2px] mx-auto mt-6" style={{ backgroundColor: accent }} />
             </div>
@@ -156,7 +156,7 @@ export default function ElegantTemplate({ data }: TemplateProps) {
       <section className="py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>Our Story</p>
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-sans font-semibold" style={{ color: accent }}>{data.site_mode === 'individual' ? 'My Story' : 'Our Story'}</p>
             <h2 className="text-3xl sm:text-4xl font-bold mb-8" style={{ color: primary }}>About {data.business_name}</h2>
             <div className="w-16 h-[2px] mx-auto mb-10" style={{ backgroundColor: accent }} />
             <p className="text-stone-600 text-lg leading-relaxed">

@@ -162,7 +162,7 @@ export default function ClutchTemplate({ data }: TemplateProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn className="text-center mb-14">
               <p className="text-sm font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3">What We Do</p>
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-[#0f172a]">Our Services</h2>
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-[#0f172a]">{data.site_mode === 'individual' ? 'My Services' : 'Our Services'}</h2>
             </FadeIn>
             <div className="grid sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {services.map((s, i) => (
@@ -189,7 +189,7 @@ export default function ClutchTemplate({ data }: TemplateProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <FadeIn>
-              <p className="text-sm font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3">Our Story</p>
+              <p className="text-sm font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3">{data.site_mode === 'individual' ? 'My Story' : 'Our Story'}</p>
               <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-[#0f172a] mb-6">
                 About {data.business_name}
               </h2>
@@ -218,7 +218,7 @@ export default function ClutchTemplate({ data }: TemplateProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn className="text-center mb-14">
               <p className="text-sm font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3">Testimonials</p>
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight">What Our Customers Say</h2>
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tight">{data.site_mode === 'individual' ? 'What My Customers Say' : 'What Our Customers Say'}</h2>
             </FadeIn>
             <div className="max-w-3xl mx-auto text-center">
               <div className="bg-white/5 border border-white/10 rounded-2xl p-10 sm:p-14 min-h-[260px] flex flex-col items-center justify-center">
