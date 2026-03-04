@@ -264,12 +264,12 @@ function generateHtml(data: PreviewData): string {
             <a href="tel:${data.phone}">${escapeHtml(data.phone)}</a>
           </div>
         </div>` : ''}
-        ${data.email ? `
+        ${((data as any).contact_email || data.email) ? `
         <div class="contact-item">
           <span class="icon">✉️</span>
           <div>
             <p class="label">Email</p>
-            <a href="mailto:${data.email}">${escapeHtml(data.email)}</a>
+            <a href="mailto:${((data as any).contact_email || data.email)}">${escapeHtml(((data as any).contact_email || data.email))}</a>
           </div>
         </div>` : ''}
       </div>

@@ -115,6 +115,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     reviews: (data.reviews || []).filter(r => r.rating >= 4),
     hero_crop: edits.hero_crop,
     site_mode: (data as any).site_mode || 'business',
+    email: (data as any).contact_email || data.email,
   }
 
   const Template = TEMPLATE_MAP[activeTemplate]

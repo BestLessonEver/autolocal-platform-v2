@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -156,7 +157,7 @@ function generateStaticHtml(data: SiteData): string {
         <h3 style="font-weight:700;color:#fff;margin-bottom:0.5rem">Contact Info</h3>
         ${data.address ? `<div class="contact-item"><span class="icon">📍</span><div><p class="label">Address</p><p class="value">${escapeHtml(data.address)}${data.city ? `, ${escapeHtml(data.city)}` : ''}${data.state ? `, ${escapeHtml(data.state)}` : ''}</p></div></div>` : ''}
         ${data.phone ? `<div class="contact-item"><span class="icon">📞</span><div><p class="label">Phone</p><a href="tel:${data.phone}">${escapeHtml(data.phone)}</a></div></div>` : ''}
-        ${data.email ? `<div class="contact-item"><span class="icon">✉️</span><div><p class="label">Email</p><a href="mailto:${data.email}">${escapeHtml(data.email)}</a></div></div>` : ''}
+        ${(data as any).contact_email || data.email ? `<div class="contact-item"><span class="icon">✉️</span><div><p class="label">Email</p><a href="mailto:${(data as any).contact_email || data.email}">${escapeHtml((data as any).contact_email || data.email)}</a></div></div>` : ''}
       </div>
     </div>
   </section>

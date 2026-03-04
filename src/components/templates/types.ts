@@ -20,6 +20,7 @@ export interface PreviewData {
   state: string | null
   phone: string | null
   email: string | null
+  contact_email?: string | null
   website_current: string | null
   reviews: { author: string; rating: number; text: string; date: string }[]
   google_rating: number | null
