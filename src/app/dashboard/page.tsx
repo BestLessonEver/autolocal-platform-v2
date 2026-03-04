@@ -804,29 +804,46 @@ function TemplateSelector({ data, onUpdate }: { data: SiteData; onUpdate: (d: Si
   const [saving, setSaving] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   const [pendingTemplate, setPendingTemplate] = useState<string | null>(null)
+  const [skipWarning, setSkipWarning] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('al_skip_template_warn') === '1'
+    return false
+  })
+  const [dontShowAgain, setDontShowAgain] = useState(false)
 
-  const handleSelect = (key: string) => {
-    if (key === data.template) return
-    setPendingTemplate(key)
-    setShowWarning(true)
-  }
-
-  const confirmChange = async () => {
-    if (!pendingTemplate) return
+  const applyTemplate = async (key: string) => {
     setSaving(true)
     try {
       const res = await fetch('/api/dashboard/me/details', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ template: pendingTemplate }),
+        body: JSON.stringify({ template: key }),
       })
       if (res.ok) {
-        onUpdate({ ...data, template: pendingTemplate })
+        onUpdate({ ...data, template: key })
       }
     } catch { /* ignore */ }
     setSaving(false)
     setShowWarning(false)
     setPendingTemplate(null)
+  }
+
+  const handleSelect = (key: string) => {
+    if (key === data.template) return
+    if (skipWarning) {
+      applyTemplate(key)
+      return
+    }
+    setPendingTemplate(key)
+    setShowWarning(true)
+  }
+
+  const confirmChange = () => {
+    if (!pendingTemplate) return
+    if (dontShowAgain) {
+      setSkipWarning(true)
+      localStorage.setItem('al_skip_template_warn', '1')
+    }
+    applyTemplate(pendingTemplate)
   }
 
   return (
@@ -874,16 +891,22 @@ function TemplateSelector({ data, onUpdate }: { data: SiteData; onUpdate: (d: Si
       {showWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
           <div className="bg-[#18181b] border border-white/10 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-white mb-3">⚠️ Change Template?</h3>
-            <p className="text-gray-400 text-sm mb-2">
-              Switching to <strong className="text-white capitalize">{pendingTemplate}</strong> will change your site&apos;s design.
+            <h3 className="text-xl font-bold text-white mb-3">🎨 Switch to <span className="capitalize">{pendingTemplate}</span>?</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Your site will be redeployed with the new design. This takes about 1–2 minutes to go live.
             </p>
-            <p className="text-amber-400 text-sm mb-6">
-              If you&apos;ve previously requested custom edits, those changes may not carry over to the new template.
-            </p>
+            <label className="flex items-center gap-2 mb-6 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={dontShowAgain}
+                onChange={e => setDontShowAgain(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-white/5 accent-indigo-500"
+              />
+              <span className="text-gray-500 text-sm">Don&apos;t show this message again</span>
+            </label>
             <div className="flex gap-3">
               <button onClick={confirmChange} disabled={saving} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition disabled:opacity-50">
-                {saving ? 'Switching...' : 'Yes, Switch Template'}
+                {saving ? 'Deploying...' : 'Switch Template'}
               </button>
               <button onClick={() => { setShowWarning(false); setPendingTemplate(null) }} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-bold hover:text-white transition">
                 Cancel
