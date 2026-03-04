@@ -66,6 +66,16 @@ function resolveTemplate(data: PreviewData): TemplateName {
 export default function PreviewWrapper({ data }: { data: PreviewData }) {
   const [bannerVisible, setBannerVisible] = useState(false)
   const [activeTemplate, setActiveTemplate] = useState<TemplateName>(() => resolveTemplate(data))
+  const [editOpen, setEditOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [edits, setEdits] = useState({
+    business_name: data.business_name || '',
+    tagline: data.tagline || '',
+    description: data.description || '',
+    phone: data.phone || '',
+    address: data.address || '',
+  })
 
   // Delay banner appearance by 3 seconds
   useEffect(() => {
@@ -73,9 +83,33 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     return () => clearTimeout(timer)
   }, [])
 
+  const handleSaveEdits = async () => {
+    setSaving(true)
+    try {
+      await fetch(`/api/preview/${data.slug}/edit`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(edits),
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch { /* silent */ }
+    setSaving(false)
+  }
+
+  // Apply edits to preview in real-time
+  const liveData = {
+    ...data,
+    business_name: edits.business_name || data.business_name,
+    tagline: edits.tagline || data.tagline,
+    description: edits.description || data.description,
+    phone: edits.phone || data.phone,
+    address: edits.address || data.address,
+  }
+
   // Filter out reviews below 4 stars
   const filteredData = {
-    ...data,
+    ...liveData,
     reviews: (data.reviews || []).filter(r => r.rating >= 4),
   }
 
@@ -150,13 +184,91 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             </div>
           </div>
         </div>
-        {/* Customization note */}
+        {/* Customize button */}
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
-          <p className="text-center text-xs text-indigo-600 py-1.5 font-medium">
-            ✏️ All text, photos, and colors can be customized after purchase
-          </p>
+          <button
+            onClick={() => setEditOpen(!editOpen)}
+            className="w-full text-center text-xs text-indigo-600 py-1.5 font-medium hover:text-indigo-800 transition"
+          >
+            ✏️ {editOpen ? 'Close Editor' : 'Customize your text — click here'}
+          </button>
         </div>
       </div>
+
+      {/* Edit Panel — slides down below banner */}
+      {editOpen && (
+        <div className="fixed top-[145px] sm:top-[130px] left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-lg">
+          <div className="max-w-2xl mx-auto px-4 py-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Business Name</label>
+                <input
+                  type="text"
+                  value={edits.business_name}
+                  onChange={e => setEdits({ ...edits, business_name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Tagline</label>
+                <input
+                  type="text"
+                  value={edits.tagline}
+                  onChange={e => setEdits({ ...edits, tagline: e.target.value })}
+                  placeholder="Your catchy headline"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+              <textarea
+                value={edits.description}
+                onChange={e => setEdits({ ...edits, description: e.target.value })}
+                rows={2}
+                placeholder="Tell visitors about your business..."
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none resize-none"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+                <input
+                  type="text"
+                  value={edits.phone}
+                  onChange={e => setEdits({ ...edits, phone: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Address</label>
+                <input
+                  type="text"
+                  value={edits.address}
+                  onChange={e => setEdits({ ...edits, address: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSaveEdits}
+                disabled={saving}
+                className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Changes'}
+              </button>
+              <button
+                onClick={() => setEditOpen(false)}
+                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition"
+              >
+                Close
+              </button>
+              {saved && <span className="text-green-600 text-xs font-medium">Changes saved — preview updated!</span>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Template content — no forced top padding, let the site breathe */}
       <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
