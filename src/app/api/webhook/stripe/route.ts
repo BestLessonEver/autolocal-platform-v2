@@ -207,7 +207,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .eq('email', email.toLowerCase())
     .eq('status', 'active')
     .then(() => {})
-    .catch(() => {})
 
   console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
 }
