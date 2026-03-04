@@ -181,6 +181,23 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const hasGoogleData = existing !== null && existing !== undefined
   await sendWelcomeEmail(email, contactName, businessName, hasGoogleData)
 
+  // Auto-deploy to Vercel with {slug}.autolocal.ai subdomain
+  const deploySlug = slug
+  if (deploySlug) {
+    fetch(`https://autolocal.ai/api/deploy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+      },
+      body: JSON.stringify({ slug: deploySlug }),
+    }).then(r => r.json()).then(r => {
+      console.log(`🚀 Auto-deploy result for ${deploySlug}:`, r)
+    }).catch(err => {
+      console.error(`Deploy error for ${deploySlug}:`, err)
+    })
+  }
+
   console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
 }
 
