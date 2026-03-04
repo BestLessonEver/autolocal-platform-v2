@@ -4,7 +4,7 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PRICES: Record<string, { id: string; mode: 'payment' | 'subscription' }> = {
-  website:  { id: 'price_1T6ks96rjk1X08jTmlFFzV5k', mode: 'payment' },
+  website:  { id: 'price_1T77nc6rjk1X08jT1bA3K1VW', mode: 'payment' }, // $1 TEST — swap back to price_1T6ks96rjk1X08jTmlFFzV5k for launch
   hosting:  { id: 'price_1T6ksA6rjk1X08jT7oK5ebY3', mode: 'subscription' },
   living:   { id: 'price_1T6ksA6rjk1X08jTHqC2DjC6', mode: 'subscription' },
   change:   { id: 'price_1T6ksB6rjk1X08jTZBgOJ20p', mode: 'payment' },
