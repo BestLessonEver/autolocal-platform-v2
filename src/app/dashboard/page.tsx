@@ -1,26 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+
+// ─── Types ──────────────────────────────────────────────────────────────────────
 
 interface SiteData {
   business_name: string
   slug: string
   tagline: string | null
+  description: string | null
   category: string
   city: string | null
   state: string | null
   phone: string | null
   email: string | null
+  contact_email: string | null
   address: string | null
   google_rating: number | null
   google_review_count: number
   status: string
   template: string
+  site_mode: string
   hero_image_url: string | null
-  services: { name: string; description: string; price?: string }[]
+  hero_crop: number
+  gallery_images: string[]
+  services: ServiceItem[]
   hours: Record<string, string> | null
   preview_url: string
   website_url: string
@@ -35,9 +42,25 @@ interface SiteData {
   brand_color_secondary: string
   brand_color_accent: string
   preview_id: string
+  website_current: string | null
 }
 
-// Change types removed — users do basic edits themselves, custom requests are $7
+interface ServiceItem {
+  name: string
+  description?: string
+  price?: string
+}
+
+// ─── Constants ──────────────────────────────────────────────────────────────────
+
+const TEMPLATES = [
+  { id: 'modern', name: 'Modern', emoji: '✨' },
+  { id: 'bold', name: 'Bold', emoji: '⚡' },
+  { id: 'professional', name: 'Professional', emoji: '💼' },
+  { id: 'clutch', name: 'Clutch', emoji: '🔥' },
+  { id: 'artika', name: 'Artika', emoji: '🎨' },
+  { id: 'bde', name: 'BDE', emoji: '🚀' },
+]
 
 const COLOR_PALETTES = [
   { name: 'Ocean', primary: '#0f172a', secondary: '#1e293b', accent: '#3b82f6' },
@@ -52,954 +75,249 @@ const COLOR_PALETTES = [
   { name: 'Midnight', primary: '#09090b', secondary: '#18181b', accent: '#6366f1' },
 ]
 
-function SiteEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [expanded, setExpanded] = useState(false)
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+// ─── Autosave Hook ──────────────────────────────────────────────────────────────
+
+function useAutosave(onSaved: () => void) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [form, setForm] = useState({
-    business_name: data.business_name,
-    tagline: data.tagline || '',
-    description: (data as any).description || '',
-    phone: data.phone || '',
-    email: data.email || '',
-    address: data.address || '',
-    city: data.city || '',
-    state: data.state || '',
-  })
-  const [services, setServices] = useState<{ name: string; description: string; price?: string }[]>(
-    data.services?.length ? data.services.map(s => ({ ...s, description: s.description || '' })) : [{ name: '', description: '', price: '' }]
-  )
-  const [hours, setHours] = useState<Record<string, string>>(data.hours || {})
 
-  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const TIME_OPTIONS = [
-    '', '6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM',
-    '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-    '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
-    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM',
-    '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM',
-    '9:00 PM', '9:30 PM', '10:00 PM', '10:30 PM', '11:00 PM',
-  ]
-
-  const parseHours = (val: string) => {
-    if (!val || val.toLowerCase() === 'closed') return { open: '', close: '', closed: !val || val.toLowerCase() === 'closed' }
-    const parts = val.split(/\s*[-–]\s*/)
-    return { open: parts[0]?.trim() || '', close: parts[1]?.trim() || '', closed: false }
-  }
-
-  const formatHours = (open: string, close: string, closed: boolean) => {
-    if (closed || (!open && !close)) return ''
-    return `${open} - ${close}`
-  }
-
-  const handleSave = async () => {
-    setSaving(true)
-    try {
-      const res = await fetch('/api/dashboard/me/details', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          display_email: form.email,
-          services: services.filter(s => s.name.trim()),
-          hours: Object.keys(hours).length ? hours : null,
-        }),
-      })
-      if (res.ok) {
-        const updated = await res.json()
-        onUpdate({ ...data, ...form, services: services.filter(s => s.name.trim()), hours })
-        setSaved(true)
-        setTimeout(() => setSaved(false), 3000)
-      } else {
-        const err = await res.json()
-        alert(err.error || 'Save failed')
-      }
-    } catch {
-      alert('Save failed. Please try again.')
-    }
-    setSaving(false)
-  }
-
-  const addService = () => setServices([...services, { name: '', description: '', price: '' }])
-  const removeService = (i: number) => setServices(services.filter((_, idx) => idx !== i))
-  const updateService = (i: number, field: string, value: string) => {
-    const updated = [...services]
-    updated[i] = { ...updated[i], [field]: value }
-    setServices(updated)
-  }
-
-  return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">✏️</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Edit Site Content</h2>
-            <p className="text-gray-500 text-sm">Update your text, services, hours, and contact info</p>
-          </div>
-        </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 space-y-6 border-t border-white/[0.06] pt-6">
-          {/* Business Info */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-300">Business Info</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Business Name</label>
-                <input type="text" value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Tagline</label>
-                <input type="text" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} placeholder="Your catchy headline" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1.5">Description</label>
-              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} placeholder="Tell visitors about your business..." className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition resize-none" />
-            </div>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-300">Contact Info</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Phone</label>
-                <input type="text" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Email</label>
-                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5">Address</label>
-                <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">City</label>
-                  <input type="text" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">State</label>
-                  <input type="text" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Services */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-300">Services</h3>
-              <button onClick={addService} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition">+ Add Service</button>
-            </div>
-            {services.map((s, i) => (
-              <div key={i} className="flex gap-3 items-start">
-                <div className="flex-1 grid grid-cols-3 gap-3">
-                  <input type="text" value={s.name} onChange={e => updateService(i, 'name', e.target.value)} placeholder="Service name" className="col-span-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
-                  <input type="text" value={s.price || ''} onChange={e => updateService(i, 'price', e.target.value)} placeholder="Price" className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
-                </div>
-                {services.length > 1 && (
-                  <button onClick={() => removeService(i)} className="text-red-400 hover:text-red-300 text-sm mt-2 transition">✕</button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Hours */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-300">Business Hours</h3>
-            <div className="space-y-2">
-              {DAYS.map(day => {
-                const parsed = parseHours(hours[day] || '')
-                const isClosed = !hours[day] || hours[day].toLowerCase() === 'closed'
-                return (
-                  <div key={day} className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 w-16 shrink-0">{day.slice(0, 3)}</span>
-                    <select
-                      value={parsed.open}
-                      onChange={e => setHours({ ...hours, [day]: formatHours(e.target.value, parsed.close, false) })}
-                      disabled={isClosed}
-                      className="flex-1 px-2 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition disabled:opacity-40 appearance-none"
-                    >
-                      <option value="" className="bg-[#18181b]">Open</option>
-                      {TIME_OPTIONS.filter(t => t).map(t => <option key={t} value={t} className="bg-[#18181b]">{t}</option>)}
-                    </select>
-                    <span className="text-gray-600 text-xs">to</span>
-                    <select
-                      value={parsed.close}
-                      onChange={e => setHours({ ...hours, [day]: formatHours(parsed.open, e.target.value, false) })}
-                      disabled={isClosed}
-                      className="flex-1 px-2 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition disabled:opacity-40 appearance-none"
-                    >
-                      <option value="" className="bg-[#18181b]">Close</option>
-                      {TIME_OPTIONS.filter(t => t).map(t => <option key={t} value={t} className="bg-[#18181b]">{t}</option>)}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => setHours({ ...hours, [day]: isClosed ? '9:00 AM - 5:00 PM' : 'Closed' })}
-                      className={`px-2.5 py-2 rounded-lg text-xs font-bold transition shrink-0 ${isClosed ? 'bg-red-500/20 text-red-400 border border-red-500/20' : 'bg-white/5 border border-white/10 text-gray-500 hover:text-white'}`}
-                    >
-                      {isClosed ? 'Closed' : 'Open'}
-                    </button>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Save */}
-          <div className="flex items-center gap-3 pt-2">
-            <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-50">
-              {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Changes'}
-            </button>
-            {saved && <span className="text-green-400 text-sm">Changes saved! Your site will update within a few minutes.</span>}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [expanded, setExpanded] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [gallery, setGallery] = useState<string[]>((data as any).gallery_images || [])
-  const [showCrop, setShowCrop] = useState(false)
-  const [heroCrop, setHeroCrop] = useState((data as any).hero_crop ?? 50)
-  const [cropSaving, setCropSaving] = useState(false)
-
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'hero' | 'gallery') => {
-    const files = e.target.files
-    if (!files?.length) return
-    setUploading(true)
-
-    for (let i = 0; i < files.length; i++) {
-      const formData = new FormData()
-      formData.append('photo', files[i])
-      formData.append('target', target)
-
-      try {
-        const res = await fetch('/api/dashboard/me/photos', { method: 'POST', body: formData })
-        const result = await res.json()
-        if (res.ok) {
-          if (target === 'hero') {
-            onUpdate({ ...data, hero_image_url: result.url })
-          } else {
-            setGallery(prev => [...prev, result.url])
+  const save = useCallback(
+    (fields: Record<string, unknown>) => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(async () => {
+        setSaving(true)
+        try {
+          const res = await fetch('/api/dashboard/me/details', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fields),
+          })
+          if (res.ok) {
+            setSaved(true)
+            onSaved()
+            setTimeout(() => setSaved(false), 2000)
           }
+        } catch { /* silent */ }
+        setSaving(false)
+      }, 2000)
+    },
+    [onSaved]
+  )
+
+  const saveNow = useCallback(
+    async (fields: Record<string, unknown>) => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      setSaving(true)
+      try {
+        const res = await fetch('/api/dashboard/me/details', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fields),
+        })
+        if (res.ok) {
+          setSaved(true)
+          onSaved()
+          setTimeout(() => setSaved(false), 2000)
         }
-      } catch { /* ignore */ }
+      } catch { /* silent */ }
+      setSaving(false)
+    },
+    [onSaved]
+  )
+
+  return { save, saveNow, saving, saved }
+}
+
+// ─── Inline Editable Text ───────────────────────────────────────────────────────
+
+function InlineEdit({
+  value,
+  onChange,
+  className = '',
+  placeholder = 'Click to edit',
+  multiline = false,
+}: {
+  value: string
+  onChange: (v: string) => void
+  className?: string
+  placeholder?: string
+  multiline?: boolean
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+
+  useEffect(() => { setDraft(value) }, [value])
+  useEffect(() => {
+    if (editing && inputRef.current) inputRef.current.focus()
+  }, [editing])
+
+  const commit = () => {
+    setEditing(false)
+    if (draft !== value) onChange(draft)
+  }
+
+  if (editing) {
+    if (multiline) {
+      return (
+        <textarea
+          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Escape') { setDraft(value); setEditing(false) } }}
+          rows={4}
+          className={`w-full px-3 py-2 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none resize-none ${className}`}
+          placeholder={placeholder}
+        />
+      )
     }
-    setUploading(false)
-    e.target.value = ''
+    return (
+      <input
+        ref={inputRef as React.RefObject<HTMLInputElement>}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={e => {
+          if (e.key === 'Enter') commit()
+          if (e.key === 'Escape') { setDraft(value); setEditing(false) }
+        }}
+        className={`px-3 py-1 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none ${className}`}
+        placeholder={placeholder}
+      />
+    )
   }
-
-  const setAsHero = async (url: string) => {
-    const res = await fetch('/api/dashboard/me/photos', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'set_hero', url }),
-    })
-    if (res.ok) onUpdate({ ...data, hero_image_url: url })
-  }
-
-  const removePhoto = async (url: string) => {
-    const res = await fetch('/api/dashboard/me/photos', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'remove', url }),
-    })
-    if (res.ok) {
-      setGallery(prev => prev.filter(u => u !== url))
-      if (data.hero_image_url === url) {
-        const remaining = gallery.filter(u => u !== url)
-        onUpdate({ ...data, hero_image_url: remaining[0] || null })
-      }
-    }
-  }
-
-  const saveCrop = async () => {
-    setCropSaving(true)
-    try {
-      await fetch('/api/dashboard/me/details', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hero_crop: heroCrop }),
-      })
-      onUpdate({ ...data, hero_crop: heroCrop } as any)
-      setShowCrop(false)
-    } catch { /* ignore */ }
-    setCropSaving(false)
-  }
-
-  // Move photo by index (arrow reorder)
-  const movePhoto = async (fromIdx: number, toIdx: number) => {
-    if (toIdx < 0 || toIdx >= gallery.length) return
-    const newGallery = [...gallery]
-    const [moved] = newGallery.splice(fromIdx, 1)
-    newGallery.splice(toIdx, 0, moved)
-    setGallery(newGallery)
-    onUpdate({ ...data, gallery_images: newGallery } as any)
-    await fetch('/api/dashboard/me/photos', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'reorder', gallery_images: newGallery }),
-    })
-  }
-
-  const allPhotos = Array.from(new Set([data.hero_image_url, ...gallery].filter(Boolean))) as string[]
 
   return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">📸</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Manage Photos</h2>
-            <p className="text-gray-500 text-sm">Set your hero image, add gallery photos, drag to reorder</p>
-          </div>
-        </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 space-y-6 border-t border-white/[0.06] pt-6">
-          {/* Hero Image with crop */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 mb-3">Hero Image</h3>
-            <p className="text-xs text-gray-500 mb-3">Click the image to adjust cropping.</p>
-            <div
-              className="relative rounded-xl overflow-hidden bg-white/5 border border-white/10 cursor-pointer group"
-              style={{ height: 200 }}
-              onClick={() => data.hero_image_url && setShowCrop(!showCrop)}
-            >
-              {data.hero_image_url ? (
-                <>
-                  <img src={data.hero_image_url} alt="Hero" className="w-full h-full object-cover" style={{ objectPosition: `center ${heroCrop}%` }} />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
-                    <span className="opacity-0 group-hover:opacity-100 transition text-white text-sm font-bold flex items-center gap-2">
-                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 2v4M18 2v4M6 18v4M18 18v4M2 6h4M2 18h4M18 6h4M18 18h4"/><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
-                      Adjust Crop
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-600">No hero image set</div>
-              )}
-            </div>
-
-            {/* Crop slider */}
-            {showCrop && data.hero_image_url && (
-              <div className="mt-3 p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-32 h-20 rounded-lg overflow-hidden border border-white/10 shrink-0">
-                    <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${heroCrop}%` }} />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs text-gray-500 mb-2">Image Position</label>
-                    <input type="range" min="0" max="100" value={heroCrop} onChange={e => setHeroCrop(parseInt(e.target.value))} className="w-full accent-indigo-600" />
-                    <div className="flex justify-between text-[10px] text-gray-500 mt-1"><span>Top</span><span>Center</span><span>Bottom</span></div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={saveCrop} disabled={cropSaving} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition disabled:opacity-50">
-                    {cropSaving ? 'Saving...' : 'Save Crop'}
-                  </button>
-                  <button onClick={() => setShowCrop(false)} className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">Cancel</button>
-                </div>
-              </div>
-            )}
-
-            <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer mt-3">
-              {uploading ? (
-                <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
-              ) : (
-                <>📤 Upload Hero Image</>
-              )}
-              <input type="file" accept="image/*" onChange={e => handleUpload(e, 'hero')} className="hidden" disabled={uploading} />
-            </label>
-          </div>
-
-          {/* Gallery with arrow reorder */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 mb-3">Site Photos ({allPhotos.length})</h3>
-            <p className="text-xs text-gray-500 mb-3">Use arrows to reorder. First gallery photo shows on your site.</p>
-
-            {allPhotos.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {allPhotos.map((url, i) => {
-                  const galleryIdx = gallery.indexOf(url)
-                  const isHero = url === data.hero_image_url
-                  const isGallery = galleryIdx >= 0
-                  return (
-                    <div key={url} className="relative group rounded-lg overflow-hidden bg-white/5 border border-white/10 aspect-square">
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      {isHero && (
-                        <div className="absolute top-1.5 left-1.5 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">HERO</div>
-                      )}
-                      {isGallery && galleryIdx === 0 && !isHero && (
-                        <div className="absolute top-1.5 left-1.5 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#1</div>
-                      )}
-                      {/* Arrow buttons + actions overlay */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
-                        {/* Reorder arrows (only for gallery photos) */}
-                        {isGallery && gallery.length > 1 && (
-                          <div className="flex gap-1.5">
-                            <button
-                              onClick={() => movePhoto(galleryIdx, galleryIdx - 1)}
-                              disabled={galleryIdx === 0}
-                              className="w-8 h-8 rounded-lg bg-white/20 text-white text-sm font-bold hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
-                            >←</button>
-                            <button
-                              onClick={() => movePhoto(galleryIdx, galleryIdx + 1)}
-                              disabled={galleryIdx === gallery.length - 1}
-                              className="w-8 h-8 rounded-lg bg-white/20 text-white text-sm font-bold hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
-                            >→</button>
-                          </div>
-                        )}
-                        <div className="flex gap-1.5">
-                          {!isHero && (
-                            <button onClick={() => setAsHero(url)} className="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition">
-                              Set Hero
-                            </button>
-                          )}
-                          <button onClick={() => removePhoto(url)} className="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500 transition">
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-600">No photos yet</div>
-            )}
-
-            <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer mt-3">
-              {uploading ? (
-                <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
-              ) : (
-                <>📤 Add Photos</>
-              )}
-              <input type="file" accept="image/*" multiple onChange={e => handleUpload(e, 'gallery')} className="hidden" disabled={uploading} />
-            </label>
-          </div>
-        </div>
-      )}
-    </div>
+    <span
+      onClick={() => setEditing(true)}
+      className={`cursor-pointer hover:bg-white/5 rounded px-1 -mx-1 transition inline-block ${!value ? 'text-gray-600 italic' : ''} ${className}`}
+      title="Click to edit"
+    >
+      {value || placeholder}
+    </span>
   )
 }
 
-function BrandCustomizer({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [logoUploading, setLogoUploading] = useState(false)
-  const [colorSaving, setColorSaving] = useState(false)
-  const [colorSaved, setColorSaved] = useState(false)
+// ─── Save Badge ─────────────────────────────────────────────────────────────────
+
+function SaveBadge({ saving, saved }: { saving: boolean; saved: boolean }) {
+  if (saving) return <span className="text-xs text-gray-400 animate-pulse">Saving...</span>
+  if (saved) return <span className="text-xs text-green-400 transition-opacity">✓ Saved</span>
+  return null
+}
+
+// ─── Brand Controls ─────────────────────────────────────────────────────────────
+
+function BrandControls({ data, onUpdate }: { data: SiteData; onUpdate: (d: Partial<SiteData>) => void }) {
   const [primary, setPrimary] = useState(data.brand_color_primary)
   const [secondary, setSecondary] = useState(data.brand_color_secondary)
   const [accent, setAccent] = useState(data.brand_color_accent)
-  const [expanded, setExpanded] = useState(false)
+  const [colorSaving, setColorSaving] = useState(false)
+  const [colorSaved, setColorSaved] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setLogoUploading(true)
+  useEffect(() => {
+    setPrimary(data.brand_color_primary)
+    setSecondary(data.brand_color_secondary)
+    setAccent(data.brand_color_accent)
+  }, [data.brand_color_primary, data.brand_color_secondary, data.brand_color_accent])
+
+  const hasChanges = primary !== data.brand_color_primary || secondary !== data.brand_color_secondary || accent !== data.brand_color_accent
+
+  const handleLogoUpload = async (file: File) => {
     const formData = new FormData()
     formData.append('logo', file)
     try {
       const res = await fetch('/api/dashboard/me/brand', { method: 'POST', body: formData })
       const result = await res.json()
-      if (res.ok && result.logo_url) {
-        onUpdate({ ...data, logo_url: result.logo_url })
-      } else {
-        alert(result.error || 'Upload failed')
-      }
-    } catch {
-      alert('Upload failed. Please try again.')
-    }
-    setLogoUploading(false)
+      if (res.ok && result.logo_url) onUpdate({ logo_url: result.logo_url })
+    } catch { /* silent */ }
   }
 
-  const handleColorSave = async () => {
+  const handleSave = async () => {
     setColorSaving(true)
     try {
       const res = await fetch('/api/dashboard/me/brand', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brand_color_primary: primary,
-          brand_color_secondary: secondary,
-          brand_color_accent: accent,
-        }),
+        body: JSON.stringify({ brand_color_primary: primary, brand_color_secondary: secondary, brand_color_accent: accent }),
       })
       if (res.ok) {
-        onUpdate({ ...data, brand_color_primary: primary, brand_color_secondary: secondary, brand_color_accent: accent })
+        onUpdate({ brand_color_primary: primary, brand_color_secondary: secondary, brand_color_accent: accent })
         setColorSaved(true)
-        setTimeout(() => setColorSaved(false), 3000)
-      } else {
-        const result = await res.json()
-        alert(result.error || 'Save failed')
+        setTimeout(() => setColorSaved(false), 2000)
       }
-    } catch {
-      alert('Save failed. Please try again.')
-    }
+    } catch { /* silent */ }
     setColorSaving(false)
   }
 
-  const applyPalette = (p: typeof COLOR_PALETTES[0]) => {
-    setPrimary(p.primary)
-    setSecondary(p.secondary)
-    setAccent(p.accent)
-  }
-
   return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
+    <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
+      <h3 className="text-sm font-semibold text-gray-400">Brand</h3>
+      <div className="flex items-center gap-6 flex-wrap">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">🎨</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Customize Your Brand</h2>
-            <p className="text-gray-500 text-sm">Upload your logo and choose your colors</p>
+          <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+            {data.logo_url ? <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain" /> : <span className="text-xl text-gray-600">📷</span>}
           </div>
+          <label className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer">
+            {data.logo_url ? 'Change' : 'Upload Logo'}
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f) }} className="hidden" />
+          </label>
         </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 space-y-8 border-t border-white/[0.06] pt-6">
-          {/* Logo Upload */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 mb-3">Your Logo</h3>
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
-                {data.logo_url ? (
-                  <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <span className="text-3xl text-gray-600">📷</span>
-                )}
-              </div>
-              <div>
-                <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer">
-                  {logoUploading ? (
-                    <><span className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />Uploading...</>
-                  ) : (
-                    <>📤 {data.logo_url ? 'Replace Logo' : 'Upload Logo'}</>
-                  )}
-                  <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={handleLogoUpload} className="hidden" disabled={logoUploading} />
-                </label>
-                <p className="text-xs text-gray-600 mt-2">PNG, JPG, WebP, or SVG. Max 5MB.</p>
-              </div>
-            </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowPicker(!showPicker)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:border-white/20 transition" title="Edit colors">
+            <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: primary }} />
+            <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: secondary }} />
+            <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: accent }} />
+            <span className="text-xs text-gray-400 ml-1">Colors</span>
+          </button>
+          {colorSaved && <span className="text-xs text-green-400">✓ Saved</span>}
+        </div>
+      </div>
+      {showPicker && (
+        <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div className="flex flex-wrap gap-1.5">
+            {COLOR_PALETTES.map(p => (
+              <button key={p.name} onClick={() => { setPrimary(p.primary); setSecondary(p.secondary); setAccent(p.accent) }}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition ${primary === p.primary && accent === p.accent ? 'border-indigo-500/50 bg-indigo-500/10 text-white' : 'border-white/[0.06] text-gray-500 hover:border-white/10'}`}>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.primary }} />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.accent }} />
+                {p.name}
+              </button>
+            ))}
           </div>
-
-          {/* Color Palettes */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 mb-3">Color Palette</h3>
-            <p className="text-xs text-gray-500 mb-4">Choose a preset or customize your own colors below.</p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
-              {COLOR_PALETTES.map(p => (
-                <button key={p.name} onClick={() => applyPalette(p)} className={`flex items-center gap-2 p-2.5 rounded-lg border text-xs font-medium transition ${primary === p.primary && accent === p.accent ? 'border-indigo-500/50 bg-indigo-500/10 text-white' : 'border-white/[0.06] bg-white/[0.02] text-gray-400 hover:border-white/10'}`}>
-                  <div className="flex gap-0.5 shrink-0">
-                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.primary }} />
-                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: p.accent }} />
-                  </div>
-                  {p.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: 'Primary', value: primary, set: setPrimary },
-                { label: 'Secondary', value: secondary, set: setSecondary },
-                { label: 'Accent', value: accent, set: setAccent },
-              ].map(c => (
-                <div key={c.label}>
-                  <label className="block text-xs text-gray-500 mb-2">{c.label}</label>
-                  <div className="flex items-center gap-2">
-                    <input type="color" value={c.value} onChange={e => c.set(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border border-white/10 bg-transparent" />
-                    <input type="text" value={c.value} onChange={e => c.set(e.target.value)} className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-xs font-mono focus:border-indigo-500 outline-none" />
-                  </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[{ label: 'Primary', value: primary, set: setPrimary }, { label: 'Secondary', value: secondary, set: setSecondary }, { label: 'Accent', value: accent, set: setAccent }].map(c => (
+              <div key={c.label}>
+                <label className="block text-[10px] text-gray-500 mb-1">{c.label}</label>
+                <div className="flex items-center gap-1.5">
+                  <input type="color" value={c.value} onChange={e => c.set(e.target.value)} className="w-8 h-8 rounded cursor-pointer border border-white/10 bg-transparent" />
+                  <input type="text" value={c.value} onChange={e => c.set(e.target.value)} className="flex-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white text-[11px] font-mono focus:border-indigo-500 outline-none" />
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-4 rounded-xl overflow-hidden flex h-12">
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 rounded-lg overflow-hidden flex h-8">
               <div className="flex-[3]" style={{ backgroundColor: primary }} />
               <div className="flex-[2]" style={{ backgroundColor: secondary }} />
               <div className="flex-[1]" style={{ backgroundColor: accent }} />
             </div>
-
-            <div className="mt-4 flex items-center gap-3">
-              <button onClick={handleColorSave} disabled={colorSaving || (primary === data.brand_color_primary && secondary === data.brand_color_secondary && accent === data.brand_color_accent)} className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40 disabled:cursor-not-allowed">
-                {colorSaving ? 'Saving...' : colorSaved ? '✓ Saved!' : 'Save Colors'}
-              </button>
-              {colorSaved && <span className="text-green-400 text-sm">Colors updated! Refresh your site preview to see changes.</span>}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function FeedbackPanel({ siteSlug, userEmail }: { siteSlug: string; userEmail: string }) {
-  const [message, setMessage] = useState('')
-  const [type, setType] = useState<'feedback' | 'bug'>('feedback')
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!message.trim()) return
-    setSending(true)
-    try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, message: message.trim(), slug: siteSlug, email: userEmail }),
-      })
-      setSent(true)
-      setMessage('')
-      setTimeout(() => setSent(false), 5000)
-    } catch { /* ignore */ }
-    setSending(false)
-  }
-
-  return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-      <h2 className="text-lg font-bold text-white mb-1">💬 Feedback & Bug Reports</h2>
-      <p className="text-gray-500 text-sm mb-4">Found a bug or have a suggestion? Let us know — we read everything.</p>
-
-      {sent ? (
-        <div className="text-center py-6">
-          <span className="text-3xl block mb-2">🙏</span>
-          <p className="text-white font-bold">Thanks for the feedback!</p>
-          <p className="text-gray-500 text-sm mt-1">We&apos;ll look into it.</p>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-2">
-            <button type="button" onClick={() => setType('feedback')} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${type === 'feedback' ? 'bg-indigo-600/20 border border-indigo-500/40 text-indigo-400' : 'bg-white/[0.02] border border-white/[0.06] text-gray-500'}`}>
-              💡 Feedback
-            </button>
-            <button type="button" onClick={() => setType('bug')} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${type === 'bug' ? 'bg-red-600/20 border border-red-500/40 text-red-400' : 'bg-white/[0.02] border border-white/[0.06] text-gray-500'}`}>
-              🐛 Bug Report
-            </button>
-          </div>
-          <textarea
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            rows={3}
-            required
-            placeholder={type === 'bug' ? 'What went wrong? What did you expect to happen?' : 'What would make this better?'}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition resize-none text-sm"
-          />
-          <button type="submit" disabled={sending || !message.trim()} className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-bold hover:bg-white/10 transition disabled:opacity-40">
-            {sending ? 'Sending...' : 'Send'}
-          </button>
-        </form>
-      )}
-    </div>
-  )
-}
-
-function SubdomainEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [expanded, setExpanded] = useState(false)
-  const [value, setValue] = useState(data.slug)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-
-  const handleSave = async () => {
-    const clean = value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '')
-    if (clean.length < 3) { setError('Must be at least 3 characters'); return }
-    if (clean === data.slug) { setError('That\'s already your subdomain'); return }
-    setSaving(true)
-    setError('')
-    setSuccess('')
-    try {
-      const res = await fetch('/api/dashboard/me/subdomain', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subdomain: clean }),
-      })
-      const result = await res.json()
-      if (res.ok) {
-        onUpdate({ ...data, slug: result.slug, website_url: result.url, preview_url: `https://autolocal.ai/preview/${result.slug}` })
-        setValue(result.slug)
-        setSuccess(`Updated! Your site is now at ${result.subdomain}`)
-        setTimeout(() => setSuccess(''), 5000)
-      } else {
-        setError(result.error || 'Failed to update')
-      }
-    } catch { setError('Connection error') }
-    setSaving(false)
-  }
-
-  return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🌐</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Your Website URL</h2>
-            <p className="text-gray-500 text-sm">{data.slug}.autolocal.ai</p>
-          </div>
-        </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6 space-y-4">
-          <p className="text-xs text-gray-500">Change your subdomain. Your site will be available at <strong className="text-gray-300">[name].autolocal.ai</strong></p>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden focus-within:border-indigo-500 transition">
-              <input
-                type="text"
-                value={value}
-                onChange={e => { setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')); setError(''); setSuccess('') }}
-                className="flex-1 px-4 py-2.5 bg-transparent text-white text-sm outline-none"
-                placeholder="my-business"
-              />
-              <span className="text-gray-500 text-sm pr-3 shrink-0">.autolocal.ai</span>
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={saving || value === data.slug}
-              className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40 shrink-0"
-            >
-              {saving ? 'Saving...' : 'Update'}
-            </button>
-          </div>
-          {error && <p className="text-red-400 text-xs">{error}</p>}
-          {success && <p className="text-green-400 text-xs">{success}</p>}
-        </div>
-      )}
-    </div>
-  )
-}
-
-const TEMPLATE_OPTIONS = [
-  { key: 'bold', label: 'Bold', icon: '⚡', desc: 'High-contrast, attention-grabbing design' },
-  { key: 'elegant', label: 'Elegant', icon: '✨', desc: 'Refined and sophisticated' },
-  { key: 'professional', label: 'Professional', icon: '🏢', desc: 'Clean corporate look' },
-  { key: 'clutch', label: 'Clutch', icon: '🔥', desc: 'Modern and edgy' },
-  { key: 'artika', label: 'Artika', icon: '🎨', desc: 'Creative and artistic' },
-  { key: 'bde', label: 'Dark', icon: '🖤', desc: 'Sleek dark theme' },
-]
-
-function TemplateSelector({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [expanded, setExpanded] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [showWarning, setShowWarning] = useState(false)
-  const [pendingTemplate, setPendingTemplate] = useState<string | null>(null)
-  const [skipWarning, setSkipWarning] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('al_skip_template_warn') === '1'
-    return false
-  })
-  const [dontShowAgain, setDontShowAgain] = useState(false)
-
-  const applyTemplate = async (key: string) => {
-    setSaving(true)
-    try {
-      const res = await fetch('/api/dashboard/me/details', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ template: key }),
-      })
-      if (res.ok) {
-        onUpdate({ ...data, template: key })
-      }
-    } catch { /* ignore */ }
-    setSaving(false)
-    setShowWarning(false)
-    setPendingTemplate(null)
-  }
-
-  const handleSelect = (key: string) => {
-    if (key === data.template) return
-    if (skipWarning) {
-      applyTemplate(key)
-      return
-    }
-    setPendingTemplate(key)
-    setShowWarning(true)
-  }
-
-  const confirmChange = () => {
-    if (!pendingTemplate) return
-    if (dontShowAgain) {
-      setSkipWarning(true)
-      localStorage.setItem('al_skip_template_warn', '1')
-    }
-    applyTemplate(pendingTemplate)
-  }
-
-  return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🎭</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Design Template</h2>
-            <p className="text-gray-500 text-sm">Currently using: <span className="text-white capitalize">{data.template}</span></p>
-          </div>
-        </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {TEMPLATE_OPTIONS.map(t => (
-              <button
-                key={t.key}
-                onClick={() => handleSelect(t.key)}
-                className={`text-left p-4 rounded-xl border transition ${
-                  data.template === t.key
-                    ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
-                    : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
-                }`}
-              >
-                <span className="text-xl">{t.icon}</span>
-                <p className="font-bold mt-2">{t.label}</p>
-                <p className="text-xs opacity-60 mt-0.5">{t.desc}</p>
-                {data.template === t.key && (
-                  <span className="text-xs text-indigo-400 font-bold mt-2 block">● Current</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Warning modal */}
-      {showWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-          <div className="bg-[#18181b] border border-white/10 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-white mb-3">🎨 Switch to <span className="capitalize">{pendingTemplate}</span>?</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Your site will be redeployed with the new design. This takes about 1–2 minutes to go live.
-            </p>
-            <label className="flex items-center gap-2 mb-6 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={dontShowAgain}
-                onChange={e => setDontShowAgain(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-white/5 accent-indigo-500"
-              />
-              <span className="text-gray-500 text-sm">Don&apos;t show this message again</span>
-            </label>
-            <div className="flex gap-3">
-              <button onClick={confirmChange} disabled={saving} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition disabled:opacity-50">
-                {saving ? 'Deploying...' : 'Switch Template'}
-              </button>
-              <button onClick={() => { setShowWarning(false); setPendingTemplate(null) }} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-bold hover:text-white transition">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function SiteModeToggle({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
-  const [expanded, setExpanded] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const currentMode = (data as any).site_mode || 'business'
-
-  const handleToggle = async (mode: string) => {
-    if (mode === currentMode) return
-    setSaving(true)
-    try {
-      const res = await fetch('/api/dashboard/me/details', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_mode: mode }),
-      })
-      if (res.ok) {
-        onUpdate({ ...data, site_mode: mode } as any)
-      }
-    } catch { /* ignore */ }
-    setSaving(false)
-  }
-
-  return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">👤</span>
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">Site Type</h2>
-            <p className="text-gray-500 text-sm">How should your site read? <span className="text-white capitalize">{currentMode === 'individual' ? 'Individual (My/I)' : 'Business (Our/We)'}</span></p>
-          </div>
-        </div>
-        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6">
-          <p className="text-xs text-gray-500 mb-4">This changes headings like &quot;Our Story&quot; → &quot;My Story&quot; and &quot;Our Work&quot; → &quot;My Work&quot; throughout your site.</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleToggle('business')}
-              disabled={saving}
-              className={`flex-1 p-4 rounded-xl border text-center transition ${
-                currentMode === 'business'
-                  ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
-                  : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
-              }`}
-            >
-              <span className="text-2xl block mb-2">🏢</span>
-              <p className="font-bold">Business</p>
-              <p className="text-xs opacity-60 mt-1">&quot;Our Story&quot; · &quot;Our Work&quot; · &quot;We&quot;</p>
-            </button>
-            <button
-              onClick={() => handleToggle('individual')}
-              disabled={saving}
-              className={`flex-1 p-4 rounded-xl border text-center transition ${
-                currentMode === 'individual'
-                  ? 'bg-indigo-600/20 border-indigo-500/40 text-white'
-                  : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'
-              }`}
-            >
-              <span className="text-2xl block mb-2">👤</span>
-              <p className="font-bold">Individual</p>
-              <p className="text-xs opacity-60 mt-1">&quot;My Story&quot; · &quot;My Work&quot; · &quot;I&quot;</p>
+            <button onClick={handleSave} disabled={colorSaving || !hasChanges} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition disabled:opacity-40">
+              {colorSaving ? '...' : 'Save Colors'}
             </button>
           </div>
         </div>
       )}
-    </div>
+    </section>
   )
 }
+
+// ─── Main Dashboard ─────────────────────────────────────────────────────────────
 
 export default function ClientDashboard() {
   const router = useRouter()
@@ -1009,62 +327,25 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [userEmail, setUserEmail] = useState('')
-  const [deployStatus, setDeployStatus] = useState<string>('live')
-  const pollRef = useRef<NodeJS.Timeout | null>(null)
+  const [previewKey, setPreviewKey] = useState(0)
+  const [mobilePreview, setMobilePreview] = useState(false)
 
-  // Poll deploy status from DB until it's no longer 'deploying'
-  const startDeployPoll = () => {
-    setDeployStatus('deploying')
-    if (pollRef.current) clearInterval(pollRef.current)
-    pollRef.current = setInterval(async () => {
-      try {
-        const res = await fetch('/api/dashboard/me')
-        if (res.ok) {
-          const d = await res.json()
-          const status = d.deploy_status || 'live'
-          if (status !== 'deploying') {
-            setDeployStatus(status)
-            if (pollRef.current) clearInterval(pollRef.current)
-          }
-        }
-      } catch { /* ignore poll errors */ }
-    }, 3000)
-    // Safety timeout — stop polling after 60s
-    setTimeout(() => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current)
-        setDeployStatus(prev => prev === 'deploying' ? 'live' : prev)
-      }
-    }, 60000)
-  }
-
-  const handleUpdate = (newData: SiteData) => {
-    setData(newData)
-    if ((newData as any).website_current || newData.website_url) {
-      startDeployPoll()
-    }
-  }
-
-  // Change request form
+  // Change request
   const [changeMessage, setChangeMessage] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [submittingChange, setSubmittingChange] = useState(false)
+  const [changeSubmitted, setChangeSubmitted] = useState(false)
+
+  const refreshPreview = useCallback(() => { setPreviewKey(k => k + 1) }, [])
+  const { save, saveNow, saving, saved } = useAutosave(refreshPreview)
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
+      if (!user) { router.push('/login'); return }
       setUserEmail(user.email || '')
-
       try {
         const res = await fetch('/api/dashboard/me')
-        if (res.status === 401) {
-          router.push('/login')
-          return
-        }
+        if (res.status === 401) { router.push('/login'); return }
         if (!res.ok) {
           const err = await res.json()
           setError(err.error || 'No website found for this account.')
@@ -1072,46 +353,125 @@ export default function ClientDashboard() {
           return
         }
         setData(await res.json())
-      } catch {
-        setError('Failed to load dashboard.')
-      }
+      } catch { setError('Failed to load dashboard.') }
       setLoading(false)
     }
     load()
   }, [])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
+  const handleLogout = async () => { await supabase.auth.signOut(); router.push('/login') }
+
+  const updateField = useCallback((field: string, value: unknown) => {
+    if (!data) return
+    setData(prev => prev ? { ...prev, [field]: value } : prev)
+    save({ [field]: value })
+  }, [data, save])
+
+  const updateFieldNow = useCallback((field: string, value: unknown) => {
+    if (!data) return
+    setData(prev => prev ? { ...prev, [field]: value } : prev)
+    saveNow({ [field]: value })
+  }, [data, saveNow])
+
+  const mergeUpdate = useCallback((partial: Partial<SiteData>) => {
+    setData(prev => prev ? { ...prev, ...partial } : prev)
+    refreshPreview()
+  }, [refreshPreview])
+
+  // Photo handlers
+  const handlePhotoUpload = async (file: File, target: 'hero' | 'gallery') => {
+    const formData = new FormData()
+    formData.append('photo', file)
+    formData.append('target', target)
+    try {
+      const res = await fetch('/api/dashboard/me/photos', { method: 'POST', body: formData })
+      const result = await res.json()
+      if (res.ok) {
+        if (target === 'hero') setData(prev => prev ? { ...prev, hero_image_url: result.url } : prev)
+        else setData(prev => prev ? { ...prev, gallery_images: [...(prev.gallery_images || []), result.url] } : prev)
+        refreshPreview()
+      }
+    } catch { /* silent */ }
   }
 
-  const handleSubmitChange = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!changeMessage.trim()) return
-    setSubmitting(true)
+  const handlePhotoRemove = async (url: string) => {
+    try {
+      const res = await fetch('/api/dashboard/me/photos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remove', url }),
+      })
+      if (res.ok) {
+        setData(prev => {
+          if (!prev) return prev
+          const gallery = prev.gallery_images.filter(u => u !== url)
+          const heroUrl = prev.hero_image_url === url ? (gallery[0] || null) : prev.hero_image_url
+          return { ...prev, gallery_images: gallery, hero_image_url: heroUrl }
+        })
+        refreshPreview()
+      }
+    } catch { /* silent */ }
+  }
 
+  // Service handlers
+  const updateService = (idx: number, field: keyof ServiceItem, value: string) => {
+    if (!data) return
+    const services = [...(data.services || [])]
+    services[idx] = { ...services[idx], [field]: value }
+    setData(prev => prev ? { ...prev, services } : prev)
+    save({ services })
+  }
+  const addService = () => {
+    if (!data) return
+    const services = [...(data.services || []), { name: 'New Service', description: '', price: '' }]
+    setData(prev => prev ? { ...prev, services } : prev)
+    saveNow({ services })
+  }
+  const removeService = (idx: number) => {
+    if (!data) return
+    const services = (data.services || []).filter((_, i) => i !== idx)
+    setData(prev => prev ? { ...prev, services } : prev)
+    saveNow({ services })
+  }
+
+  // Hours handlers
+  const updateHour = (day: string, value: string) => {
+    if (!data) return
+    const hours = { ...(data.hours || {}), [day]: value }
+    setData(prev => prev ? { ...prev, hours } : prev)
+    save({ hours })
+  }
+  const toggleDayClosed = (day: string) => {
+    if (!data) return
+    const current = data.hours?.[day] || ''
+    const isClosed = current.toLowerCase() === 'closed' || !current
+    updateHour(day, isClosed ? '9:00 AM - 5:00 PM' : 'Closed')
+  }
+  const copyToWeekdays = () => {
+    if (!data) return
+    const mondayHours = data.hours?.['Monday'] || '9:00 AM - 5:00 PM'
+    const hours = { ...(data.hours || {}) }
+    for (const day of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) hours[day] = mondayHours
+    setData(prev => prev ? { ...prev, hours } : prev)
+    saveNow({ hours })
+  }
+
+  // Change request
+  const submitChange = async () => {
+    if (!changeMessage.trim()) return
+    setSubmittingChange(true)
     try {
       const res = await fetch('/api/dashboard/me/changes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'custom',
-          message: changeMessage.trim(),
-          priority: 'normal',
-        }),
+        body: JSON.stringify({ type: 'custom', message: changeMessage.trim(), priority: 'normal' }),
       })
-      const result = await res.json()
-      if (res.ok) {
-        setSubmitted(true)
-        setChangeMessage('')
-      } else {
-        alert(result.error || 'Something went wrong')
-      }
-    } catch {
-      alert('Connection error. Please try again.')
-    }
-    setSubmitting(false)
+      if (res.ok) { setChangeSubmitted(true); setChangeMessage(''); setTimeout(() => setChangeSubmitted(false), 5000) }
+    } catch { /* silent */ }
+    setSubmittingChange(false)
   }
+
+  // ─── Loading / Error ──────────────────────
 
   if (loading) {
     return (
@@ -1128,189 +488,259 @@ export default function ClientDashboard() {
           <span className="text-5xl mb-4 block">🔍</span>
           <h1 className="text-2xl font-black text-white mb-2">No Website Found</h1>
           <p className="text-gray-400">{error || 'We couldn\'t find a website linked to your account.'}</p>
-          <p className="text-gray-500 text-sm mt-2">Signed in as <span className="text-cyan-400">{userEmail}</span></p>
+          <p className="text-gray-500 text-sm mt-2">Signed in as <span className="text-indigo-400">{userEmail}</span></p>
           <div className="flex gap-3 justify-center mt-6">
             <a href="/" className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">Get a Website — $99</a>
             <button onClick={handleLogout} className="px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white transition">Sign Out</button>
           </div>
-          <p className="text-gray-600 text-sm mt-6">
-            Think this is wrong? Email <a href="mailto:support@autolocal.ai" className="text-indigo-400 hover:underline">support@autolocal.ai</a>
-          </p>
         </div>
       </div>
     )
   }
 
+  // ─── Render ───────────────────────────────
+
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
-      {/* Header */}
-      <header className="border-b border-white/10 px-4 sm:px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Your Website Dashboard</p>
-            <h1 className="text-xl font-black text-white">{data.business_name}</h1>
+      {/* ═══ Sticky Header ═══ */}
+      <header className="sticky top-0 z-50 bg-[#09090b]/95 backdrop-blur border-b border-white/10 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <InlineEdit
+              value={data.business_name}
+              onChange={v => updateFieldNow('business_name', v)}
+              className="text-lg font-black text-white truncate"
+              placeholder="Business Name"
+            />
           </div>
-          <div className="flex items-center gap-3">
-            <a href={data.website_url} target="_blank" className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
-              View My Site →
-            </a>
-            <button onClick={handleLogout} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">
-              Sign Out
-            </button>
-          </div>
+
+          <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+            data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'
+          }`}>
+            {data.status === 'published' ? '🟢 LIVE' : '🟡 DRAFT'}
+          </span>
+
+          <span className="hidden sm:inline text-xs text-gray-500 font-mono truncate">{data.slug}.autolocal.ai</span>
+
+          <button onClick={() => { const m = (data as any).site_mode === 'individual' ? 'business' : 'individual'; updateFieldNow('site_mode', m) }}
+            className="shrink-0 px-3 py-1 rounded-full text-xs font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition">
+            {(data as any).site_mode === 'individual' ? '👤 Individual' : '🏢 Business'}
+          </button>
+
+          <div className="flex-1" />
+
+          <SaveBadge saving={saving} saved={saved} />
+
+          <span className="hidden md:inline text-xs text-gray-500">
+            {data.plan === 'living' ? '🚀 Living — $49/mo' : '📄 Starter — $9/mo'}
+          </span>
+
+          <a href={data.website_url || data.preview_url} target="_blank" className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
+            View Site ↗
+          </a>
+
+          <button onClick={handleLogout} className="shrink-0 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">
+            Sign Out
+          </button>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      {/* ═══ Main Layout ═══ */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* ─── Left: Content Editor ─── */}
+          <div className="flex-1 min-w-0 space-y-6">
 
-        {/* Site Status Card */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
-          {data.hero_image_url && (
-            <div className="h-48 sm:h-56 overflow-hidden">
-              <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" />
-            </div>
-          )}
-          <div className="p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-black">{data.business_name}</h2>
-                {data.tagline && <p className="text-gray-400 mt-1">{data.tagline}</p>}
-                <p className="text-gray-500 text-sm mt-1">{data.city}{data.state ? `, ${data.state}` : ''}</p>
+            {/* Template Carousel */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
+              <h3 className="text-sm font-semibold text-gray-400 mb-3">Design Template</h3>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {TEMPLATES.map(t => (
+                  <button key={t.id} onClick={() => updateFieldNow('template', t.id)}
+                    className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition min-w-[90px] ${
+                      data.template === t.id ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10' : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
+                    }`}>
+                    <span className="text-2xl">{t.emoji}</span>
+                    <span className={`text-xs font-semibold ${data.template === t.id ? 'text-white' : 'text-gray-400'}`}>{t.name}</span>
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center gap-3">
-                {data.google_rating && (
-                  <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-1.5">
-                    <span className="text-yellow-400 font-bold">★ {data.google_rating}</span>
-                    {data.google_review_count >= 20 && <span className="text-yellow-400/60 text-sm">({data.google_review_count})</span>}
+            </section>
+
+            {/* Brand Controls */}
+            <BrandControls data={data} onUpdate={mergeUpdate} />
+
+            {/* Hero */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-400">Hero</h3>
+              <div className="relative group rounded-xl overflow-hidden h-48 bg-white/5">
+                {data.hero_image_url ? (
+                  <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop || 50}%` }} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-600"><span className="text-4xl">📷</span></div>
+                )}
+                <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                  <span className="px-4 py-2 rounded-lg bg-white/20 text-white text-sm font-bold">📤 Change Hero Image</span>
+                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'hero') }} className="hidden" />
+                </label>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Headline</label>
+                <InlineEdit value={data.business_name} onChange={v => updateField('business_name', v)} className="text-xl font-black" placeholder="Your Business Name" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Tagline</label>
+                <InlineEdit value={data.tagline || ''} onChange={v => updateField('tagline', v)} className="text-gray-300" placeholder="A short description of your business" />
+              </div>
+            </section>
+
+            {/* About */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-400">About</h3>
+              <InlineEdit value={(data as any).description || ''} onChange={v => updateField('description', v)} className="text-gray-300 text-sm leading-relaxed" placeholder="Tell customers about your business..." multiline />
+            </section>
+
+            {/* Services */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-400">Services</h3>
+              <div className="space-y-2">
+                {(data.services || []).map((s, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] group">
+                    <div className="flex-1 space-y-1">
+                      <InlineEdit value={s.name} onChange={v => updateService(i, 'name', v)} className="font-semibold text-sm" placeholder="Service name" />
+                      <InlineEdit value={s.description || ''} onChange={v => updateService(i, 'description', v)} className="text-xs text-gray-400" placeholder="Description (optional)" />
+                    </div>
+                    <InlineEdit value={s.price || ''} onChange={v => updateService(i, 'price', v)} className="text-sm text-gray-400 shrink-0 w-24 text-right" placeholder="Price" />
+                    <button onClick={() => removeService(i)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 text-sm transition shrink-0" title="Remove">✕</button>
+                  </div>
+                ))}
+              </div>
+              <button onClick={addService} className="w-full py-2.5 rounded-xl border border-dashed border-white/10 text-gray-500 hover:text-white hover:border-white/20 text-sm transition">＋ Add Service</button>
+            </section>
+
+            {/* Hours */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-400">Hours</h3>
+                <button onClick={copyToWeekdays} className="text-xs text-indigo-400 hover:text-indigo-300 transition">Copy Monday to all weekdays</button>
+              </div>
+              <div className="space-y-1.5">
+                {DAYS.map(day => {
+                  const val = data.hours?.[day] || ''
+                  const isClosed = val.toLowerCase() === 'closed' || !val
+                  return (
+                    <div key={day} className="flex items-center gap-3">
+                      <span className="w-24 text-xs text-gray-400 shrink-0">{day}</span>
+                      <button onClick={() => toggleDayClosed(day)} className={`w-10 h-5 rounded-full transition relative ${isClosed ? 'bg-white/10' : 'bg-green-600'}`}>
+                        <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${isClosed ? 'left-0.5' : 'left-5'}`} />
+                      </button>
+                      {isClosed ? <span className="text-xs text-gray-600">Closed</span> : (
+                        <InlineEdit value={val} onChange={v => updateHour(day, v)} className="text-xs text-gray-300 flex-1" placeholder="9:00 AM - 5:00 PM" />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+
+            {/* Contact */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-400">Contact Info</h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">📞 Phone</label>
+                  <InlineEdit value={data.phone || ''} onChange={v => updateField('phone', v)} className="text-sm" placeholder="(555) 123-4567" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">📧 Email</label>
+                  <InlineEdit value={(data as any).contact_email || data.email || ''} onChange={v => updateField('display_email', v)} className="text-sm" placeholder="you@example.com" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs text-gray-500 mb-1">📍 Address</label>
+                  <InlineEdit value={data.address || ''} onChange={v => updateField('address', v)} className="text-sm" placeholder="123 Main St, City, State" />
+                </div>
+              </div>
+            </section>
+
+            {/* Photos */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {(data.gallery_images || []).map((url, i) => (
+                  <div key={url} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    {i === 0 && url === data.hero_image_url && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Hero</span>}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                      <button onClick={() => handlePhotoRemove(url)} className="px-2 py-1 rounded bg-red-600/80 text-white text-xs font-bold hover:bg-red-500">✕ Remove</button>
+                    </div>
+                  </div>
+                ))}
+                <label className="aspect-square rounded-lg border-2 border-dashed border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition cursor-pointer">
+                  <span className="text-2xl">＋</span>
+                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'gallery') }} className="hidden" />
+                </label>
+              </div>
+            </section>
+
+            {/* Bottom — Custom Changes + Billing */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-400 mb-2">Need something special?</h3>
+                {changeSubmitted ? (
+                  <p className="text-sm text-green-400">✅ Request submitted! We&apos;ll get back to you within 24 hours.</p>
+                ) : (
+                  <div className="flex gap-2">
+                    <input value={changeMessage} onChange={e => setChangeMessage(e.target.value)} placeholder="Describe what you'd like changed..."
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-500 outline-none focus:border-indigo-500 transition"
+                      onKeyDown={e => { if (e.key === 'Enter') submitChange() }} />
+                    <button onClick={submitChange} disabled={submittingChange || !changeMessage.trim()}
+                      className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40">
+                      {submittingChange ? '...' : 'Submit'}
+                    </button>
                   </div>
                 )}
-                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${deployStatus === 'deploying' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : deployStatus === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/20' : data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'}`}>
-                  {deployStatus === 'deploying' ? '⟳ Deploying' : deployStatus === 'failed' ? '✕ Deploy Failed' : data.status === 'published' ? '● Live' : data.status}
-                </span>
               </div>
-            </div>
+              <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-white/[0.06] text-xs text-gray-500">
+                <span>{data.plan === 'living' ? '🚀 Living Website — $49/mo' : '📄 Starter — $9/mo'}</span>
+                <button onClick={async () => {
+                  try { const res = await fetch('/api/billing-portal', { method: 'POST' }); const d = await res.json(); if (d.url) window.location.href = d.url } catch { /* silent */ }
+                }} className="text-indigo-400 hover:underline">Manage Billing</button>
+                <span className="text-gray-700">·</span>
+                <a href="mailto:support@autolocal.ai?subject=Feedback" className="hover:text-gray-300 transition">💡 Feedback</a>
+                <a href="mailto:support@autolocal.ai?subject=Bug Report" className="hover:text-gray-300 transition">🐛 Bug</a>
+              </div>
+            </section>
+          </div>
 
-            {/* Plan Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${deployStatus === 'deploying' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : deployStatus === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/20' : 'bg-green-500/20 text-green-400 border border-green-500/20'}`}>
-                  {deployStatus === 'deploying' ? '⟳ Deploying...' : deployStatus === 'failed' ? '✕ Deploy Failed' : '📄 Website Active'}
-                </span>
-                <span className="text-xs text-gray-500">$9/mo hosting</span>
+          {/* ─── Right: Live Preview (desktop) ─── */}
+          <div className="hidden lg:block w-[420px] shrink-0">
+            <div className="sticky top-20">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</h3>
+                <a href={data.preview_url || data.website_url} target="_blank" className="text-xs text-indigo-400 hover:underline">Full size ↗</a>
               </div>
-              <button
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/api/billing-portal', { method: 'POST' })
-                    const data = await res.json()
-                    if (data.url) window.location.href = data.url
-                    else alert(data.error || 'Could not open billing portal')
-                  } catch { alert('Connection error') }
-                }}
-                className="text-xs text-gray-400 hover:text-white transition underline underline-offset-2"
-              >
-                Manage Billing
-              </button>
-            </div>
-
-            {/* Quick Info Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <p className="text-2xl font-black">{data.view_count || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Preview Views</p>
-              </div>
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <p className="text-2xl font-black">{data.services?.length || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Services Listed</p>
-              </div>
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <p className="text-2xl font-black capitalize">{data.template}</p>
-                <p className="text-xs text-gray-500 mt-1">Design Style</p>
-              </div>
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <p className="text-sm font-bold text-white">{new Date(data.created_at).toLocaleDateString()}</p>
-                <p className="text-xs text-gray-500 mt-1">Created</p>
+              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '680px' }}>
+                <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[2400px] origin-top-left" style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }} title="Live Preview" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div className="grid sm:grid-cols-3 gap-4">
-          <a href={data.website_url} target="_blank" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
-            <span className="text-2xl mb-2 block">🌐</span>
-            <h3 className="font-bold text-white group-hover:text-indigo-400 transition">View My Website</h3>
-            <p className="text-gray-500 text-xs mt-1">See your live site with all current changes</p>
-          </a>
-          <a href="/setup" target="_blank" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
-            <span className="text-2xl mb-2 block">🔗</span>
-            <h3 className="font-bold text-white group-hover:text-indigo-400 transition">Connect My Domain</h3>
-            <p className="text-gray-500 text-xs mt-1">Step-by-step guide to point your domain</p>
-          </a>
-          <a href="#changes" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
-            <span className="text-2xl mb-2 block">✏️</span>
-            <h3 className="font-bold text-white group-hover:text-indigo-400 transition">Custom Changes</h3>
-            <p className="text-gray-500 text-xs mt-1">Need something custom? $7 per request</p>
-          </a>
+        {/* Mobile Preview Toggle */}
+        <div className="lg:hidden fixed bottom-4 right-4 z-50">
+          <button onClick={() => setMobilePreview(!mobilePreview)} className="w-14 h-14 rounded-full bg-indigo-600 text-white text-xl shadow-2xl shadow-indigo-500/30 flex items-center justify-center hover:bg-indigo-500 transition">👁</button>
         </div>
-
-        {/* Subdomain Editor */}
-        <SubdomainEditor data={data} onUpdate={handleUpdate} />
-
-        {/* Editable Site Details */}
-        <SiteEditor data={data} onUpdate={handleUpdate} />
-
-        {/* Brand Customization */}
-        {/* Photo Manager */}
-        <PhotoManager data={data} onUpdate={handleUpdate} />
-
-        {/* Brand Customization */}
-        <BrandCustomizer data={data} onUpdate={handleUpdate} />
-
-        {/* Template Selector */}
-        <TemplateSelector data={data} onUpdate={handleUpdate} />
-
-        {/* Business vs Individual */}
-        <SiteModeToggle data={data} onUpdate={handleUpdate} />
-
-        {/* Custom Change Request */}
-        <div id="changes" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-lg font-bold">Request a Custom Change</h2>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400">$7 per request</span>
-          </div>
-          <p className="text-gray-500 text-sm mb-6">
-            Need something you can&apos;t do from the dashboard? Describe what you need and our team will handle it within 24 hours.
-          </p>
-
-          {submitted ? (
-            <div className="text-center py-8">
-              <span className="text-4xl mb-4 block">✅</span>
-              <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>
-              <p className="text-gray-400 mb-6">We&apos;ll review your request and get back to you within 24 hours.</p>
-              <button onClick={() => setSubmitted(false)} className="px-6 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition">
-                Submit Another Request
-              </button>
+        {mobilePreview && (
+          <div className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur flex flex-col">
+            <div className="flex items-center justify-between p-4">
+              <h3 className="text-sm font-bold text-white">Preview</h3>
+              <button onClick={() => setMobilePreview(false)} className="text-white text-xl">✕</button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmitChange} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">What do you need?</label>
-                <textarea value={changeMessage} onChange={e => setChangeMessage(e.target.value)} rows={4} required placeholder="E.g., 'Add a booking widget to my site', 'Create a special holiday promo banner', 'Redesign my services section with icons'" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition resize-none" />
-              </div>
-
-              <button type="submit" disabled={submitting || !changeMessage.trim()} className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-xl hover:shadow-indigo-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
-                {submitting ? 'Submitting...' : 'Submit Request — $7'}
-              </button>
-              <p className="text-center text-xs text-gray-500">
-                You&apos;ll only be charged after we complete the change. Basic edits (text, photos, colors, hours) are free and unlimited from your dashboard above.
-              </p>
-            </form>
-          )}
-        </div>
-
-        {/* Feedback / Bug Report */}
-        <FeedbackPanel siteSlug={data.slug} userEmail={userEmail} />
+            <div className="flex-1 overflow-auto p-4">
+              <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-full h-full rounded-xl border border-white/10" style={{ minHeight: '600px' }} title="Mobile Preview" />
+            </div>
+          </div>
+        )}
       </div>
 
       <footer className="py-6 px-4 border-t border-white/5 text-center">
