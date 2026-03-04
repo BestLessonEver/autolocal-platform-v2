@@ -650,6 +650,85 @@ function BrandCustomizer({ data, onUpdate }: { data: SiteData; onUpdate: (d: Sit
   )
 }
 
+function SubdomainEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [value, setValue] = useState(data.slug)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const handleSave = async () => {
+    const clean = value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '')
+    if (clean.length < 3) { setError('Must be at least 3 characters'); return }
+    if (clean === data.slug) { setError('That\'s already your subdomain'); return }
+    setSaving(true)
+    setError('')
+    setSuccess('')
+    try {
+      const res = await fetch('/api/dashboard/me/subdomain', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subdomain: clean }),
+      })
+      const result = await res.json()
+      if (res.ok) {
+        onUpdate({ ...data, slug: result.slug, website_url: result.url, preview_url: `https://autolocal.ai/preview/${result.slug}` })
+        setValue(result.slug)
+        setSuccess(`Updated! Your site is now at ${result.subdomain}`)
+        setTimeout(() => setSuccess(''), 5000)
+      } else {
+        setError(result.error || 'Failed to update')
+      }
+    } catch { setError('Connection error') }
+    setSaving(false)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🌐</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Your Website URL</h2>
+            <p className="text-gray-500 text-sm">{data.slug}.autolocal.ai</p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 border-t border-white/[0.06] pt-6 space-y-4">
+          <p className="text-xs text-gray-500">Change your subdomain. Your site will be available at <strong className="text-gray-300">[name].autolocal.ai</strong></p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden focus-within:border-indigo-500 transition">
+              <input
+                type="text"
+                value={value}
+                onChange={e => { setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')); setError(''); setSuccess('') }}
+                className="flex-1 px-4 py-2.5 bg-transparent text-white text-sm outline-none"
+                placeholder="my-business"
+              />
+              <span className="text-gray-500 text-sm pr-3 shrink-0">.autolocal.ai</span>
+            </div>
+            <button
+              onClick={handleSave}
+              disabled={saving || value === data.slug}
+              className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40 shrink-0"
+            >
+              {saving ? 'Saving...' : 'Update'}
+            </button>
+          </div>
+          {error && <p className="text-red-400 text-xs">{error}</p>}
+          {success && <p className="text-green-400 text-xs">{success}</p>}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const TEMPLATE_OPTIONS = [
   { key: 'bold', label: 'Bold', icon: '⚡', desc: 'High-contrast, attention-grabbing design' },
   { key: 'elegant', label: 'Elegant', icon: '✨', desc: 'Refined and sophisticated' },
@@ -1047,6 +1126,9 @@ export default function ClientDashboard() {
             <p className="text-gray-500 text-xs mt-1">Need something custom? $7 per request</p>
           </a>
         </div>
+
+        {/* Subdomain Editor */}
+        <SubdomainEditor data={data} onUpdate={setData} />
 
         {/* Editable Site Details */}
         <SiteEditor data={data} onUpdate={setData} />
