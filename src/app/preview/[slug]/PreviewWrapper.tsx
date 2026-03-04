@@ -109,6 +109,18 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     address: edits.address || data.address,
   }
 
+  // Normalize hours keys (DB may have "Monday" or "mon")
+  const normalizeHours = (h: Record<string, string> | null) => {
+    if (!h) return null
+    const map: Record<string, string> = { monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu', friday: 'fri', saturday: 'sat', sunday: 'sun' }
+    const result: Record<string, string> = {}
+    for (const [k, v] of Object.entries(h)) {
+      const key = map[k.toLowerCase()] || k.toLowerCase()
+      result[key] = v
+    }
+    return result
+  }
+
   // Filter out reviews below 4 stars + apply crop
   const filteredData = {
     ...liveData,
@@ -116,6 +128,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     hero_crop: edits.hero_crop,
     site_mode: (data as any).site_mode || 'business',
     email: (data as any).contact_email || data.email,
+    hours: normalizeHours(liveData.hours),
   }
 
   const Template = TEMPLATE_MAP[activeTemplate]

@@ -58,6 +58,14 @@ function generateStaticHtml(data: SiteData): string {
   const heroCrop = data.hero_crop ?? 50
   const services = data.services || []
   const reviews = (data.reviews || []).filter(r => r.rating >= 4)
+
+  // Normalize hours keys (DB may have "Monday" or "mon")
+  const dayMap: Record<string, string> = { monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu', friday: 'fri', saturday: 'sat', sunday: 'sun' }
+  const rawHours = data.hours || {}
+  const normalizedHours: Record<string, string> = {}
+  for (const [k, v] of Object.entries(rawHours)) {
+    normalizedHours[dayMap[k.toLowerCase()] || k.toLowerCase()] = v as string
+  }
   const gallery = data.gallery_images || []
   const hours = data.hours || {}
   const showReviewCount = (data.google_review_count ?? 0) >= 20
@@ -158,7 +166,7 @@ function generateStaticHtml(data: SiteData): string {
     <p class="section-label">Get In Touch</p>
     <h2 class="section-title">Hours & Contact</h2>
     <div class="contact-grid">
-      ${Object.keys(hours).length > 0 ? `<div><h3 style="font-weight:700;color:#fff;margin-bottom:1rem">Business Hours</h3><div>${daysOrder.filter(d => hours[d]).map(d => `<div class="hours-row"><span class="day">${dayLabels[d]}</span><span class="time">${hours[d]}</span></div>`).join('')}</div></div>` : '<div></div>'}
+      ${Object.keys(normalizedHours).length > 0 ? `<div><h3 style="font-weight:700;color:#fff;margin-bottom:1rem">Business Hours</h3><div>${daysOrder.filter(d => normalizedHours[d]).map(d => `<div class="hours-row"><span class="day">${dayLabels[d]}</span><span class="time">${normalizedHours[d]}</span></div>`).join('')}</div></div>` : '<div></div>'}
       <div class="contact-info">
         <h3 style="font-weight:700;color:#fff;margin-bottom:0.5rem">Contact Info</h3>
         ${data.address ? `<div class="contact-item"><span class="icon">📍</span><div><p class="label">Address</p><p class="value">${escapeHtml(data.address)}${data.city ? `, ${escapeHtml(data.city)}` : ''}${data.state ? `, ${escapeHtml(data.state)}` : ''}</p></div></div>` : ''}
