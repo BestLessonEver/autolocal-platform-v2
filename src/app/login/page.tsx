@@ -34,38 +34,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy-950 px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      {/* Background gradient orbs — matching home page */}
+      <div className="absolute top-1/3 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-1/3 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3 text-3xl font-bold gradient-text">
-            <Image src="/logo.png" alt="AutoLocal.ai" width={44} height={44} className="rounded-xl" />
-            AutoLocal.ai
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <Image src="/logo.png" alt="AutoLocal.ai" width={40} height={40} className="rounded-xl" />
+            <span className="text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              AutoLocal.ai
+            </span>
           </Link>
-          <p className="text-slate-400 mt-2">Client Dashboard</p>
+          <p className="text-gray-500 text-sm mt-2">Client Dashboard</p>
         </div>
 
-        <div className="glass rounded-2xl p-8">
+        {/* Card */}
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 backdrop-blur-sm">
           {sent ? (
             <div className="text-center space-y-4">
               <div className="text-5xl">✉️</div>
               <h2 className="text-xl font-bold text-white">Check your email</h2>
-              <p className="text-slate-400">
-                We sent a magic link to <span className="text-cyan-400 font-medium">{email}</span>
+              <p className="text-gray-400">
+                We sent a magic link to <span className="text-indigo-400 font-medium">{email}</span>
               </p>
-              <p className="text-slate-500 text-sm">
+              <p className="text-gray-600 text-sm">
                 Click the link in the email to sign in. It expires in 1 hour.
               </p>
               <button
                 onClick={() => { setSent(false); setEmail('') }}
-                className="text-sm text-cyan-400 hover:text-cyan-300 transition mt-4"
+                className="text-sm text-indigo-400 hover:text-indigo-300 transition mt-4"
               >
-                Use a different email
+                ← Use a different email
               </button>
             </div>
           ) : (
             <>
               <h2 className="text-xl font-bold text-white text-center mb-2">Sign in to your dashboard</h2>
-              <p className="text-slate-400 text-center text-sm mb-6">
+              <p className="text-gray-500 text-center text-sm mb-6">
                 Enter the email associated with your website and we&apos;ll send you a magic link.
               </p>
 
@@ -76,7 +84,7 @@ export default function LoginPage() {
                     placeholder="your@email.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl dark-input text-white placeholder-slate-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition"
                     required
                     autoFocus
                   />
@@ -87,23 +95,30 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full btn-gradient text-white font-semibold py-3 rounded-xl disabled:opacity-50 transition"
+                  className="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition disabled:opacity-50 shadow-lg shadow-indigo-500/20"
                 >
-                  {loading ? 'Sending...' : 'Send Magic Link'}
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
+                    </span>
+                  ) : (
+                    'Send Magic Link'
+                  )}
                 </button>
               </form>
 
-              <p className="text-center text-xs text-slate-600 mt-6">
+              <p className="text-center text-xs text-gray-600 mt-6">
                 No password needed — just click the link in your email.
               </p>
             </>
           )}
         </div>
 
-        <p className="text-center text-sm text-slate-600 mt-6">
+        <p className="text-center text-sm text-gray-600 mt-6">
           Don&apos;t have a website yet?{' '}
-          <Link href="/" className="text-cyan-400 hover:text-cyan-300 transition">
-            Get one for $99
+          <Link href="/" className="text-indigo-400 hover:text-indigo-300 transition">
+            Get one for $99 →
           </Link>
         </p>
       </div>
