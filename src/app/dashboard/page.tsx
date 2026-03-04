@@ -58,6 +58,173 @@ const COLOR_PALETTES = [
   { name: 'Midnight', primary: '#09090b', secondary: '#18181b', accent: '#6366f1' },
 ]
 
+function SiteEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [form, setForm] = useState({
+    business_name: data.business_name,
+    tagline: data.tagline || '',
+    description: (data as any).description || '',
+    phone: data.phone || '',
+    email: data.email || '',
+    address: data.address || '',
+    city: data.city || '',
+    state: data.state || '',
+  })
+  const [services, setServices] = useState<{ name: string; description?: string; price?: string }[]>(
+    data.services?.length ? data.services : [{ name: '', description: '', price: '' }]
+  )
+  const [hours, setHours] = useState<Record<string, string>>(data.hours || {})
+
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/dashboard/me/details', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          services: services.filter(s => s.name.trim()),
+          hours: Object.keys(hours).length ? hours : null,
+        }),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        onUpdate({ ...data, ...form, services: services.filter(s => s.name.trim()), hours })
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Save failed')
+      }
+    } catch {
+      alert('Save failed. Please try again.')
+    }
+    setSaving(false)
+  }
+
+  const addService = () => setServices([...services, { name: '', description: '', price: '' }])
+  const removeService = (i: number) => setServices(services.filter((_, idx) => idx !== i))
+  const updateService = (i: number, field: string, value: string) => {
+    const updated = [...services]
+    updated[i] = { ...updated[i], [field]: value }
+    setServices(updated)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">✏️</span>
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-white">Edit Site Content</h2>
+            <p className="text-gray-500 text-sm">Update your text, services, hours, and contact info</p>
+          </div>
+        </div>
+        <span className={`text-gray-500 text-xl transition-transform ${expanded ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {expanded && (
+        <div className="px-6 pb-6 space-y-6 border-t border-white/[0.06] pt-6">
+          {/* Business Info */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-300">Business Info</h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">Business Name</label>
+                <input type="text" value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">Tagline</label>
+                <input type="text" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} placeholder="Your catchy headline" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">Description</label>
+              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} placeholder="Tell visitors about your business..." className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition resize-none" />
+            </div>
+          </div>
+
+          {/* Contact Info */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-300">Contact Info</h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">Phone</label>
+                <input type="text" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5">Address</label>
+                <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">City</label>
+                  <input type="text" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">State</label>
+                  <input type="text" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-indigo-500 outline-none transition" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Services */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-300">Services</h3>
+              <button onClick={addService} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition">+ Add Service</button>
+            </div>
+            {services.map((s, i) => (
+              <div key={i} className="flex gap-3 items-start">
+                <div className="flex-1 grid grid-cols-3 gap-3">
+                  <input type="text" value={s.name} onChange={e => updateService(i, 'name', e.target.value)} placeholder="Service name" className="col-span-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
+                  <input type="text" value={s.price || ''} onChange={e => updateService(i, 'price', e.target.value)} placeholder="Price" className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
+                </div>
+                {services.length > 1 && (
+                  <button onClick={() => removeService(i)} className="text-red-400 hover:text-red-300 text-sm mt-2 transition">✕</button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Hours */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-300">Business Hours</h3>
+            <div className="space-y-2">
+              {DAYS.map(day => (
+                <div key={day} className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500 w-20 shrink-0">{day}</span>
+                  <input type="text" value={hours[day] || ''} onChange={e => setHours({ ...hours, [day]: e.target.value })} placeholder="e.g. 9:00 AM - 5:00 PM or Closed" className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Save */}
+          <div className="flex items-center gap-3 pt-2">
+            <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-50">
+              {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Changes'}
+            </button>
+            {saved && <span className="text-green-400 text-sm">Changes saved! Your site will update within a few minutes.</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
   const [expanded, setExpanded] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -571,36 +738,8 @@ export default function ClientDashboard() {
           </a>
         </div>
 
-        {/* Current Site Details */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-          <h2 className="text-lg font-bold mb-4">Your Site Details</h2>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Business Name</p>
-                <p className="text-white font-medium">{data.business_name}</p>
-              </div>
-              {data.phone && <div><p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Phone</p><p className="text-white font-medium">{data.phone}</p></div>}
-              {data.email && <div><p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Email</p><p className="text-white font-medium">{data.email}</p></div>}
-              {data.address && <div><p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Address</p><p className="text-white font-medium">{data.address}{data.city ? `, ${data.city}` : ''}{data.state ? `, ${data.state}` : ''}</p></div>}
-            </div>
-            <div>
-              {data.services && data.services.length > 0 && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Services</p>
-                  <div className="space-y-2">
-                    {data.services.map((s: any, i: number) => (
-                      <div key={i} className="flex justify-between text-sm">
-                        <span className="text-gray-300">{s.name}</span>
-                        {s.price && <span className="text-gray-500">{s.price}</span>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* Editable Site Details */}
+        <SiteEditor data={data} onUpdate={setData} />
 
         {/* Brand Customization */}
         {/* Photo Manager */}
