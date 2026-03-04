@@ -121,13 +121,14 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     return result
   }
 
-  // Filter out reviews below 4 stars + apply crop
+  // Filter out reviews below 4 stars, apply crop, dedupe gallery
   const filteredData = {
     ...liveData,
     reviews: (data.reviews || []).filter(r => r.rating >= 4),
     hero_crop: edits.hero_crop,
     site_mode: (data as any).site_mode || 'business',
     email: (data as any).contact_email || data.email,
+    gallery_images: (liveData.gallery_images || []).filter(img => img !== liveData.hero_image_url),
     hours: normalizeHours(liveData.hours) || {},
   }
 
