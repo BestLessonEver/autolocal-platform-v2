@@ -85,8 +85,8 @@ function ThankYouContent() {
                 <span className="text-green-400 text-xs">✓</span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Payment confirmed</p>
-                <p className="text-gray-500 text-xs">Your receipt is in your email</p>
+                <p className="text-white text-sm font-medium">Your custom website is ready!</p>
+                <p className="text-gray-500 text-xs">Payment confirmed — your receipt is in your email</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -94,8 +94,8 @@ function ThankYouContent() {
                 <span className="text-indigo-400 text-xs font-bold">2</span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Customize your site</p>
-                <p className="text-gray-500 text-xs">Edit text, upload photos, pick colors from your dashboard</p>
+                <p className="text-white text-sm font-medium">Check your email for login info</p>
+                <p className="text-gray-500 text-xs">We sent a magic link — one click to get in</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -103,8 +103,8 @@ function ThankYouContent() {
                 <span className="text-gray-400 text-xs font-bold">3</span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">We deploy & go live</p>
-                <p className="text-gray-500 text-xs">We handle hosting, SSL, and domain setup</p>
+                <p className="text-white text-sm font-medium">Preview your site & make changes</p>
+                <p className="text-gray-500 text-xs">Edit text, upload photos, pick colors from your dashboard</p>
               </div>
             </div>
           </div>

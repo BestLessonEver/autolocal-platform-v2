@@ -65,10 +65,9 @@ async function sendWelcomeEmail(to: string, contactName: string, businessName: s
             We already pulled your business info from Google and started building. Here's what happens next:
           </p>
           <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">We finalize your custom site (within 24 hours)</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">You'll get an email with your live preview</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Request any changes from your dashboard</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">4.</span> <span style="color:#d4d4d8;">We launch it live on your domain</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Your custom website is ready!</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Log in with the button below</span></td></tr>
+            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Preview your site and make changes in your dashboard</span></td></tr>
           </table>
           <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
             Your dashboard is ready — you can access it anytime:
@@ -81,8 +80,7 @@ async function sendWelcomeEmail(to: string, contactName: string, businessName: s
           <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Fill out your business details (5 min)</span></td></tr>
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Upload your photos and logo</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">We build your site within 24 hours</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">4.</span> <span style="color:#d4d4d8;">Review, request changes, and go live</span></td></tr>
+            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Preview your site and make changes in your dashboard</span></td></tr>
           </table>
           <a href="https://autolocal.ai/intake/${slugify(businessName)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Complete Your Details →</a>
           `}
