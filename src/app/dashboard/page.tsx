@@ -650,6 +650,67 @@ function BrandCustomizer({ data, onUpdate }: { data: SiteData; onUpdate: (d: Sit
   )
 }
 
+function FeedbackPanel({ siteSlug, userEmail }: { siteSlug: string; userEmail: string }) {
+  const [message, setMessage] = useState('')
+  const [type, setType] = useState<'feedback' | 'bug'>('feedback')
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!message.trim()) return
+    setSending(true)
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, message: message.trim(), slug: siteSlug, email: userEmail }),
+      })
+      setSent(true)
+      setMessage('')
+      setTimeout(() => setSent(false), 5000)
+    } catch { /* ignore */ }
+    setSending(false)
+  }
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+      <h2 className="text-lg font-bold text-white mb-1">💬 Feedback & Bug Reports</h2>
+      <p className="text-gray-500 text-sm mb-4">Found a bug or have a suggestion? Let us know — we read everything.</p>
+
+      {sent ? (
+        <div className="text-center py-6">
+          <span className="text-3xl block mb-2">🙏</span>
+          <p className="text-white font-bold">Thanks for the feedback!</p>
+          <p className="text-gray-500 text-sm mt-1">We&apos;ll look into it.</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setType('feedback')} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${type === 'feedback' ? 'bg-indigo-600/20 border border-indigo-500/40 text-indigo-400' : 'bg-white/[0.02] border border-white/[0.06] text-gray-500'}`}>
+              💡 Feedback
+            </button>
+            <button type="button" onClick={() => setType('bug')} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${type === 'bug' ? 'bg-red-600/20 border border-red-500/40 text-red-400' : 'bg-white/[0.02] border border-white/[0.06] text-gray-500'}`}>
+              🐛 Bug Report
+            </button>
+          </div>
+          <textarea
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            rows={3}
+            required
+            placeholder={type === 'bug' ? 'What went wrong? What did you expect to happen?' : 'What would make this better?'}
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition resize-none text-sm"
+          />
+          <button type="submit" disabled={sending || !message.trim()} className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-bold hover:bg-white/10 transition disabled:opacity-40">
+            {sending ? 'Sending...' : 'Send'}
+          </button>
+        </form>
+      )}
+    </div>
+  )
+}
+
 function SubdomainEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData) => void }) {
   const [expanded, setExpanded] = useState(false)
   const [value, setValue] = useState(data.slug)
@@ -1182,12 +1243,8 @@ export default function ClientDashboard() {
           )}
         </div>
 
-        {/* Support */}
-        <div className="text-center py-4">
-          <p className="text-gray-500 text-sm">
-            Need help? Email us at <a href="mailto:support@autolocal.ai" className="text-indigo-400 hover:underline">support@autolocal.ai</a>
-          </p>
-        </div>
+        {/* Feedback / Bug Report */}
+        <FeedbackPanel siteSlug={data.slug} userEmail={userEmail} />
       </div>
 
       <footer className="py-6 px-4 border-t border-white/5 text-center">

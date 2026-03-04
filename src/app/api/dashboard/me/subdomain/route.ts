@@ -124,6 +124,18 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Failed to update subdomain' }, { status: 500 })
     }
 
+    // Trigger redeploy with new slug so the site keeps all settings
+    if (site.website_current) {
+      fetch(`https://autolocal.ai/api/deploy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+        },
+        body: JSON.stringify({ slug: newSlug }),
+      }).catch(err => console.error('Redeploy after subdomain change failed:', err))
+    }
+
     return NextResponse.json({
       success: true,
       slug: newSlug,
