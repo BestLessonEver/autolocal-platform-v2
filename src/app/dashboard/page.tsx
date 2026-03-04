@@ -275,8 +275,7 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
   const [showCrop, setShowCrop] = useState(false)
   const [heroCrop, setHeroCrop] = useState((data as any).hero_crop ?? 50)
   const [cropSaving, setCropSaving] = useState(false)
-  const [dragIdx, setDragIdx] = useState<number | null>(null)
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
+
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'hero' | 'gallery') => {
     const files = e.target.files
@@ -342,18 +341,14 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
     setCropSaving(false)
   }
 
-  // Drag-to-reorder
-  const handleDragStart = (i: number) => setDragIdx(i)
-  const handleDragOver = (e: React.DragEvent, i: number) => { e.preventDefault(); setDragOverIdx(i) }
-  const handleDrop = async (i: number) => {
-    if (dragIdx === null || dragIdx === i) { setDragIdx(null); setDragOverIdx(null); return }
+  // Move photo by index (arrow reorder)
+  const movePhoto = async (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= gallery.length) return
     const newGallery = [...gallery]
-    const [moved] = newGallery.splice(dragIdx, 1)
-    newGallery.splice(i, 0, moved)
+    const [moved] = newGallery.splice(fromIdx, 1)
+    newGallery.splice(toIdx, 0, moved)
     setGallery(newGallery)
-    setDragIdx(null)
-    setDragOverIdx(null)
-    // Save new order
+    onUpdate({ ...data, gallery_images: newGallery })
     await fetch('/api/dashboard/me/photos', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -437,44 +432,57 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
             </label>
           </div>
 
-          {/* Gallery with drag-to-reorder */}
+          {/* Gallery with arrow reorder */}
           <div>
             <h3 className="text-sm font-semibold text-gray-300 mb-3">Site Photos ({allPhotos.length})</h3>
-            <p className="text-xs text-gray-500 mb-3">Drag to reorder. Click to set as hero or remove.</p>
+            <p className="text-xs text-gray-500 mb-3">Use arrows to reorder. First gallery photo shows on your site.</p>
 
             {allPhotos.length > 0 ? (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {allPhotos.map((url, i) => (
-                  <div
-                    key={url}
-                    draggable
-                    onDragStart={() => handleDragStart(i)}
-                    onDragOver={e => handleDragOver(e, i)}
-                    onDrop={() => handleDrop(i)}
-                    onDragEnd={() => { setDragIdx(null); setDragOverIdx(null) }}
-                    className={`relative group rounded-lg overflow-hidden bg-white/5 border aspect-square cursor-grab active:cursor-grabbing transition-all ${
-                      dragOverIdx === i ? 'border-indigo-500 scale-105' : dragIdx === i ? 'opacity-50 border-white/10' : 'border-white/10'
-                    }`}
-                  >
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    {url === data.hero_image_url && (
-                      <div className="absolute top-1.5 left-1.5 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">HERO</div>
-                    )}
-                    <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition">
-                      <span className="text-white/60 text-xs">⠿</span>
-                    </div>
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                      {url !== data.hero_image_url && (
-                        <button onClick={() => setAsHero(url)} className="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition">
-                          Set Hero
-                        </button>
+                {allPhotos.map((url, i) => {
+                  const galleryIdx = gallery.indexOf(url)
+                  const isHero = url === data.hero_image_url
+                  const isGallery = galleryIdx >= 0
+                  return (
+                    <div key={url} className="relative group rounded-lg overflow-hidden bg-white/5 border border-white/10 aspect-square">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      {isHero && (
+                        <div className="absolute top-1.5 left-1.5 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">HERO</div>
                       )}
-                      <button onClick={() => removePhoto(url)} className="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500 transition">
-                        ✕
-                      </button>
+                      {isGallery && galleryIdx === 0 && !isHero && (
+                        <div className="absolute top-1.5 left-1.5 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#1</div>
+                      )}
+                      {/* Arrow buttons + actions overlay */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
+                        {/* Reorder arrows (only for gallery photos) */}
+                        {isGallery && gallery.length > 1 && (
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={() => movePhoto(galleryIdx, galleryIdx - 1)}
+                              disabled={galleryIdx === 0}
+                              className="w-8 h-8 rounded-lg bg-white/20 text-white text-sm font-bold hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                            >←</button>
+                            <button
+                              onClick={() => movePhoto(galleryIdx, galleryIdx + 1)}
+                              disabled={galleryIdx === gallery.length - 1}
+                              className="w-8 h-8 rounded-lg bg-white/20 text-white text-sm font-bold hover:bg-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                            >→</button>
+                          </div>
+                        )}
+                        <div className="flex gap-1.5">
+                          {!isHero && (
+                            <button onClick={() => setAsHero(url)} className="px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition">
+                              Set Hero
+                            </button>
+                          )}
+                          <button onClick={() => removePhoto(url)} className="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500 transition">
+                            ✕
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-600">No photos yet</div>
