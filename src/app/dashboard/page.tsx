@@ -72,8 +72,8 @@ function SiteEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData
     city: data.city || '',
     state: data.state || '',
   })
-  const [services, setServices] = useState<{ name: string; description?: string; price?: string }[]>(
-    data.services?.length ? data.services : [{ name: '', description: '', price: '' }]
+  const [services, setServices] = useState<{ name: string; description: string; price?: string }[]>(
+    data.services?.length ? data.services.map(s => ({ ...s, description: s.description || '' })) : [{ name: '', description: '', price: '' }]
   )
   const [hours, setHours] = useState<Record<string, string>>(data.hours || {})
 
