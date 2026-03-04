@@ -348,7 +348,7 @@ function PhotoManager({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteDa
     const [moved] = newGallery.splice(fromIdx, 1)
     newGallery.splice(toIdx, 0, moved)
     setGallery(newGallery)
-    onUpdate({ ...data, gallery_images: newGallery })
+    onUpdate({ ...data, gallery_images: newGallery } as any)
     await fetch('/api/dashboard/me/photos', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -1040,7 +1040,7 @@ export default function ClientDashboard() {
 
   const handleUpdate = (newData: SiteData) => {
     setData(newData)
-    if (newData.website_current) {
+    if ((newData as any).website_current || newData.website_url) {
       startDeployPoll()
     }
   }
