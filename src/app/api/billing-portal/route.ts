@@ -45,7 +45,7 @@ export async function POST() {
           .from('clients')
           .update({ stripe_customer_id: customerId })
           .eq('id', client.id)
-          .catch(() => {})
+          .then(() => {})
       }
     }
 
