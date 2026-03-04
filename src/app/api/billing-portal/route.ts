@@ -16,7 +16,7 @@ export async function POST() {
     // Find their Stripe customer ID from the clients table
     const { data: client } = await supabase
       .from('clients')
-      .select('stripe_customer_id')
+      .select('id, stripe_customer_id')
       .eq('email', user.email)
       .order('created_at', { ascending: false })
       .limit(1)

@@ -200,6 +200,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     })
   }
 
+  // Cancel any active drip campaigns for this email (they converted!)
+  supabase
+    .from('drip_queue')
+    .update({ status: 'converted' })
+    .eq('email', email.toLowerCase())
+    .eq('status', 'active')
+    .then(() => {})
+    .catch(() => {})
+
   console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
 }
 
@@ -224,6 +233,30 @@ export async function POST(req: Request) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
       await handleCheckoutComplete(session)
+      break
+    }
+
+    case 'checkout.session.expired': {
+      const expiredSession = event.data.object as Stripe.Checkout.Session
+      const expMeta = expiredSession.metadata || {}
+      const expEmail = expMeta.email || expiredSession.customer_email
+      if (expEmail) {
+        // Enqueue abandoned checkout drip
+        fetch('https://autolocal.ai/api/drip/enqueue', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.INTERNAL_API_KEY}`,
+          },
+          body: JSON.stringify({
+            email: expEmail,
+            stage: 'abandoned_checkout',
+            slug: expMeta.business_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || null,
+            businessName: expMeta.business_name,
+            contactName: expMeta.contact_name,
+          }),
+        }).catch(err => console.error('Drip enqueue failed:', err))
+      }
       break
     }
 

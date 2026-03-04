@@ -52,6 +52,23 @@ export async function POST(req: Request) {
       })
     }
 
+    // Enqueue drip campaign (non-blocking)
+    const dripStage = source === 'selected_google_business' ? 'previewed' : 'searched'
+    fetch('https://autolocal.ai/api/drip/enqueue', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.INTERNAL_API_KEY}`,
+      },
+      body: JSON.stringify({
+        email: email.toLowerCase().trim(),
+        stage: dripStage,
+        slug: businessName ? businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-') : null,
+        businessName,
+        contactName: name,
+      }),
+    }).catch(() => {})
+
     return NextResponse.json({ captured: true })
   } catch (err) {
     console.error('Lead capture error:', err)
