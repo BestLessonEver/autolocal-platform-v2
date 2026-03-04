@@ -150,6 +150,12 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             </div>
           </div>
         </div>
+        {/* Customization note */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
+          <p className="text-center text-xs text-indigo-600 py-1.5 font-medium">
+            ✏️ All text, photos, and colors can be customized after purchase
+          </p>
+        </div>
       </div>
 
       {/* Template content — no forced top padding, let the site breathe */}

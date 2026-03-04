@@ -51,6 +51,52 @@ function sanitizeInput(str: string): string {
     .slice(0, 200)
 }
 
+// Human-readable labels for Google Place types
+const TYPE_LABELS: Record<string, string> = {
+  hair_care: 'Hair Care', beauty_salon: 'Beauty Salon', barber_shop: 'Barber Shop', spa: 'Spa & Wellness',
+  gym: 'Fitness Center', fitness_center: 'Fitness Center', yoga_studio: 'Yoga Studio',
+  restaurant: 'Restaurant', cafe: 'Café', bar: 'Bar & Grill', bakery: 'Bakery',
+  plumber: 'Plumbing', electrician: 'Electrical', roofing_contractor: 'Roofing',
+  car_repair: 'Auto Repair', car_dealer: 'Auto Dealer',
+  dentist: 'Dental Practice', doctor: 'Medical Practice', veterinary_care: 'Veterinary Care',
+  real_estate_agency: 'Real Estate', insurance_agency: 'Insurance', accounting: 'Accounting',
+  lawyer: 'Law Firm', school: 'Education', music_school: 'Music Education',
+  store: 'Retail', clothing_store: 'Fashion', pet_store: 'Pet Care',
+  florist: 'Floral Design', photographer: 'Photography', moving_company: 'Moving Services',
+}
+
+function generateTagline(name: string, category: string, types: string[], city: string): string {
+  // Try to get a human-readable type
+  let typeLabel = ''
+  for (const t of types) {
+    if (TYPE_LABELS[t]) { typeLabel = TYPE_LABELS[t]; break }
+  }
+
+  if (typeLabel) {
+    const taglines = [
+      `Quality ${typeLabel} in ${city}`,
+      `${city}'s choice for ${typeLabel.toLowerCase()}`,
+      `Professional ${typeLabel.toLowerCase()} serving ${city}`,
+    ]
+    return taglines[Math.floor(Math.random() * taglines.length)]
+  }
+
+  // Category-based fallbacks
+  const catTaglines: Record<string, string[]> = {
+    salon: [`Premium beauty services in ${city}`, `Look your best in ${city}`],
+    fitness: [`Get fit in ${city}`, `${city}'s fitness destination`],
+    restaurant: [`Great food, great vibes in ${city}`, `A ${city} favorite`],
+    contractor: [`Reliable service in ${city}`, `${city}'s trusted professionals`],
+    general: [`Proudly serving ${city}`, `Your neighborhood business in ${city}`],
+  }
+  const options = catTaglines[category] || catTaglines.general
+  return options[Math.floor(Math.random() * options.length)]
+}
+
+function generateDescription(name: string, category: string, city: string): string {
+  return `Welcome to ${name} — proudly serving ${city} and the surrounding area. We're committed to delivering exceptional quality and service.`
+}
+
 const TYPE_MAP: Record<string, string> = {
   hair_care: 'salon', beauty_salon: 'salon', barber_shop: 'salon', spa: 'salon',
   dentist: 'dental', doctor: 'dental',
@@ -209,8 +255,8 @@ export async function POST(req: NextRequest) {
     const payload = {
       slug: fullSlug,
       business_name: name,
-      tagline: summary || `Your trusted ${category} in ${cityName}`,
-      description: summary || '',
+      tagline: summary || generateTagline(name, category, types, cityName),
+      description: summary || generateDescription(name, category, cityName),
       category,
       brand_color_primary: primary,
       brand_color_secondary: secondary,
