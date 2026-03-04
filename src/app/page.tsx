@@ -52,9 +52,23 @@ export default function HomePage() {
   const handlePreview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!businessName.trim()) return
+    if (!email.trim()) { setError('Email is required'); return }
     setSearching(true)
     setError('')
     setShowResults(false)
+
+    // Capture lead IMMEDIATELY — fire and forget
+    fetch('/api/capture-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.trim(),
+        name: contactName.trim() || undefined,
+        businessName: businessName.trim(),
+        city: city.trim() || undefined,
+        source: 'landing_page_search',
+      }),
+    }).catch(() => {})
 
     try {
       const res = await fetch('/api/search-business', {
@@ -83,6 +97,19 @@ export default function HomePage() {
     setShowResults(false)
     setLoading(true)
     setLoadingStep(0)
+
+    // Update lead stage
+    fetch('/api/capture-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.trim(),
+        name: contactName.trim() || undefined,
+        businessName: businessName.trim(),
+        city: city.trim() || undefined,
+        source: 'selected_google_business',
+      }),
+    }).catch(() => {})
 
     try {
       const res = await fetch('/api/generate-preview', {
