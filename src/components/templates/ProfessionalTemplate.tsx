@@ -78,7 +78,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
       <section className="relative overflow-hidden bg-gray-50">
         {/* Mobile hero image */}
         <div className="lg:hidden relative h-[300px] sm:h-[400px]">
-          <img src={heroImg} alt="" className="w-full h-full object-cover" />
+          <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50" />
         </div>
         <div className="max-w-7xl mx-auto">
@@ -132,7 +132,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
               </div>
             </div>
             <div className="hidden lg:block relative">
-              <img src={heroImg} alt="" className="w-full h-full object-cover" />
+              <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
               <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-transparent to-transparent" />
             </div>
           </div>

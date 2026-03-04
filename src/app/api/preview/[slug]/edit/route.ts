@@ -17,6 +17,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { slug: stri
     if (body.description !== undefined) updates.description = body.description || null
     if (body.phone !== undefined) updates.phone = body.phone || null
     if (body.address !== undefined) updates.address = body.address || null
+    // hero_crop saved only if column exists (added later via migration)
+    if (body.hero_crop !== undefined) {
+      try {
+        await supabase.from('website_previews').update({ hero_crop: body.hero_crop }).eq('slug', slug)
+      } catch { /* column may not exist yet */ }
+    }
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'No changes provided' }, { status: 400 })

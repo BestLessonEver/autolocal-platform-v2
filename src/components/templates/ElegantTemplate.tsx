@@ -72,7 +72,7 @@ export default function ElegantTemplate({ data }: TemplateProps) {
       {/* Hero — Elegant overlay with centered text */}
       <section className="relative min-h-[80vh] flex items-center justify-center text-center">
         <div className="absolute inset-0">
-          <img src={heroImg} alt="" className="w-full h-full object-cover" />
+          <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
           <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${primary}99, ${primary}55)` }} />
         </div>
         <div className="relative max-w-3xl mx-auto px-4 py-20">

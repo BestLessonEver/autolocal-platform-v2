@@ -10,6 +10,7 @@ export interface PreviewData {
   brand_color_accent: string
   logo_url: string | null
   hero_image_url: string | null
+  hero_crop?: number
   gallery_images: string[]
   services: { name: string; description: string; price?: string }[]
   hours: Record<string, string>

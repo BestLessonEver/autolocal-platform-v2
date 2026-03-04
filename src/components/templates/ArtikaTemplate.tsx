@@ -65,7 +65,7 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       <section className="relative min-h-screen flex items-center justify-center text-center">
         {/* Background: hero image with cream overlay */}
         <div className="absolute inset-0">
-          <img src={heroImg} alt="" className="w-full h-full object-cover" />
+          <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(250,249,246,0.85)' }} />
         </div>
 

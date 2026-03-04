@@ -74,7 +74,7 @@ export default function BDETemplate({ data }: TemplateProps) {
           <img
             src={data.hero_image_url}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#09090b]/30 via-[#09090b]/20 to-[#09090b]/90" />

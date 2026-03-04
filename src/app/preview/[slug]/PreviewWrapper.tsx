@@ -75,6 +75,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     description: data.description || '',
     phone: data.phone || '',
     address: data.address || '',
+    hero_crop: (data as any).hero_crop || 50,
   })
 
   // Delay banner appearance by 3 seconds
@@ -107,10 +108,11 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     address: edits.address || data.address,
   }
 
-  // Filter out reviews below 4 stars
+  // Filter out reviews below 4 stars + apply crop
   const filteredData = {
     ...liveData,
     reviews: (data.reviews || []).filter(r => r.rating >= 4),
+    hero_crop: edits.hero_crop,
   }
 
   const Template = TEMPLATE_MAP[activeTemplate]
@@ -250,6 +252,38 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                 />
               </div>
             </div>
+            {/* Hero Image Crop */}
+            {liveData.hero_image_url && (
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-2">Hero Image Position</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-20 rounded-lg overflow-hidden border border-gray-200 shrink-0">
+                    <img
+                      src={liveData.hero_image_url}
+                      alt="Hero preview"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: `center ${edits.hero_crop}%` }}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={edits.hero_crop}
+                      onChange={e => setEdits({ ...edits, hero_crop: parseInt(e.target.value) })}
+                      className="w-full accent-indigo-600"
+                    />
+                    <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                      <span>Top</span>
+                      <span>Center</span>
+                      <span>Bottom</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSaveEdits}
