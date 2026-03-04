@@ -218,7 +218,7 @@ export default function HomePage() {
             <span className="text-lg font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AutoLocal.ai</span>
           </a>
           <div className="flex items-center gap-4">
-            <a href="/login" className="text-sm text-gray-400 hover:text-white transition hidden sm:block">Client Login</a>
+            <a href="/login" className="text-sm text-gray-400 hover:text-white transition">Client Login</a>
             <a href="#order" onClick={(e) => { e.preventDefault(); scrollTo('order') }} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
               Get Started
             </a>
