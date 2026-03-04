@@ -74,19 +74,19 @@ export default function BDETemplate({ data }: TemplateProps) {
           <img
             src={data.hero_image_url}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-[0.12] pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b]/60 via-transparent to-[#09090b]" />
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#09090b]/30 via-[#09090b]/20 to-[#09090b]/90" />
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center flex flex-col items-center justify-center">
           <FadeIn>
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-6">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-6" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.6)' }}>
               {data.business_name}
             </h1>
           </FadeIn>
           {data.tagline && (
             <FadeIn>
-              <p className="text-xl sm:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 font-normal leading-relaxed">
+              <p className="text-xl sm:text-2xl text-gray-200 max-w-2xl mx-auto mb-10 font-normal leading-relaxed" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                 {data.tagline}
               </p>
             </FadeIn>

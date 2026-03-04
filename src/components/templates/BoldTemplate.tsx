@@ -114,7 +114,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
 
       {/* Services — Dark section */}
       {data.services.length > 0 && (
-        <section id="services" className="py-24 bg-gray-950 text-white">
+        <section id="services" className="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
               <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>What We Do</p>
@@ -178,7 +178,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
 
       {/* Reviews — Bold dark bg */}
       {data.reviews.length > 0 && (
-        <section id="reviews" className="py-24 bg-gray-950 text-white">
+        <section id="reviews" className="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>Testimonials</p>
@@ -270,7 +270,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
       </section>
 
       {/* CTA Banner — Bold, dark */}
-      <section className="py-24 bg-gray-950 text-white">
+      <section className="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl sm:text-6xl font-black tracking-tight mb-6">Ready to Get Started?</h2>
           <p className="text-xl text-gray-400 mb-10 max-w-xl mx-auto">Contact us today and experience the difference.</p>

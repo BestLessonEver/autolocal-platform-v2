@@ -92,7 +92,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
         body: JSON.stringify(edits),
       })
       setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
+      setTimeout(() => { setSaved(false); setEditOpen(false) }, 1500)
     } catch { /* silent */ }
     setSaving(false)
   }
@@ -206,7 +206,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                   type="text"
                   value={edits.business_name}
                   onChange={e => setEdits({ ...edits, business_name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
                 />
               </div>
               <div>
@@ -216,7 +216,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                   value={edits.tagline}
                   onChange={e => setEdits({ ...edits, tagline: e.target.value })}
                   placeholder="Your catchy headline"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
                 />
               </div>
             </div>
@@ -227,7 +227,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                 onChange={e => setEdits({ ...edits, description: e.target.value })}
                 rows={2}
                 placeholder="Tell visitors about your business..."
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none resize-none"
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none resize-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -237,7 +237,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                   type="text"
                   value={edits.phone}
                   onChange={e => setEdits({ ...edits, phone: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
                 />
               </div>
               <div>
@@ -246,7 +246,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                   type="text"
                   value={edits.address}
                   onChange={e => setEdits({ ...edits, address: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none"
                 />
               </div>
             </div>
@@ -265,6 +265,12 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                 Close
               </button>
               {saved && <span className="text-green-600 text-xs font-medium">Changes saved — preview updated!</span>}
+            </div>
+            <div className="space-y-1.5 pt-2 border-t border-gray-100">
+              <p className="text-xs text-gray-500">📸 You can change the hero image, reorder photos, and crop images after purchase in your dashboard</p>
+              {(!data.services || data.services.length === 0) && (
+                <p className="text-xs text-gray-500">📋 No services listed yet — you can add services after purchase in your dashboard</p>
+              )}
             </div>
           </div>
         </div>
