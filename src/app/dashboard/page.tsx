@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -1001,6 +1001,18 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [userEmail, setUserEmail] = useState('')
+  const [deploying, setDeploying] = useState(false)
+  const deployTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Trigger deploying indicator for 15 seconds after any edit
+  const handleUpdate = (newData: SiteData) => {
+    setData(newData)
+    if (newData.website_current) {
+      setDeploying(true)
+      if (deployTimerRef.current) clearTimeout(deployTimerRef.current)
+      deployTimerRef.current = setTimeout(() => setDeploying(false), 15000)
+    }
+  }
 
   // Change request form
   const [changeMessage, setChangeMessage] = useState('')
@@ -1141,8 +1153,8 @@ export default function ClientDashboard() {
                     {data.google_review_count >= 20 && <span className="text-yellow-400/60 text-sm">({data.google_review_count})</span>}
                   </div>
                 )}
-                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'}`}>
-                  {data.status === 'published' ? '● Live' : data.status}
+                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${deploying ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'}`}>
+                  {deploying ? '⟳ Deploying' : data.status === 'published' ? '● Live' : data.status}
                 </span>
               </div>
             </div>
@@ -1150,8 +1162,8 @@ export default function ClientDashboard() {
             {/* Plan Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-green-500/20 text-green-400 border border-green-500/20">
-                  📄 Website Active
+                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${deploying ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : 'bg-green-500/20 text-green-400 border border-green-500/20'}`}>
+                  {deploying ? '⟳ Deploying...' : '📄 Website Active'}
                 </span>
                 <span className="text-xs text-gray-500">$9/mo hosting</span>
               </div>
@@ -1212,23 +1224,23 @@ export default function ClientDashboard() {
         </div>
 
         {/* Subdomain Editor */}
-        <SubdomainEditor data={data} onUpdate={setData} />
+        <SubdomainEditor data={data} onUpdate={handleUpdate} />
 
         {/* Editable Site Details */}
-        <SiteEditor data={data} onUpdate={setData} />
+        <SiteEditor data={data} onUpdate={handleUpdate} />
 
         {/* Brand Customization */}
         {/* Photo Manager */}
-        <PhotoManager data={data} onUpdate={setData} />
+        <PhotoManager data={data} onUpdate={handleUpdate} />
 
         {/* Brand Customization */}
-        <BrandCustomizer data={data} onUpdate={setData} />
+        <BrandCustomizer data={data} onUpdate={handleUpdate} />
 
         {/* Template Selector */}
-        <TemplateSelector data={data} onUpdate={setData} />
+        <TemplateSelector data={data} onUpdate={handleUpdate} />
 
         {/* Business vs Individual */}
-        <SiteModeToggle data={data} onUpdate={setData} />
+        <SiteModeToggle data={data} onUpdate={handleUpdate} />
 
         {/* Custom Change Request */}
         <div id="changes" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
