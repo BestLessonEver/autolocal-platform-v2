@@ -22,7 +22,6 @@ export default function IntakePage() {
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [submitted] = useState(false)
-  const [uploading] = useState(false)
 
   const [form, setForm] = useState({
     businessName: '',
@@ -112,11 +111,63 @@ export default function IntakePage() {
     }))
   }
 
+  const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = document.createElement('img')
+      const canvas = document.createElement('canvas')
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        let w = img.width, h = img.height
+        if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth }
+        canvas.width = w
+        canvas.height = h
+        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+        canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', quality)
+      }
+      img.onerror = () => resolve(file)
+      img.src = url
+    })
+  }
+
   const handleSubmit = async () => {
     setSubmitting(true)
 
     try {
-      // Submit form data FIRST (fast, no file uploads)
+      // 1. Upload all files in PARALLEL first (compressed)
+      const uploadPromises: Promise<{ type: string; url: string }>[] = []
+
+      if (logo) {
+        uploadPromises.push((async () => {
+          const compressed = await compressImage(logo.file, 400, 0.9)
+          const fd = new FormData()
+          fd.append('file', new File([compressed], logo.file.name, { type: 'image/jpeg' }))
+          fd.append('slug', slug as string)
+          fd.append('type', 'logo')
+          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
+          const data = await res.json()
+          return { type: 'logo', url: data.url || '' }
+        })())
+      }
+
+      for (const photo of photos) {
+        uploadPromises.push((async () => {
+          const compressed = await compressImage(photo.file)
+          const fd = new FormData()
+          fd.append('file', new File([compressed], photo.file.name, { type: 'image/jpeg' }))
+          fd.append('slug', slug as string)
+          fd.append('type', 'photo')
+          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
+          const data = await res.json()
+          return { type: 'photo', url: data.url || '' }
+        })())
+      }
+
+      const uploadResults = await Promise.all(uploadPromises)
+      const logoUrl = uploadResults.find(r => r.type === 'logo')?.url || ''
+      const photoUrls = uploadResults.filter(r => r.type === 'photo' && r.url).map(r => r.url)
+
+      // 2. Submit form data WITH photo URLs
       const hours: Record<string, string> = {}
       for (const [day, h] of Object.entries(form.hours)) {
         hours[day] = h.closed ? 'Closed' : `${h.open} - ${h.close}`
@@ -130,48 +181,15 @@ export default function IntakePage() {
           ...form,
           hours,
           services: form.services.filter(s => s.name.trim()),
-          logoUrl: '',
-          photoUrls: [],
+          logoUrl,
+          photoUrls,
         }),
       })
 
       const result = await submitRes.json()
       const previewSlug = result.slug || slug
 
-      // Redirect to building page IMMEDIATELY
-      // Upload files in background (fire-and-forget)
-      const uploadFiles = async () => {
-        let logoUrl = ''
-        if (logo) {
-          const fd = new FormData()
-          fd.append('file', logo.file)
-          fd.append('slug', previewSlug as string)
-          fd.append('type', 'logo')
-          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
-          const data = await res.json()
-          if (data.url) logoUrl = data.url
-        }
-        const photoUrls: string[] = []
-        for (const photo of photos) {
-          const fd = new FormData()
-          fd.append('file', photo.file)
-          fd.append('slug', previewSlug as string)
-          fd.append('type', 'photo')
-          const res = await fetch('/api/intake/upload', { method: 'POST', body: fd })
-          const data = await res.json()
-          if (data.url) photoUrls.push(data.url)
-        }
-        // Update the preview record with uploaded URLs
-        if (logoUrl || photoUrls.length) {
-          await fetch('/api/intake/submit', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slug: previewSlug, logoUrl, photoUrls }),
-          })
-        }
-      }
-      uploadFiles() // fire-and-forget — don't await
-
+      // 3. Redirect to building animation
       window.location.href = `/building/${previewSlug}`
     } catch {
       alert('Something went wrong. Please try again.')
@@ -467,7 +485,7 @@ export default function IntakePage() {
               </button>
               <button onClick={handleSubmit} disabled={submitting}
                 className="flex-1 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50">
-                {submitting ? (uploading ? 'Uploading photos...' : 'Building your preview...') : 'See My Website Preview 🚀'}
+                {submitting ? 'Uploading & building...' : 'See My Website Preview 🚀'}
               </button>
             </div>
           </div>
