@@ -46,7 +46,7 @@ export async function PATCH(req: Request) {
     // Find user's preview by email
     const { data: preview, error: findErr } = await supabaseAdmin
       .from('website_previews')
-      .select('id')
+      .select('id, slug, website_current')
       .eq('email', email)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -80,6 +80,18 @@ export async function PATCH(req: Request) {
     if (updateErr) {
       console.error('Update error:', updateErr)
       return NextResponse.json({ error: 'Failed to save changes' }, { status: 500 })
+    }
+
+    // Auto-redeploy if the site is live on Vercel
+    if (preview.website_current && preview.slug) {
+      fetch('https://autolocal.ai/api/deploy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+        },
+        body: JSON.stringify({ slug: preview.slug }),
+      }).catch(err => console.error('Auto-redeploy failed:', err))
     }
 
     return NextResponse.json({ success: true })
