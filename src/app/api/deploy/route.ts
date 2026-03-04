@@ -67,7 +67,7 @@ function generateStaticHtml(data: SiteData): string {
     normalizedHours[dayMap[k.toLowerCase()] || k.toLowerCase()] = v as string
   }
   const gallery = data.gallery_images || []
-  const hours = data.hours || {}
+  // hours normalized below as normalizedHours
   const showReviewCount = (data.google_review_count ?? 0) >= 20
   const primary = data.brand_color_primary || '#1a1a2e'
   const accent = data.brand_color_accent || '#6366f1'
