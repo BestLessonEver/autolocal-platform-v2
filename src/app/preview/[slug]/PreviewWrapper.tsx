@@ -64,6 +64,7 @@ function resolveTemplate(data: PreviewData): TemplateName {
 }
 
 export default function PreviewWrapper({ data }: { data: PreviewData }) {
+  const isPurchased = !!data.website_current
   const [bannerVisible, setBannerVisible] = useState(false)
   const [activeTemplate, setActiveTemplate] = useState<TemplateName>(() => resolveTemplate(data))
   const [editOpen, setEditOpen] = useState(false)
@@ -125,35 +126,44 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
           bannerVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         }`}
       >
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+        <div className={`${isPurchased ? 'bg-gradient-to-r from-emerald-600 to-teal-600' : 'bg-gradient-to-r from-indigo-600 to-purple-600'} text-white shadow-lg`}>
           <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
             <p className="text-sm font-medium">
-              ✨ This is a preview of your new website
+              {isPurchased ? '🎉 Your website is live!' : '✨ This is a preview of your new website'}
             </p>
             <div className="flex items-center gap-3 shrink-0">
-              <button
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/api/checkout', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        product: 'website',
-                        email: filteredData.email || '',
-                        businessName: filteredData.business_name || '',
-                        slug: data.slug || '',
-                      }),
-                    })
-                    const d = await res.json()
-                    if (d.url) window.location.href = d.url
-                  } catch {
-                    window.location.href = `https://autolocal.ai/offer?business=${encodeURIComponent(filteredData.business_name || '')}&e=${encodeURIComponent(filteredData.email || '')}`
-                  }
-                }}
-                className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
-              >
-                Get Started — $99
-              </button>
+              {isPurchased ? (
+                <a
+                  href="/dashboard"
+                  className="px-4 py-1.5 bg-white text-emerald-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
+                >
+                  Go to Dashboard →
+                </a>
+              ) : (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          product: 'website',
+                          email: filteredData.email || '',
+                          businessName: filteredData.business_name || '',
+                          slug: data.slug || '',
+                        }),
+                      })
+                      const d = await res.json()
+                      if (d.url) window.location.href = d.url
+                    } catch {
+                      window.location.href = `https://autolocal.ai/offer?business=${encodeURIComponent(filteredData.business_name || '')}&e=${encodeURIComponent(filteredData.email || '')}`
+                    }
+                  }}
+                  className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
+                >
+                  Get Started — $99
+                </button>
+              )}
               <button
                 onClick={() => setBannerVisible(false)}
                 className="text-white/70 hover:text-white transition text-xl leading-none"
@@ -165,7 +175,8 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
           </div>
         </div>
 
-        {/* Choose Your Style — directly below banner */}
+        {/* Choose Your Style — only for unpurchased previews */}
+        {!isPurchased && (
         <div className="bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center gap-3">
             <span className="hidden sm:inline text-xs font-medium text-gray-500 uppercase tracking-wide mr-2">Choose your style</span>
@@ -187,7 +198,9 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             </div>
           </div>
         </div>
-        {/* Customize button */}
+        )}
+        {/* Customize button — only for unpurchased previews */}
+        {!isPurchased && (
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100">
           <button
             onClick={() => setEditOpen(!editOpen)}
@@ -196,6 +209,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             ✏️ {editOpen ? 'Close Editor' : 'Customize your text — click here'}
           </button>
         </div>
+        )}
       </div>
 
       {/* Edit Panel — slides down below banner */}
