@@ -23,6 +23,7 @@ interface SiteData {
   services: { name: string; description: string; price?: string }[]
   hours: Record<string, string> | null
   preview_url: string
+  website_url: string
   view_count: number
   created_at: string
   plan: 'starter' | 'living'
@@ -36,14 +37,7 @@ interface SiteData {
   preview_id: string
 }
 
-const CHANGE_TYPES = [
-  { value: 'text', label: '✏️ Text / Copy Changes', desc: 'Update headings, descriptions, or service info' },
-  { value: 'photos', label: '📸 Photo Changes', desc: 'Swap hero image, add gallery photos' },
-  { value: 'colors', label: '🎨 Colors / Style', desc: 'Adjust brand colors, fonts, or layout' },
-  { value: 'services', label: '📋 Services / Pricing', desc: 'Add, remove, or update services and prices' },
-  { value: 'hours', label: '🕐 Hours / Contact', desc: 'Update business hours, phone, or address' },
-  { value: 'other', label: '💬 Other', desc: 'Anything else — just describe what you need' },
-]
+// Change types removed — users do basic edits themselves, custom requests are $7
 
 const COLOR_PALETTES = [
   { name: 'Ocean', primary: '#0f172a', secondary: '#1e293b', accent: '#3b82f6' },
@@ -87,6 +81,7 @@ function SiteEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          display_email: form.email,
           services: services.filter(s => s.name.trim()),
           hours: Object.keys(hours).length ? hours : null,
         }),
@@ -206,7 +201,7 @@ function SiteEditor({ data, onUpdate }: { data: SiteData; onUpdate: (d: SiteData
               {DAYS.map(day => (
                 <div key={day} className="flex items-center gap-3">
                   <span className="text-xs text-gray-500 w-20 shrink-0">{day}</span>
-                  <input type="text" value={hours[day] || ''} onChange={e => setHours({ ...hours, [day]: e.target.value })} placeholder="e.g. 9:00 AM - 5:00 PM or Closed" className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
+                  <input type="text" value={hours[day] || ''} onChange={e => setHours({ ...hours, [day]: e.target.value })} placeholder="9:00 AM - 5:00 PM" className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:border-indigo-500 outline-none transition" />
                 </div>
               ))}
             </div>
@@ -531,9 +526,7 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState('')
 
   // Change request form
-  const [changeType, setChangeType] = useState('')
   const [changeMessage, setChangeMessage] = useState('')
-  const [changePriority, setChangePriority] = useState('normal')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -582,16 +575,15 @@ export default function ClientDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: changeType || 'other',
+          type: 'custom',
           message: changeMessage.trim(),
-          priority: changePriority,
+          priority: 'normal',
         }),
       })
       const result = await res.json()
       if (res.ok) {
         setSubmitted(true)
         setChangeMessage('')
-        setChangeType('')
       } else {
         alert(result.error || 'Something went wrong')
       }
@@ -639,7 +631,7 @@ export default function ClientDashboard() {
             <h1 className="text-xl font-black text-white">{data.business_name}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <a href={data.preview_url} target="_blank" className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
+            <a href={data.website_url} target="_blank" className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
               View My Site →
             </a>
             <button onClick={handleLogout} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">
@@ -678,22 +670,13 @@ export default function ClientDashboard() {
               </div>
             </div>
 
-            {/* Plan + Changes Bar */}
+            {/* Plan Bar */}
             <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${data.plan === 'living' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20' : 'bg-white/10 text-gray-400 border border-white/10'}`}>
-                {data.plan === 'living' ? '🚀 Living Website' : '📄 Starter Plan'}
+                {data.plan === 'living' ? '🚀 Dynamic Smart Website' : '📄 Website'}
               </span>
-              <span className="text-gray-600">·</span>
-              {data.unlimited_changes ? (
-                <span className="text-sm text-gray-400"><span className="text-green-400 font-semibold">Unlimited</span> changes included</span>
-              ) : (
-                <span className="text-sm text-gray-400">
-                  <span className={`font-semibold ${data.free_changes_remaining > 0 ? 'text-white' : 'text-red-400'}`}>{data.free_changes_remaining}</span> free change{data.free_changes_remaining !== 1 ? 's' : ''} remaining this month
-                  <span className="text-gray-600"> · {data.changes_this_month} used</span>
-                </span>
-              )}
               {data.plan !== 'living' && (
-                <a href="/offer?upgrade=living" className="ml-auto text-xs font-bold text-amber-400 hover:text-amber-300 transition">Upgrade to Unlimited →</a>
+                <a href="/offer?upgrade=living" className="ml-auto text-xs font-bold text-amber-400 hover:text-amber-300 transition">Upgrade to Dynamic Smart Website →</a>
               )}
             </div>
 
@@ -721,7 +704,7 @@ export default function ClientDashboard() {
 
         {/* Quick Links */}
         <div className="grid sm:grid-cols-3 gap-4">
-          <a href={data.preview_url} target="_blank" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
+          <a href={data.website_url} target="_blank" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
             <span className="text-2xl mb-2 block">🌐</span>
             <h3 className="font-bold text-white group-hover:text-indigo-400 transition">View My Website</h3>
             <p className="text-gray-500 text-xs mt-1">See your live site with all current changes</p>
@@ -733,8 +716,8 @@ export default function ClientDashboard() {
           </a>
           <a href="#changes" className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:border-indigo-500/30 transition group">
             <span className="text-2xl mb-2 block">✏️</span>
-            <h3 className="font-bold text-white group-hover:text-indigo-400 transition">Request Changes</h3>
-            <p className="text-gray-500 text-xs mt-1">Need something updated? Tell us below</p>
+            <h3 className="font-bold text-white group-hover:text-indigo-400 transition">Custom Changes</h3>
+            <p className="text-gray-500 text-xs mt-1">Need something custom? $7 per request</p>
           </a>
         </div>
 
@@ -748,45 +731,20 @@ export default function ClientDashboard() {
         {/* Brand Customization */}
         <BrandCustomizer data={data} onUpdate={setData} />
 
-        {/* Out of free changes — upgrade prompt */}
-        {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
-          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-white mb-1">You&apos;ve used your 2 free changes this month</h3>
-                <p className="text-gray-400 text-sm">
-                  Additional changes are <strong className="text-white">$19 each</strong>, or upgrade to the Living Website for <strong className="text-white">$49/mo</strong> and get <strong className="text-white">unlimited changes</strong> — plus A/B testing, SEO updates, and priority support.
-                </p>
-              </div>
-              <a href="/offer?upgrade=living" className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:brightness-110 transition shrink-0">
-                Upgrade — $49/mo
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Request Changes Form */}
+        {/* Custom Change Request */}
         <div id="changes" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-lg font-bold">Request Changes</h2>
-            {!data.unlimited_changes && (
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${data.free_changes_remaining > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {data.free_changes_remaining > 0 ? `${data.free_changes_remaining} free left` : '$19 per change'}
-              </span>
-            )}
+            <h2 className="text-lg font-bold">Request a Custom Change</h2>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400">$7 per request</span>
           </div>
           <p className="text-gray-500 text-sm mb-6">
-            {data.unlimited_changes
-              ? 'Unlimited changes included with your Living Website plan. We\'ll handle it within 24 hours.'
-              : data.free_changes_remaining > 0
-                ? `You have ${data.free_changes_remaining} free change${data.free_changes_remaining !== 1 ? 's' : ''} remaining this month.`
-                : 'You\'ve used your free changes this month. Additional changes are $19 each, or upgrade to unlimited for $49/mo.'}
+            Need something you can&apos;t do from the dashboard? Describe what you need and our team will handle it within 24 hours.
           </p>
 
           {submitted ? (
             <div className="text-center py-8">
               <span className="text-4xl mb-4 block">✅</span>
-              <h3 className="text-xl font-bold text-white mb-2">Change Request Submitted!</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>
               <p className="text-gray-400 mb-6">We&apos;ll review your request and get back to you within 24 hours.</p>
               <button onClick={() => setSubmitted(false)} className="px-6 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:border-white/20 transition">
                 Submit Another Request
@@ -795,51 +753,16 @@ export default function ClientDashboard() {
           ) : (
             <form onSubmit={handleSubmitChange} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-3">What do you want to change?</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {CHANGE_TYPES.map(ct => (
-                    <button key={ct.value} type="button" onClick={() => setChangeType(ct.value)} className={`text-left p-3 rounded-xl border text-sm transition ${changeType === ct.value ? 'bg-indigo-600/20 border-indigo-500/40 text-white' : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'}`}>
-                      <p className="font-semibold">{ct.label}</p>
-                      <p className="text-xs mt-0.5 opacity-60">{ct.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Describe what you&apos;d like changed</label>
-                <textarea value={changeMessage} onChange={e => setChangeMessage(e.target.value)} rows={4} required placeholder="E.g., 'Change the hero image to a photo of our storefront' or 'Update our hours — we're now open Sundays 10am-4pm'" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition resize-none" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Priority</label>
-                <div className="flex gap-3">
-                  <button type="button" onClick={() => setChangePriority('normal')} className={`flex-1 p-4 rounded-xl border text-sm text-center transition ${changePriority === 'normal' ? 'bg-indigo-600/20 border-indigo-500/40 text-white' : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'}`}>
-                    <p className="font-semibold">Normal</p>
-                    <p className="text-xs mt-1 opacity-60">Within 24 hours</p>
-                    <p className="text-xs mt-1 text-green-400 font-medium">Included</p>
-                  </button>
-                  <button type="button" onClick={() => setChangePriority('urgent')} className={`flex-1 p-4 rounded-xl border text-sm text-center transition relative ${changePriority === 'urgent' ? 'bg-red-600/20 border-red-500/40 text-red-400' : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:border-white/10'}`}>
-                    {data.plan !== 'living' && <span className="absolute -top-2 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">+$29</span>}
-                    <p className="font-semibold">🚨 Urgent</p>
-                    <p className="text-xs mt-1 opacity-60">Within 2 hours</p>
-                    {data.plan === 'living' ? <p className="text-xs mt-1 text-green-400 font-medium">Included with plan</p> : <p className="text-xs mt-1 text-red-400 font-medium">$29 rush fee</p>}
-                  </button>
-                </div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">What do you need?</label>
+                <textarea value={changeMessage} onChange={e => setChangeMessage(e.target.value)} rows={4} required placeholder="E.g., 'Add a booking widget to my site', 'Create a special holiday promo banner', 'Redesign my services section with icons'" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none transition resize-none" />
               </div>
 
               <button type="submit" disabled={submitting || !changeMessage.trim()} className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-xl hover:shadow-indigo-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
-                {submitting ? 'Submitting...'
-                  : changePriority === 'urgent' && data.plan !== 'living'
-                    ? data.free_changes_remaining > 0 ? 'Submit Urgent Request — $29 rush fee' : 'Submit Urgent Request — $19 + $29 rush'
-                    : data.unlimited_changes ? 'Submit Change Request'
-                    : data.free_changes_remaining > 0 ? `Submit Change Request (${data.free_changes_remaining} free left)` : 'Submit Change Request — $19'}
+                {submitting ? 'Submitting...' : 'Submit Request — $7'}
               </button>
-              {!data.unlimited_changes && data.free_changes_remaining <= 0 && (
-                <p className="text-center text-xs text-gray-500 mt-2">
-                  This change will be billed at $19. <a href="/offer?upgrade=living" className="text-amber-400 hover:underline">Upgrade to unlimited for $49/mo →</a>
-                </p>
-              )}
+              <p className="text-center text-xs text-gray-500">
+                You&apos;ll only be charged after we complete the change. Basic edits (text, photos, colors, hours) are free and unlimited from your dashboard above.
+              </p>
             </form>
           )}
         </div>

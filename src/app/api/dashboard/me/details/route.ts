@@ -32,6 +32,7 @@ export async function PATCH(req: Request) {
       tagline,
       description,
       phone,
+      display_email,
       address,
       city,
       state,
@@ -61,6 +62,7 @@ export async function PATCH(req: Request) {
     if (address !== undefined) updates.address = address || null
     if (city !== undefined) updates.city = city || null
     if (state !== undefined) updates.state = state || null
+    if (display_email !== undefined) updates.contact_email = display_email || null
     if (services !== undefined) updates.services = services
     if (hours !== undefined) updates.hours = hours
 
