@@ -77,12 +77,29 @@ const COLOR_PALETTES = [
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
+const TIME_OPTIONS = [
+  '6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM',
+  '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+  '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
+  '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM',
+  '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM',
+  '9:00 PM', '9:30 PM', '10:00 PM', '10:30 PM', '11:00 PM',
+]
+
 // ─── Autosave Hook ──────────────────────────────────────────────────────────────
 
 function useAutosave(onSaved: () => void) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [deploying, setDeploying] = useState(false)
+  const deployTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const triggerDeploy = useCallback(() => {
+    setDeploying(true)
+    if (deployTimerRef.current) clearTimeout(deployTimerRef.current)
+    deployTimerRef.current = setTimeout(() => setDeploying(false), 20000)
+  }, [])
 
   const save = useCallback(
     (fields: Record<string, unknown>) => {
@@ -97,6 +114,7 @@ function useAutosave(onSaved: () => void) {
           })
           if (res.ok) {
             setSaved(true)
+            triggerDeploy()
             onSaved()
             setTimeout(() => setSaved(false), 2000)
           }
@@ -104,7 +122,7 @@ function useAutosave(onSaved: () => void) {
         setSaving(false)
       }, 2000)
     },
-    [onSaved]
+    [onSaved, triggerDeploy]
   )
 
   const saveNow = useCallback(
@@ -119,16 +137,17 @@ function useAutosave(onSaved: () => void) {
         })
         if (res.ok) {
           setSaved(true)
+          triggerDeploy()
           onSaved()
           setTimeout(() => setSaved(false), 2000)
         }
       } catch { /* silent */ }
       setSaving(false)
     },
-    [onSaved]
+    [onSaved, triggerDeploy]
   )
 
-  return { save, saveNow, saving, saved }
+  return { save, saveNow, saving, saved, deploying, triggerDeploy }
 }
 
 // ─── Inline Editable Text ───────────────────────────────────────────────────────
@@ -210,9 +229,113 @@ function SaveBadge({ saving, saved }: { saving: boolean; saved: boolean }) {
   return null
 }
 
+// ─── Subdomain Editor ───────────────────────────────────────────────────────────
+
+function SubdomainField({ slug, onUpdate }: { slug: string; onUpdate: (newSlug: string) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(slug)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { setValue(slug) }, [slug])
+  useEffect(() => { if (editing && inputRef.current) inputRef.current.focus() }, [editing])
+
+  const handleSave = async () => {
+    const clean = value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '')
+    if (clean.length < 3) { setError('Min 3 characters'); return }
+    if (clean === slug) { setEditing(false); return }
+    setSaving(true)
+    setError('')
+    try {
+      const res = await fetch('/api/dashboard/me/subdomain', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subdomain: clean }),
+      })
+      const result = await res.json()
+      if (res.ok) {
+        onUpdate(result.slug)
+        setEditing(false)
+      } else {
+        setError(result.error || 'Failed')
+      }
+    } catch { setError('Connection error') }
+    setSaving(false)
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className="flex items-center bg-white/5 border border-indigo-500/50 rounded-lg overflow-hidden">
+          <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={e => { setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')); setError('') }}
+            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') { setValue(slug); setEditing(false) } }}
+            className="px-2 py-1 bg-transparent text-white text-xs outline-none w-32"
+          />
+          <span className="text-gray-500 text-xs pr-2">.autolocal.ai</span>
+        </div>
+        <button onClick={handleSave} disabled={saving} className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-bold hover:bg-indigo-500 transition disabled:opacity-40">
+          {saving ? '...' : '✓'}
+        </button>
+        <button onClick={() => { setValue(slug); setEditing(false) }} className="text-gray-500 text-xs hover:text-white">✕</button>
+        {error && <span className="text-red-400 text-[10px]">{error}</span>}
+      </div>
+    )
+  }
+
+  return (
+    <button onClick={() => setEditing(true)} className="text-xs text-gray-500 font-mono hover:text-indigo-400 transition truncate" title="Click to change subdomain">
+      {slug}.autolocal.ai <span className="text-gray-700 ml-1">✎</span>
+    </button>
+  )
+}
+
+// ─── Photo Crop Modal ───────────────────────────────────────────────────────────
+
+function PhotoCropModal({
+  imageUrl,
+  onSave,
+  onClose,
+}: {
+  imageUrl: string
+  onSave: (cropY: number) => void
+  onClose: () => void
+}) {
+  const [cropY, setCropY] = useState(50)
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+      <div className="bg-[#18181b] border border-white/10 rounded-2xl p-6 max-w-lg w-full">
+        <h3 className="text-lg font-bold text-white mb-4">Crop Photo (4:3)</h3>
+        <div className="rounded-xl overflow-hidden bg-white/5 mb-4" style={{ aspectRatio: '4/3' }}>
+          <img
+            src={imageUrl}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ objectPosition: `center ${cropY}%` }}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-xs text-gray-500 mb-2">Vertical Position</label>
+          <input type="range" min="0" max="100" value={cropY} onChange={e => setCropY(parseInt(e.target.value))} className="w-full accent-indigo-600" />
+          <div className="flex justify-between text-[10px] text-gray-500 mt-1"><span>Top</span><span>Center</span><span>Bottom</span></div>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => onSave(cropY)} className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition">Save</button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-bold hover:text-white transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Brand Controls ─────────────────────────────────────────────────────────────
 
-function BrandControls({ data, onUpdate }: { data: SiteData; onUpdate: (d: Partial<SiteData>) => void }) {
+function BrandControls({ data, onUpdate, onDeploy }: { data: SiteData; onUpdate: (d: Partial<SiteData>) => void; onDeploy: () => void }) {
   const [primary, setPrimary] = useState(data.brand_color_primary)
   const [secondary, setSecondary] = useState(data.brand_color_secondary)
   const [accent, setAccent] = useState(data.brand_color_accent)
@@ -234,7 +357,7 @@ function BrandControls({ data, onUpdate }: { data: SiteData; onUpdate: (d: Parti
     try {
       const res = await fetch('/api/dashboard/me/brand', { method: 'POST', body: formData })
       const result = await res.json()
-      if (res.ok && result.logo_url) onUpdate({ logo_url: result.logo_url })
+      if (res.ok && result.logo_url) { onUpdate({ logo_url: result.logo_url }); onDeploy() }
     } catch { /* silent */ }
   }
 
@@ -248,6 +371,7 @@ function BrandControls({ data, onUpdate }: { data: SiteData; onUpdate: (d: Parti
       })
       if (res.ok) {
         onUpdate({ brand_color_primary: primary, brand_color_secondary: secondary, brand_color_accent: accent })
+        onDeploy()
         setColorSaved(true)
         setTimeout(() => setColorSaved(false), 2000)
       }
@@ -317,6 +441,14 @@ function BrandControls({ data, onUpdate }: { data: SiteData; onUpdate: (d: Parti
   )
 }
 
+// ─── Hours Dropdown Helpers ─────────────────────────────────────────────────────
+
+function parseHours(val: string): { open: string; close: string } {
+  if (!val || val.toLowerCase() === 'closed') return { open: '', close: '' }
+  const parts = val.split(/\s*[-–]\s*/)
+  return { open: parts[0]?.trim() || '', close: parts[1]?.trim() || '' }
+}
+
 // ─── Main Dashboard ─────────────────────────────────────────────────────────────
 
 export default function ClientDashboard() {
@@ -329,6 +461,7 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState('')
   const [previewKey, setPreviewKey] = useState(0)
   const [mobilePreview, setMobilePreview] = useState(false)
+  const [cropPhoto, setCropPhoto] = useState<{ url: string; index: number } | null>(null)
 
   // Change request
   const [changeMessage, setChangeMessage] = useState('')
@@ -336,7 +469,7 @@ export default function ClientDashboard() {
   const [changeSubmitted, setChangeSubmitted] = useState(false)
 
   const refreshPreview = useCallback(() => { setPreviewKey(k => k + 1) }, [])
-  const { save, saveNow, saving, saved } = useAutosave(refreshPreview)
+  const { save, saveNow, saving, saved, deploying, triggerDeploy } = useAutosave(refreshPreview)
 
   useEffect(() => {
     const load = async () => {
@@ -387,8 +520,14 @@ export default function ClientDashboard() {
       const res = await fetch('/api/dashboard/me/photos', { method: 'POST', body: formData })
       const result = await res.json()
       if (res.ok) {
-        if (target === 'hero') setData(prev => prev ? { ...prev, hero_image_url: result.url } : prev)
-        else setData(prev => prev ? { ...prev, gallery_images: [...(prev.gallery_images || []), result.url] } : prev)
+        if (target === 'hero') {
+          setData(prev => prev ? { ...prev, hero_image_url: result.url } : prev)
+        } else {
+          setData(prev => prev ? { ...prev, gallery_images: [...(prev.gallery_images || []), result.url] } : prev)
+          // Open crop modal for new gallery photo
+          setCropPhoto({ url: result.url, index: (data?.gallery_images?.length || 0) })
+        }
+        triggerDeploy()
         refreshPreview()
       }
     } catch { /* silent */ }
@@ -408,9 +547,39 @@ export default function ClientDashboard() {
           const heroUrl = prev.hero_image_url === url ? (gallery[0] || null) : prev.hero_image_url
           return { ...prev, gallery_images: gallery, hero_image_url: heroUrl }
         })
+        triggerDeploy()
         refreshPreview()
       }
     } catch { /* silent */ }
+  }
+
+  const handlePhotoReorder = async (fromIdx: number, toIdx: number) => {
+    if (!data) return
+    const gallery = [...(data.gallery_images || [])]
+    if (toIdx < 0 || toIdx >= gallery.length) return
+    const [moved] = gallery.splice(fromIdx, 1)
+    gallery.splice(toIdx, 0, moved)
+    setData(prev => prev ? { ...prev, gallery_images: gallery } : prev)
+    await fetch('/api/dashboard/me/photos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reorder', gallery_images: gallery }),
+    })
+    triggerDeploy()
+    refreshPreview()
+  }
+
+  const handleSetHero = async (url: string) => {
+    const res = await fetch('/api/dashboard/me/photos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'set_hero', url }),
+    })
+    if (res.ok) {
+      setData(prev => prev ? { ...prev, hero_image_url: url } : prev)
+      triggerDeploy()
+      refreshPreview()
+    }
   }
 
   // Service handlers
@@ -434,10 +603,11 @@ export default function ClientDashboard() {
     saveNow({ services })
   }
 
-  // Hours handlers
-  const updateHour = (day: string, value: string) => {
+  // Hours handlers (dropdown-based)
+  const updateHours = (day: string, open: string, close: string) => {
     if (!data) return
-    const hours = { ...(data.hours || {}), [day]: value }
+    const val = open && close ? `${open} - ${close}` : ''
+    const hours = { ...(data.hours || {}), [day]: val || 'Closed' }
     setData(prev => prev ? { ...prev, hours } : prev)
     save({ hours })
   }
@@ -445,7 +615,9 @@ export default function ClientDashboard() {
     if (!data) return
     const current = data.hours?.[day] || ''
     const isClosed = current.toLowerCase() === 'closed' || !current
-    updateHour(day, isClosed ? '9:00 AM - 5:00 PM' : 'Closed')
+    const hours = { ...(data.hours || {}), [day]: isClosed ? '9:00 AM - 5:00 PM' : 'Closed' }
+    setData(prev => prev ? { ...prev, hours } : prev)
+    saveNow({ hours })
   }
   const copyToWeekdays = () => {
     if (!data) return
@@ -514,18 +686,39 @@ export default function ClientDashboard() {
             />
           </div>
 
+          {/* Deploy Status Badge — 20s deploying timer */}
           <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-            data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'
+            deploying
+              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse'
+              : data.status === 'published'
+                ? 'bg-green-500/20 text-green-400 border border-green-500/20'
+                : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'
           }`}>
-            {data.status === 'published' ? '🟢 LIVE' : '🟡 DRAFT'}
+            {deploying ? '⟳ Deploying...' : data.status === 'published' ? '🟢 LIVE' : '🟡 DRAFT'}
           </span>
 
-          <span className="hidden sm:inline text-xs text-gray-500 font-mono truncate">{data.slug}.autolocal.ai</span>
+          {/* Subdomain — editable field */}
+          <div className="hidden sm:block">
+            <SubdomainField slug={data.slug} onUpdate={newSlug => {
+              setData(prev => prev ? { ...prev, slug: newSlug } : prev)
+              refreshPreview()
+            }} />
+          </div>
 
-          <button onClick={() => { const m = (data as any).site_mode === 'individual' ? 'business' : 'individual'; updateFieldNow('site_mode', m) }}
-            className="shrink-0 px-3 py-1 rounded-full text-xs font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition">
-            {(data as any).site_mode === 'individual' ? '👤 Individual' : '🏢 Business'}
-          </button>
+          {/* Site Type Toggle — Business [switch] Individual */}
+          <div className="shrink-0 flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
+            <span className={`text-xs font-medium ${(data as any).site_mode !== 'individual' ? 'text-white' : 'text-gray-500'}`}>Business</span>
+            <button
+              onClick={() => {
+                const m = (data as any).site_mode === 'individual' ? 'business' : 'individual'
+                updateFieldNow('site_mode', m)
+              }}
+              className={`relative w-9 h-5 rounded-full transition ${(data as any).site_mode === 'individual' ? 'bg-indigo-600' : 'bg-white/20'}`}
+            >
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${(data as any).site_mode === 'individual' ? 'left-[18px]' : 'left-0.5'}`} />
+            </button>
+            <span className={`text-xs font-medium ${(data as any).site_mode === 'individual' ? 'text-white' : 'text-gray-500'}`}>Individual</span>
+          </div>
 
           <div className="flex-1" />
 
@@ -568,12 +761,12 @@ export default function ClientDashboard() {
             </section>
 
             {/* Brand Controls */}
-            <BrandControls data={data} onUpdate={mergeUpdate} />
+            <BrandControls data={data} onUpdate={mergeUpdate} onDeploy={triggerDeploy} />
 
             {/* Hero */}
             <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
               <h3 className="text-sm font-semibold text-gray-400">Hero</h3>
-              <div className="relative group rounded-xl overflow-hidden h-48 bg-white/5">
+              <div className="relative group rounded-xl overflow-hidden bg-white/5" style={{ aspectRatio: '4/3', maxHeight: '300px' }}>
                 {data.hero_image_url ? (
                   <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop || 50}%` }} />
                 ) : (
@@ -591,6 +784,25 @@ export default function ClientDashboard() {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Tagline</label>
                 <InlineEdit value={data.tagline || ''} onChange={v => updateField('tagline', v)} className="text-gray-300" placeholder="A short description of your business" />
+              </div>
+            </section>
+
+            {/* Contact — ABOVE About */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-400">Contact Info</h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">📞 Phone</label>
+                  <InlineEdit value={data.phone || ''} onChange={v => updateField('phone', v)} className="text-sm" placeholder="(555) 123-4567" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">📧 Email</label>
+                  <InlineEdit value={(data as any).contact_email || data.email || ''} onChange={v => updateField('display_email', v)} className="text-sm" placeholder="you@example.com" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs text-gray-500 mb-1">📍 Address</label>
+                  <InlineEdit value={data.address || ''} onChange={v => updateField('address', v)} className="text-sm" placeholder="123 Main St, City, State" />
+                </div>
               </div>
             </section>
 
@@ -618,24 +830,45 @@ export default function ClientDashboard() {
               <button onClick={addService} className="w-full py-2.5 rounded-xl border border-dashed border-white/10 text-gray-500 hover:text-white hover:border-white/20 text-sm transition">＋ Add Service</button>
             </section>
 
-            {/* Hours */}
+            {/* Hours — Dropdown-based */}
             <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-400">Hours</h3>
                 <button onClick={copyToWeekdays} className="text-xs text-indigo-400 hover:text-indigo-300 transition">Copy Monday to all weekdays</button>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {DAYS.map(day => {
                   const val = data.hours?.[day] || ''
                   const isClosed = val.toLowerCase() === 'closed' || !val
+                  const { open, close } = parseHours(val)
                   return (
-                    <div key={day} className="flex items-center gap-3">
-                      <span className="w-24 text-xs text-gray-400 shrink-0">{day}</span>
-                      <button onClick={() => toggleDayClosed(day)} className={`w-10 h-5 rounded-full transition relative ${isClosed ? 'bg-white/10' : 'bg-green-600'}`}>
+                    <div key={day} className="flex items-center gap-2">
+                      <span className="w-20 text-xs text-gray-400 shrink-0">{day}</span>
+                      <button onClick={() => toggleDayClosed(day)} className={`w-10 h-5 rounded-full transition relative shrink-0 ${isClosed ? 'bg-white/10' : 'bg-green-600'}`}>
                         <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${isClosed ? 'left-0.5' : 'left-5'}`} />
                       </button>
-                      {isClosed ? <span className="text-xs text-gray-600">Closed</span> : (
-                        <InlineEdit value={val} onChange={v => updateHour(day, v)} className="text-xs text-gray-300 flex-1" placeholder="9:00 AM - 5:00 PM" />
+                      {isClosed ? (
+                        <span className="text-xs text-gray-600">Closed</span>
+                      ) : (
+                        <div className="flex items-center gap-1.5 flex-1">
+                          <select
+                            value={open}
+                            onChange={e => updateHours(day, e.target.value, close)}
+                            className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:border-indigo-500 outline-none appearance-none"
+                          >
+                            <option value="" className="bg-[#18181b]">Open</option>
+                            {TIME_OPTIONS.map(t => <option key={t} value={t} className="bg-[#18181b]">{t}</option>)}
+                          </select>
+                          <span className="text-gray-600 text-xs">to</span>
+                          <select
+                            value={close}
+                            onChange={e => updateHours(day, open, e.target.value)}
+                            className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:border-indigo-500 outline-none appearance-none"
+                          >
+                            <option value="" className="bg-[#18181b]">Close</option>
+                            {TIME_OPTIONS.map(t => <option key={t} value={t} className="bg-[#18181b]">{t}</option>)}
+                          </select>
+                        </div>
                       )}
                     </div>
                   )
@@ -643,39 +876,39 @@ export default function ClientDashboard() {
               </div>
             </section>
 
-            {/* Contact */}
-            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-400">Contact Info</h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">📞 Phone</label>
-                  <InlineEdit value={data.phone || ''} onChange={v => updateField('phone', v)} className="text-sm" placeholder="(555) 123-4567" />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">📧 Email</label>
-                  <InlineEdit value={(data as any).contact_email || data.email || ''} onChange={v => updateField('display_email', v)} className="text-sm" placeholder="you@example.com" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-xs text-gray-500 mb-1">📍 Address</label>
-                  <InlineEdit value={data.address || ''} onChange={v => updateField('address', v)} className="text-sm" placeholder="123 Main St, City, State" />
-                </div>
-              </div>
-            </section>
-
-            {/* Photos */}
+            {/* Photos — with reorder arrows + crop */}
             <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
               <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
+              <p className="text-xs text-gray-600">All photos display at 4:3 ratio. Use arrows to reorder, hover to set as hero or remove.</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {(data.gallery_images || []).map((url, i) => (
-                  <div key={url} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    {i === 0 && url === data.hero_image_url && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Hero</span>}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                      <button onClick={() => handlePhotoRemove(url)} className="px-2 py-1 rounded bg-red-600/80 text-white text-xs font-bold hover:bg-red-500">✕ Remove</button>
+                {(data.gallery_images || []).map((url, i) => {
+                  const isHero = url === data.hero_image_url
+                  return (
+                    <div key={url} className="relative group rounded-lg overflow-hidden bg-white/5" style={{ aspectRatio: '4/3' }}>
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Hero</span>}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-1.5">
+                        {/* Reorder arrows */}
+                        {(data.gallery_images || []).length > 1 && (
+                          <div className="flex gap-1">
+                            <button onClick={() => handlePhotoReorder(i, i - 1)} disabled={i === 0}
+                              className="w-7 h-7 rounded bg-white/20 text-white text-xs font-bold hover:bg-white/30 disabled:opacity-30 flex items-center justify-center">←</button>
+                            <button onClick={() => handlePhotoReorder(i, i + 1)} disabled={i === (data.gallery_images || []).length - 1}
+                              className="w-7 h-7 rounded bg-white/20 text-white text-xs font-bold hover:bg-white/30 disabled:opacity-30 flex items-center justify-center">→</button>
+                          </div>
+                        )}
+                        <div className="flex gap-1">
+                          {!isHero && (
+                            <button onClick={() => handleSetHero(url)} className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-bold hover:bg-indigo-500">Set Hero</button>
+                          )}
+                          <button onClick={() => setCropPhoto({ url, index: i })} className="px-2 py-1 rounded bg-white/20 text-white text-[10px] font-bold hover:bg-white/30">Crop</button>
+                          <button onClick={() => handlePhotoRemove(url)} className="px-2 py-1 rounded bg-red-600/80 text-white text-[10px] font-bold hover:bg-red-500">✕</button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-                <label className="aspect-square rounded-lg border-2 border-dashed border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition cursor-pointer">
+                  )
+                })}
+                <label className="rounded-lg border-2 border-dashed border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition cursor-pointer" style={{ aspectRatio: '4/3' }}>
                   <span className="text-2xl">＋</span>
                   <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'gallery') }} className="hidden" />
                 </label>
@@ -742,6 +975,23 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Photo Crop Modal */}
+      {cropPhoto && (
+        <PhotoCropModal
+          imageUrl={cropPhoto.url}
+          onSave={async (cropY) => {
+            // For now, crop is saved as hero_crop (applies to hero display)
+            // Individual photo crops would need a per-photo crop field
+            if (cropPhoto.url === data.hero_image_url) {
+              await saveNow({ hero_crop: cropY })
+              setData(prev => prev ? { ...prev, hero_crop: cropY } : prev)
+            }
+            setCropPhoto(null)
+          }}
+          onClose={() => setCropPhoto(null)}
+        />
+      )}
 
       <footer className="py-6 px-4 border-t border-white/5 text-center">
         <p className="text-gray-600 text-sm">Powered by <a href="https://autolocal.ai" className="text-indigo-400 hover:underline">AutoLocal.ai</a></p>

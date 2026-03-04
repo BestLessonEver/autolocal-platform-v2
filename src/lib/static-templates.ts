@@ -67,6 +67,12 @@ function getEmail(d: SiteData): string {
   return d.contact_email || d.email || ''
 }
 
+/** Gallery images with hero image filtered out to avoid duplication */
+function getGallery(d: SiteData): string[] {
+  if (!d.gallery_images || d.gallery_images.length === 0) return []
+  return d.gallery_images.filter(img => img !== d.hero_image_url)
+}
+
 function isIndividual(d: SiteData): boolean {
   return d.site_mode === 'individual'
 }
@@ -202,7 +208,7 @@ function boldTemplate(d: SiteData): string {
         </div>
         <div class="relative">
           <div class="rounded-2xl overflow-hidden aspect-[4/3] shadow-2xl">
-            <img src="${esc(d.gallery_images[0] || heroImg)}" alt="" class="w-full h-full object-cover" ${!d.gallery_images[0] ? `style="object-position:center ${d.hero_crop ?? 50}%"` : ''}>
+            <img src="${esc(getGallery(d)[0] || heroImg)}" alt="" class="w-full h-full object-cover" ${!getGallery(d)[0] ? `style="object-position:center ${d.hero_crop ?? 50}%"` : ''}>
           </div>
           <div class="absolute -bottom-6 -left-6 w-32 h-32 rounded-2xl" style="background:${p};opacity:0.15"></div>
           <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full" style="background:${a};opacity:0.2"></div>
@@ -286,7 +292,7 @@ function elegantTemplate(d: SiteData): string {
   const ctaText = getCtaText(d)
   const email = getEmail(d)
   const ind = isIndividual(d)
-  const gallery = d.gallery_images.length > 0 ? d.gallery_images : []
+  const gallery = getGallery(d)
   const year = new Date().getFullYear()
 
   return `
@@ -666,7 +672,7 @@ function clutchTemplate(d: SiteData): string {
           <p class="text-gray-600 text-lg leading-relaxed">${esc(d.description || `Welcome to ${d.business_name} — proudly serving ${d.city || 'the community'}${d.state ? `, ${d.state}` : ''}.`)}</p>
         </div>
         <div>
-          ${d.gallery_images[0] ? `<div class="rounded-2xl overflow-hidden aspect-[4/3] shadow-xl"><img src="${esc(d.gallery_images[0])}" alt="" class="w-full h-full object-cover"></div>` : `<div class="rounded-2xl aspect-[4/3] bg-[#0f172a] flex items-center justify-center"><span class="text-6xl opacity-30">🏢</span></div>`}
+          ${getGallery(d)[0] ? `<div class="rounded-2xl overflow-hidden aspect-[4/3] shadow-xl"><img src="${esc(getGallery(d)[0])}" alt="" class="w-full h-full object-cover"></div>` : `<div class="rounded-2xl aspect-[4/3] bg-[#0f172a] flex items-center justify-center"><span class="text-6xl opacity-30">🏢</span></div>`}
         </div>
       </div>
     </div>
@@ -737,7 +743,7 @@ function artikaTemplate(d: SiteData): string {
   const ctaText = getCtaText(d)
   const email = getEmail(d)
   const heroImg = getHeroImg(d)
-  const gallery = d.gallery_images
+  const gallery = getGallery(d)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const year = new Date().getFullYear()
 
@@ -852,7 +858,7 @@ function bdeTemplate(d: SiteData): string {
   const ctaText = getCtaText(d)
   const email = getEmail(d)
   const year = new Date().getFullYear()
-  const gallery = d.gallery_images
+  const gallery = getGallery(d)
 
   const stats: { value: string; label: string }[] = []
   if (d.google_rating) stats.push({ value: `${d.google_rating}★`, label: 'Google Rating' })
