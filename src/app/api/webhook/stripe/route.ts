@@ -113,6 +113,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const phone = metadata.phone || ''
   const businessType = metadata.business_type || ''
   const product = metadata.product || 'website'
+  const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id || null
 
   if (!email || !businessName) {
     console.error('Missing email or business name in checkout metadata:', metadata)
@@ -171,6 +172,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       email,
       phone: phone || null,
       status: 'paid',
+      stripe_customer_id: stripeCustomerId,
     })
     if (clientErr) {
       console.error('Client insert error (non-fatal):', clientErr.message)

@@ -985,10 +985,26 @@ export default function ClientDashboard() {
             </div>
 
             {/* Plan Bar */}
-            <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-green-500/20 text-green-400 border border-green-500/20">
-                📄 Website Active
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-green-500/20 text-green-400 border border-green-500/20">
+                  📄 Website Active
+                </span>
+                <span className="text-xs text-gray-500">$9/mo hosting</span>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/billing-portal', { method: 'POST' })
+                    const data = await res.json()
+                    if (data.url) window.location.href = data.url
+                    else alert(data.error || 'Could not open billing portal')
+                  } catch { alert('Connection error') }
+                }}
+                className="text-xs text-gray-400 hover:text-white transition underline underline-offset-2"
+              >
+                Manage Billing
+              </button>
             </div>
 
             {/* Quick Info Grid */}
