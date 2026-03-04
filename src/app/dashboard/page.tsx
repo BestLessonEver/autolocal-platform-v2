@@ -1001,16 +1001,39 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [userEmail, setUserEmail] = useState('')
-  const [deploying, setDeploying] = useState(false)
-  const deployTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const [deployStatus, setDeployStatus] = useState<string>('live')
+  const pollRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Trigger deploying indicator for 15 seconds after any edit
+  // Poll deploy status from DB until it's no longer 'deploying'
+  const startDeployPoll = () => {
+    setDeployStatus('deploying')
+    if (pollRef.current) clearInterval(pollRef.current)
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch('/api/dashboard/me')
+        if (res.ok) {
+          const d = await res.json()
+          const status = d.deploy_status || 'live'
+          if (status !== 'deploying') {
+            setDeployStatus(status)
+            if (pollRef.current) clearInterval(pollRef.current)
+          }
+        }
+      } catch { /* ignore poll errors */ }
+    }, 3000)
+    // Safety timeout — stop polling after 60s
+    setTimeout(() => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current)
+        setDeployStatus(prev => prev === 'deploying' ? 'live' : prev)
+      }
+    }, 60000)
+  }
+
   const handleUpdate = (newData: SiteData) => {
     setData(newData)
     if (newData.website_current) {
-      setDeploying(true)
-      if (deployTimerRef.current) clearTimeout(deployTimerRef.current)
-      deployTimerRef.current = setTimeout(() => setDeploying(false), 15000)
+      startDeployPoll()
     }
   }
 
@@ -1153,8 +1176,8 @@ export default function ClientDashboard() {
                     {data.google_review_count >= 20 && <span className="text-yellow-400/60 text-sm">({data.google_review_count})</span>}
                   </div>
                 )}
-                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${deploying ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'}`}>
-                  {deploying ? '⟳ Deploying' : data.status === 'published' ? '● Live' : data.status}
+                <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide ${deployStatus === 'deploying' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : deployStatus === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/20' : data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'}`}>
+                  {deployStatus === 'deploying' ? '⟳ Deploying' : deployStatus === 'failed' ? '✕ Deploy Failed' : data.status === 'published' ? '● Live' : data.status}
                 </span>
               </div>
             </div>
@@ -1162,8 +1185,8 @@ export default function ClientDashboard() {
             {/* Plan Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-4 bg-white/[0.02] rounded-xl border border-white/[0.06]">
               <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${deploying ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : 'bg-green-500/20 text-green-400 border border-green-500/20'}`}>
-                  {deploying ? '⟳ Deploying...' : '📄 Website Active'}
+                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${deployStatus === 'deploying' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse' : deployStatus === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/20' : 'bg-green-500/20 text-green-400 border border-green-500/20'}`}>
+                  {deployStatus === 'deploying' ? '⟳ Deploying...' : deployStatus === 'failed' ? '✕ Deploy Failed' : '📄 Website Active'}
                 </span>
                 <span className="text-xs text-gray-500">$9/mo hosting</span>
               </div>

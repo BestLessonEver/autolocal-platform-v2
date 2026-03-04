@@ -90,8 +90,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: auth.message }, { status: auth.status })
   }
 
+  let slug = ''
   try {
-    const { slug } = await req.json()
+    const body = await req.json()
+    slug = body.slug || ''
     if (!slug) {
       return NextResponse.json({ error: 'Missing slug' }, { status: 400 })
     }
@@ -107,7 +109,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Preview not found' }, { status: 404 })
     }
 
-    // 2. Prepare data — normalize hours, resolve email, filter reviews
+    // 2. Mark as deploying
+    await supabase
+      .from('website_previews')
+      .update({ deploy_status: 'deploying' })
+      .eq('slug', slug)
+
+    // 3. Prepare data — normalize hours, resolve email, filter reviews
     const siteData = {
       ...data,
       hours: normalizeHours(data.hours),
@@ -115,25 +123,28 @@ export async function POST(req: Request) {
       reviews: (data.reviews || []).filter((r: any) => r.rating >= 4),
     }
 
-    // 3. Generate static HTML using the selected template
+    // 4. Generate static HTML using the selected template
     const template = data.template || 'bold'
     const html = generateStaticHtml(siteData, template)
 
-    // 4. Deploy to Vercel
+    // 5. Deploy to Vercel
     const { url, projectId } = await deployToVercel(slug, html)
 
-    // 5. Add subdomain
+    // 6. Add subdomain
     const subdomain = await addSubdomain(slug, projectId)
 
-    // 6. Update DB
+    // 7. Update DB — mark as live
     await supabase
       .from('website_previews')
-      .update({ website_current: `https://${subdomain}` })
+      .update({ website_current: `https://${subdomain}`, deploy_status: 'live' })
       .eq('slug', slug)
 
     return NextResponse.json({ success: true, url, subdomain: `https://${subdomain}`, projectId })
-  } catch (err) {
+  } catch (err: any) {
     console.error('Deploy error:', err)
+    if (slug) {
+      await supabase.from('website_previews').update({ deploy_status: 'failed' }).eq('slug', slug)
+    }
     return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
