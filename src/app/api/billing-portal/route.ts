@@ -22,21 +22,35 @@ export async function POST() {
       .limit(1)
       .single()
 
-    if (!client?.stripe_customer_id) {
-      // Try to find by email in Stripe directly
+    // Find or create Stripe customer
+    let customerId = client?.stripe_customer_id || null
+
+    if (!customerId) {
+      // Search Stripe by email
       const customers = await stripe.customers.list({ email: user.email, limit: 1 })
-      if (!customers.data.length) {
-        return NextResponse.json({ error: 'No billing account found' }, { status: 404 })
+      if (customers.data.length) {
+        customerId = customers.data[0].id
+      } else {
+        // Create a new Stripe customer for existing users (pre-subscription era)
+        const newCustomer = await stripe.customers.create({
+          email: user.email,
+          metadata: { source: 'billing_portal_upgrade' },
+        })
+        customerId = newCustomer.id
       }
-      const session = await stripe.billingPortal.sessions.create({
-        customer: customers.data[0].id,
-        return_url: 'https://autolocal.ai/dashboard',
-      })
-      return NextResponse.json({ url: session.url })
+
+      // Save customer ID for future lookups
+      if (client) {
+        await supabase
+          .from('clients')
+          .update({ stripe_customer_id: customerId })
+          .eq('id', client.id)
+          .catch(() => {})
+      }
     }
 
     const session = await stripe.billingPortal.sessions.create({
-      customer: client.stripe_customer_id,
+      customer: customerId,
       return_url: 'https://autolocal.ai/dashboard',
     })
 
