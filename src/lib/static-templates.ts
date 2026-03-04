@@ -610,10 +610,14 @@ function clutchTemplate(d: SiteData): string {
   </header>
 
   <!-- Hero -->
-  <section class="bg-[#0f172a] py-24 sm:py-32">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <section class="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0">
+      <img src="${esc(getHeroImg(d))}" alt="" class="w-full h-full object-cover" style="object-position:center ${d.hero_crop ?? 50}%">
+      <div class="absolute inset-0 bg-[#0f172a]/80"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24 sm:py-32">
       <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">${esc(d.business_name)}</h1>
-      ${d.tagline ? `<p class="text-xl sm:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">${esc(d.tagline)}</p>` : ''}
+      ${d.tagline ? `<p class="text-xl sm:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">${esc(d.tagline)}</p>` : ''}
       <a href="${esc(d.cta_url || '#contact')}" class="inline-flex items-center justify-center px-12 py-5 rounded-lg text-white text-lg font-bold shadow-2xl transition-all hover:scale-105" style="background:#f97316">${esc(ctaText)}</a>
     </div>
   </section>

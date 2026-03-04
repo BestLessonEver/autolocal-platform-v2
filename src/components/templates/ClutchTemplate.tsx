@@ -69,6 +69,15 @@ export default function ClutchTemplate({ data }: TemplateProps) {
 
   const ctaText = getCtaButtonText(data)
 
+  const HERO_IMAGES: Record<string, string> = {
+    salon: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&h=600&fit=crop',
+    fitness: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=600&fit=crop',
+    restaurant: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=600&fit=crop',
+    contractor: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&h=600&fit=crop',
+    general: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop',
+  }
+  const heroImg = data.hero_image_url || HERO_IMAGES[data.category] || HERO_IMAGES.general
+
   // Auto-rotate reviews every 6 seconds
   useEffect(() => {
     if (reviews.length <= 1) return
@@ -106,14 +115,18 @@ export default function ClutchTemplate({ data }: TemplateProps) {
         </div>
       </header>
 
-      {/* ── Hero — clean type on dark bg ── */}
-      <section className="bg-[#0f172a] py-24 sm:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* ── Hero with background image ── */}
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
+          <div className="absolute inset-0 bg-[#0f172a]/80" />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24 sm:py-32">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">
             {data.business_name}
           </h1>
           {data.tagline && (
-            <p className="text-xl sm:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">{data.tagline}</p>
+            <p className="text-xl sm:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">{data.tagline}</p>
           )}
           <a
             href={data.cta_url || '#contact'}
