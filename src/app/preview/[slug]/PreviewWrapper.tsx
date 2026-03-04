@@ -141,6 +141,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                         product: 'website',
                         email: filteredData.email || '',
                         businessName: filteredData.business_name || '',
+                        slug: data.slug || '',
                       }),
                     })
                     const d = await res.json()

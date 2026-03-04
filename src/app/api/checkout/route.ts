@@ -14,7 +14,7 @@ const PRICES: Record<string, { id: string; mode: 'payment' | 'subscription' }> =
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { product, email, businessName, contactName, phone, businessType } = body
+    const { product, email, businessName, contactName, phone, businessType, slug } = body
 
     if (!product || !PRICES[product]) {
       return NextResponse.json({ error: 'Invalid product' }, { status: 400 })
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: price.mode,
       line_items: lineItems,
-      success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=${product}`,
+      success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=${product}&business=${encodeURIComponent(businessName || '')}&slug=${encodeURIComponent(slug || '')}`,
       cancel_url: `https://autolocal.ai/offer${businessName ? `?business=${encodeURIComponent(businessName)}` : ''}`,
       customer_email: email || undefined,
       metadata,
