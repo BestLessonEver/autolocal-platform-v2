@@ -281,13 +281,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert to Supabase
-    console.log('[generate-preview] Inserting slug:', fullSlug, 'name:', name)
+    log('[generate-preview] Inserting slug:', fullSlug, 'name:', name)
     const { error: insertError } = await supabase
       .from('website_previews')
       .insert(payload)
 
     if (insertError) {
-      console.log('[generate-preview] Insert error:', insertError.code, insertError.message)
+      log('[generate-preview] Insert error:', insertError.code, insertError.message)
       if (insertError.code === '23505') {
         // Duplicate slug — update instead
         const { error: updateError } = await supabase
@@ -318,7 +318,7 @@ export async function POST(req: NextRequest) {
         .then(() => {})
     }
 
-    console.log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
+    log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
     return NextResponse.json({
       success: true,
       previewUrl: `/preview/${fullSlug}`,

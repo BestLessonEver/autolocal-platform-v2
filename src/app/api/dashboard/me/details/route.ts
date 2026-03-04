@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -88,7 +89,7 @@ export async function PATCH(req: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+          'Authorization': internalAuthHeader(),
         },
         body: JSON.stringify({ slug: preview.slug }),
       }).catch(err => console.error('Auto-redeploy failed:', err))

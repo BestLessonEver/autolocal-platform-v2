@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -107,7 +108,7 @@ export async function PATCH(req: Request) {
       await fetch(`https://api.vercel.com/v9/projects/${projectName}/domains/${oldSubdomain}?${teamQuery}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${VERCEL_TOKEN}` },
-      }).catch(() => {})
+      }).catch(err => console.error('Subdomain old-project cleanup failed:', err))
     }
 
     // Update DB
@@ -130,7 +131,7 @@ export async function PATCH(req: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+          'Authorization': internalAuthHeader(),
         },
         body: JSON.stringify({ slug: newSlug }),
       }).catch(err => console.error('Redeploy after subdomain change failed:', err))

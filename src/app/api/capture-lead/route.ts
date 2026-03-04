@@ -67,7 +67,7 @@ export async function POST(req: Request) {
         businessName,
         contactName: name,
       }),
-    }).catch(() => {})
+    }).catch(err => console.error('Capture-lead fire-and-forget failed:', err))
 
     return NextResponse.json({ captured: true })
   } catch (err) {

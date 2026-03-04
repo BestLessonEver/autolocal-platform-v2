@@ -252,7 +252,7 @@ export async function sendAuditEmail(
       approachType: approach.type,
       status: 'pending',
       scheduledFor: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    }).catch(() => {})
+    }).catch(err => console.error("Outbound engine fire-and-forget failed:", err))
     return { success: false, error: msg, audit, approach }
   }
 
@@ -268,7 +268,7 @@ export async function sendAuditEmail(
       approachType: approach.type,
       status: 'failed',
       errorMessage: result.error.message,
-    }).catch(() => {})
+    }).catch(err => console.error("Outbound engine fire-and-forget failed:", err))
     return { success: false, error: result.error.message, audit, approach }
   }
 
@@ -287,7 +287,7 @@ export async function sendAuditEmail(
 
   // Schedule follow-ups
   if (emailId) {
-    await scheduleFollowUps(audit.id, recipientEmail, emailId).catch(() => {})
+    await scheduleFollowUps(audit.id, recipientEmail, emailId).catch(err => console.error("Outbound engine fire-and-forget failed:", err))
   }
 
   // Mark audit as email_sent

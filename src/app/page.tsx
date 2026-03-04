@@ -68,7 +68,7 @@ export default function HomePage() {
         city: city.trim() || undefined,
         source: 'landing_page_search',
       }),
-    }).catch(() => {})
+    }).catch(err => console.error("Background request failed:", err))
 
     try {
       const res = await fetch('/api/search-business', {
@@ -109,7 +109,7 @@ export default function HomePage() {
         city: city.trim() || undefined,
         source: 'selected_google_business',
       }),
-    }).catch(() => {})
+    }).catch(err => console.error("Background request failed:", err))
 
     try {
       const res = await fetch('/api/generate-preview', {

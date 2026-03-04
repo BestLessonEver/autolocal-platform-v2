@@ -99,7 +99,7 @@ function OfferContent() {
           state: '',
           email: formData.email,
         }),
-      }).catch(() => {}) // Don't block on this
+      }).catch(err => console.error("Lead capture failed:", err))
 
       // Create Stripe checkout
       const product = formData.package === 'living' ? 'living' : 'website'

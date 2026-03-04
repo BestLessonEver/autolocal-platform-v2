@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateStaticHtml } from '@/lib/static-templates'
+import { validateInternalAuth } from '@/lib/internal-auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -84,10 +85,9 @@ async function addSubdomain(slug: string, projectId: string): Promise<string> {
 }
 
 export async function POST(req: Request) {
-  const authHeader = req.headers.get('authorization')
-  const token = authHeader?.replace('Bearer ', '')
-  if (token !== (process.env.INTERNAL_API_KEY || 'internal')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = validateInternalAuth(req)
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.message }, { status: auth.status })
   }
 
   try {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { validateInternalAuth } from '@/lib/internal-auth'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -10,11 +11,9 @@ const transporter = nodemailer.createTransport({
 })
 
 export async function POST(req: Request) {
-  // Simple auth check — only internal calls
-  const authHeader = req.headers.get('authorization')
-  const token = authHeader?.replace('Bearer ', '')
-  if (token !== (process.env.INTERNAL_API_KEY || 'internal')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = validateInternalAuth(req)
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.message }, { status: auth.status })
   }
 
   try {

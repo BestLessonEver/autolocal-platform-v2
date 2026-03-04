@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+          'Authorization': internalAuthHeader(),
         },
         body: JSON.stringify({
           to: 'brian@autolocal.ai',
@@ -50,8 +51,8 @@ export async function POST(req: Request) {
 </div>`,
         }),
       })
-    } catch {
-      // Email send is non-fatal
+    } catch (emailErr) {
+      console.error('Feedback email notification failed:', emailErr)
     }
 
     return NextResponse.json({ success: true })

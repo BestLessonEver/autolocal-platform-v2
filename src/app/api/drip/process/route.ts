@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     let failed = 0
 
     for (const item of due) {
-      // Double-check unsubscribe
+      // Double-check unsubscribe (check both tables for belt & suspenders)
       const { data: unsub } = await supabase
         .from('unsubscribes')
         .select('id')
@@ -46,7 +46,16 @@ export async function POST(req: Request) {
         .limit(1)
         .single()
 
-      if (unsub) {
+      // Also check if outbound_emails has 'unsubscribed' status (fallback if unsubscribes table is empty)
+      const { data: unsubEmail } = !unsub ? await supabase
+        .from('outbound_emails')
+        .select('id')
+        .eq('to_email', item.email)
+        .eq('status', 'unsubscribed')
+        .limit(1)
+        .single() : { data: null }
+
+      if (unsub || unsubEmail) {
         await supabase
           .from('drip_queue')
           .update({ status: 'cancelled', sent_at: now })

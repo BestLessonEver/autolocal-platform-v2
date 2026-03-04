@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -39,7 +40,7 @@ async function sendWelcomeEmail(to: string, contactName: string, businessName: s
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+        'Authorization': internalAuthHeader(),
       },
       body: JSON.stringify({
         to,
@@ -190,7 +191,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+        'Authorization': internalAuthHeader(),
       },
       body: JSON.stringify({ slug: deploySlug }),
     }).then(r => r.json()).then(r => {
@@ -280,7 +281,8 @@ export async function POST(req: Request) {
     }
 
     default:
-      console.log(`Unhandled event: ${event.type}`)
+      // Unhandled event types are normal — Stripe sends many we don't need
+      break
   }
 
   return NextResponse.json({ received: true })

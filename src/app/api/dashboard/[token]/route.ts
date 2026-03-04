@@ -51,8 +51,8 @@ export async function GET(
     changesThisMonth = changes.length
   }
 
-  // Determine plan — for now default to 'starter', upgrade to 'living' stored in preview metadata
-  // TODO: Link to Stripe subscription status
+  // Plan is stored on the preview record and updated by Stripe webhooks
+  // (checkout.session.completed sets plan, customer.subscription.deleted downgrades)
   const plan = (data as any).plan || 'starter'
   const FREE_CHANGES_PER_MONTH = plan === 'living' ? 999 : 2
   const freeChangesRemaining = Math.max(0, FREE_CHANGES_PER_MONTH - changesThisMonth)
