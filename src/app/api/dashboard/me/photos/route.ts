@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const adminSupabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +31,7 @@ function triggerRedeploy(slug: string | null, websiteCurrent: string | null) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.INTERNAL_API_KEY || 'internal'}`,
+      'Authorization': internalAuthHeader(),
     },
     body: JSON.stringify({ slug }),
   }).catch(err => console.error('Photo redeploy failed:', err))

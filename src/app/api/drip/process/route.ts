@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getDripEmail } from '@/lib/drip-emails'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,7 +11,11 @@ const supabase = createClient(
 export async function POST(req: Request) {
   try {
     const auth = req.headers.get('authorization')
-    if (auth !== `Bearer ${process.env.INTERNAL_API_KEY}`) {
+    const expectedKey = process.env.INTERNAL_API_KEY
+    if (!expectedKey) {
+      return NextResponse.json({ error: 'Internal API not configured' }, { status: 503 })
+    }
+    if (auth !== `Bearer ${expectedKey}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -111,7 +116,7 @@ export async function POST(req: Request) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.INTERNAL_API_KEY}`,
+            'Authorization': internalAuthHeader(),
           },
           body: JSON.stringify({
             to: item.email,

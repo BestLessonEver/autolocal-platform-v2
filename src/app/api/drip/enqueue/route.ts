@@ -20,7 +20,11 @@ export type DripStage = 'searched' | 'previewed' | 'abandoned_checkout' | 'intak
 export async function POST(req: Request) {
   try {
     const auth = req.headers.get('authorization')
-    if (auth !== `Bearer ${process.env.INTERNAL_API_KEY}`) {
+    const expectedKey = process.env.INTERNAL_API_KEY
+    if (!expectedKey) {
+      return NextResponse.json({ error: 'Internal API not configured' }, { status: 503 })
+    }
+    if (auth !== `Bearer ${expectedKey}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

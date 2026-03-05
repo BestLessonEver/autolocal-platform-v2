@@ -195,7 +195,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       },
       body: JSON.stringify({ slug: deploySlug }),
     }).then(r => r.json()).then(r => {
-      console.log(`🚀 Auto-deploy result for ${deploySlug}:`, r)
+      console.log(`🚀 Auto-deploy for ${deploySlug}: ${r?.success ? 'ok' : 'failed'}`)
     }).catch(err => {
       console.error(`Deploy error for ${deploySlug}:`, err)
     })
@@ -246,7 +246,7 @@ export async function POST(req: Request) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.INTERNAL_API_KEY}`,
+            'Authorization': internalAuthHeader(),
           },
           body: JSON.stringify({
             email: expEmail,
