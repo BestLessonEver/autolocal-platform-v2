@@ -57,7 +57,6 @@ const TEMPLATES = [
   { id: 'professional', name: 'Professional', emoji: '💼' },
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
-  { id: 'bde', name: 'BDE', emoji: '🚀' },
 ]
 
 const COLOR_PALETTES = [
