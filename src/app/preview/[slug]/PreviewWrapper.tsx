@@ -76,7 +76,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
     description: data.description || '',
     phone: data.phone || '',
     address: data.address || '',
-    hero_crop: (data as any).hero_crop || 50,
+    hero_crop: (data as any).hero_crop ?? 50,
   })
 
   // Delay banner appearance by 3 seconds

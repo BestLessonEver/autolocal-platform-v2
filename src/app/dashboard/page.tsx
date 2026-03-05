@@ -960,13 +960,12 @@ export default function ClientDashboard() {
               {data.hero_image_url && (
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Image Position</label>
-                  <input type="range" min="0" max="100" value={data.hero_crop || 50}
+                  <input type="range" min="0" max="100" value={data.hero_crop ?? 50}
                     onChange={e => {
                       const v = parseInt(e.target.value)
                       setData(p => p ? { ...p, hero_crop: v } : p)
+                      save({ hero_crop: v })
                     }}
-                    onMouseUp={e => saveNow({ hero_crop: parseInt((e.target as HTMLInputElement).value) })}
-                    onTouchEnd={e => saveNow({ hero_crop: parseInt((e.target as HTMLInputElement).value) })}
                     className="w-full accent-indigo-600" />
                   <div className="flex justify-between text-[10px] text-gray-600 mt-0.5"><span>Top</span><span>Center</span><span>Bottom</span></div>
                 </div>
