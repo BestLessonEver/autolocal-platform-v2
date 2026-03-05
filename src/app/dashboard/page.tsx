@@ -477,19 +477,10 @@ function SortablePhoto({
     <div ref={setNodeRef} style={sortStyle} {...attributes} {...listeners}
       className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group touch-none select-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
       onClick={e => {
-        // Only open action sheet on quick tap (not after drag), mobile only
-        if (!isDragging && window.innerWidth < 768) { e.preventDefault(); onActionSheet() }
+        if (!isDragging) { e.preventDefault(); onActionSheet() }
       }}>
       <img src={url} alt="" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} style={{ WebkitTouchCallout: 'none' }} />
       {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white pointer-events-none">Hero</span>}
-      {/* Desktop hover overlay */}
-      <div className="hidden md:flex absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex-col items-center justify-center gap-1.5 pointer-events-none group-hover:pointer-events-auto">
-        <div className="flex gap-1">
-          {!isHero && <button onClick={e => { e.stopPropagation(); onSetHero() }} className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-bold hover:bg-indigo-500 cursor-pointer">Set Hero</button>}
-          <button onClick={e => { e.stopPropagation(); onCrop() }} className="px-2 py-1 rounded bg-white/20 text-white text-[10px] font-bold hover:bg-white/30 cursor-pointer">Crop</button>
-          <button onClick={e => { e.stopPropagation(); onRemove() }} className="px-2 py-1 rounded bg-red-600/80 text-white text-[10px] font-bold hover:bg-red-500 cursor-pointer">✕</button>
-        </div>
-      </div>
     </div>
   )
 }
