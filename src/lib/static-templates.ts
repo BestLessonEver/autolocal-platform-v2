@@ -971,6 +971,7 @@ function bdeTemplate(d: SiteData): string {
 // MAIN EXPORT
 // ═══════════════════════════════════════════════════════
 const TEMPLATE_MAP: Record<string, (d: SiteData) => string> = {
+  modern: bdeTemplate,
   bold: boldTemplate,
   elegant: elegantTemplate,
   professional: professionalTemplate,
