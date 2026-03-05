@@ -761,7 +761,7 @@ function artikaTemplate(d: SiteData): string {
   <section class="relative min-h-screen flex items-center justify-center text-center">
     <div class="absolute inset-0">
       <img src="${esc(heroImg)}" alt="" class="w-full h-full object-cover" style="object-position:center ${d.hero_crop ?? 50}%">
-      <div class="absolute inset-0" style="background:rgba(250,249,246,0.85)"></div>
+      <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(250,249,246,0.92) 0%, rgba(250,249,246,0.7) 50%, rgba(250,249,246,0.3) 100%)"></div>
     </div>
     <div class="relative z-10 px-6 max-w-3xl mx-auto artika-fade-up">
       ${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" class="h-16 w-16 mx-auto mb-8 rounded-full object-cover">` : ''}
