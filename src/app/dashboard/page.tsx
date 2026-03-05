@@ -464,22 +464,24 @@ function SortablePhoto({
   onReorder: (from: number, to: number) => void; onActionSheet: () => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: url })
-  const style = {
+  const sortStyle: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : undefined,
     opacity: isDragging ? 0.8 : 1,
     aspectRatio: '4/3',
+    WebkitTouchCallout: 'none',
+    WebkitUserSelect: 'none',
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}
-      className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group touch-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
+    <div ref={setNodeRef} style={sortStyle} {...attributes} {...listeners}
+      className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group touch-none select-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
       onClick={e => {
         // Only open action sheet on quick tap (not after drag), mobile only
         if (!isDragging && window.innerWidth < 768) { e.preventDefault(); onActionSheet() }
       }}>
-      <img src={url} alt="" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} />
+      <img src={url} alt="" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} style={{ WebkitTouchCallout: 'none' }} />
       {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white pointer-events-none">Hero</span>}
       {/* Desktop hover overlay */}
       <div className="hidden md:flex absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex-col items-center justify-center gap-1.5 pointer-events-none group-hover:pointer-events-auto">
