@@ -956,6 +956,21 @@ export default function ClientDashboard() {
                   <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'hero') }} className="hidden" />
                 </label>
               </div>
+              {/* Hero Crop Slider */}
+              {data.hero_image_url && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">Image Position</label>
+                  <input type="range" min="0" max="100" value={data.hero_crop || 50}
+                    onChange={e => {
+                      const v = parseInt(e.target.value)
+                      setData(p => p ? { ...p, hero_crop: v } : p)
+                    }}
+                    onMouseUp={e => saveNow({ hero_crop: parseInt((e.target as HTMLInputElement).value) })}
+                    onTouchEnd={e => saveNow({ hero_crop: parseInt((e.target as HTMLInputElement).value) })}
+                    className="w-full accent-indigo-600" />
+                  <div className="flex justify-between text-[10px] text-gray-600 mt-0.5"><span>Top</span><span>Center</span><span>Bottom</span></div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Headline</label>
                 <InlineEdit value={data.business_name} onChange={v => updateField('business_name', v)} className="text-xl font-black" placeholder="Your Business Name" />
