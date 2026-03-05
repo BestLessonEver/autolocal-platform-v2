@@ -911,8 +911,8 @@ export default function ClientDashboard() {
           <span className="text-xs text-gray-500">{tabletPreview ? '▲ Hide' : '▼ Show'}</span>
         </button>
         {tabletPreview && (
-          <div className="mt-2 rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '280px' }}>
-            <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[2400px] origin-top-left" style={{ transform: 'scale(0.22)', transformOrigin: 'top left' }} title="Preview" />
+          <div className="mt-2 rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '180px' }}>
+            <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[800px] origin-top-left" style={{ transform: 'scale(0.22)', transformOrigin: 'top left' }} title="Preview" />
           </div>
         )}
       </div>
@@ -1118,8 +1118,8 @@ export default function ClientDashboard() {
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</h3>
                 <a href={data.preview_url || data.website_url} target="_blank" className="text-xs text-indigo-400 hover:underline">Full size ↗</a>
               </div>
-              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '680px' }}>
-                <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[2400px] origin-top-left" style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }} title="Live Preview" />
+              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '270px' }}>
+                <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[800px] origin-top-left" style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }} title="Live Preview" />
               </div>
             </div>
           </div>
