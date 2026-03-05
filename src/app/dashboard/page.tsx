@@ -4,6 +4,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -451,6 +454,100 @@ function BrandControls({ data, onUpdate, onDeploy }: { data: SiteData; onUpdate:
   )
 }
 
+// ─── Sortable Photo Item ────────────────────────────────────────────────────────
+
+function SortablePhoto({
+  url, isHero, index, totalCount, onSetHero, onCrop, onRemove, onReorder, onActionSheet,
+}: {
+  url: string; isHero: boolean; index: number; totalCount: number
+  onSetHero: () => void; onCrop: () => void; onRemove: () => void
+  onReorder: (from: number, to: number) => void; onActionSheet: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: url })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.8 : 1,
+    aspectRatio: '4/3',
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}
+      className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group touch-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
+      onClick={e => {
+        // Only open action sheet on quick tap (not after drag), mobile only
+        if (!isDragging && window.innerWidth < 768) { e.preventDefault(); onActionSheet() }
+      }}>
+      <img src={url} alt="" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} />
+      {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white pointer-events-none">Hero</span>}
+      {/* Desktop hover overlay */}
+      <div className="hidden md:flex absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex-col items-center justify-center gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+        <div className="flex gap-1">
+          {!isHero && <button onClick={e => { e.stopPropagation(); onSetHero() }} className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-bold hover:bg-indigo-500 cursor-pointer">Set Hero</button>}
+          <button onClick={e => { e.stopPropagation(); onCrop() }} className="px-2 py-1 rounded bg-white/20 text-white text-[10px] font-bold hover:bg-white/30 cursor-pointer">Crop</button>
+          <button onClick={e => { e.stopPropagation(); onRemove() }} className="px-2 py-1 rounded bg-red-600/80 text-white text-[10px] font-bold hover:bg-red-500 cursor-pointer">✕</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Photo Grid with Drag ───────────────────────────────────────────────────────
+
+function PhotoGrid({
+  galleryImages, heroImageUrl, onReorder, onSetHero, onCrop, onRemove, onActionSheet, onUpload,
+}: {
+  galleryImages: string[]; heroImageUrl: string | null
+  onReorder: (oldIndex: number, newIndex: number) => void
+  onSetHero: (url: string) => void; onCrop: (url: string, i: number) => void
+  onRemove: (url: string) => void; onActionSheet: (url: string, i: number) => void
+  onUpload: (f: File) => void
+}) {
+  const pointerSensor = useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  const sensors = useSensors(pointerSensor, touchSensor)
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = galleryImages.indexOf(active.id as string)
+    const newIndex = galleryImages.indexOf(over.id as string)
+    if (oldIndex !== -1 && newIndex !== -1) onReorder(oldIndex, newIndex)
+  }
+
+  return (
+    <section id="sec-photos" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+      <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
+      <p className="text-xs text-gray-600">Hold and drag to reorder. Tap to manage. All photos display at 4:3.</p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={galleryImages} strategy={rectSortingStrategy}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {galleryImages.map((url, i) => (
+              <SortablePhoto
+                key={url}
+                url={url}
+                isHero={url === heroImageUrl}
+                index={i}
+                totalCount={galleryImages.length}
+                onSetHero={() => onSetHero(url)}
+                onCrop={() => onCrop(url, i)}
+                onRemove={() => onRemove(url)}
+                onReorder={onReorder}
+                onActionSheet={() => onActionSheet(url, i)}
+              />
+            ))}
+            <label className="rounded-lg border-2 border-dashed border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition cursor-pointer" style={{ aspectRatio: '4/3' }}>
+              <span className="text-2xl">＋</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) onUpload(f) }} className="hidden" />
+            </label>
+          </div>
+        </SortableContext>
+      </DndContext>
+    </section>
+  )
+}
+
 // ─── Hours Helpers ──────────────────────────────────────────────────────────────
 
 function parseHours(val: string): { open: string; close: string } {
@@ -658,6 +755,14 @@ export default function ClientDashboard() {
     gallery.splice(toIdx, 0, moved)
     setData(p => p ? { ...p, gallery_images: gallery } : p)
     await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: gallery }) })
+    triggerDeploy(); refreshPreview()
+  }
+
+  const handlePhotoDragEnd = async (oldIndex: number, newIndex: number) => {
+    if (!data) return
+    const newGallery = arrayMove(data.gallery_images || [], oldIndex, newIndex)
+    setData(p => p ? { ...p, gallery_images: newGallery } : p)
+    await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: newGallery }) })
     triggerDeploy(); refreshPreview()
   }
 
@@ -955,44 +1060,17 @@ export default function ClientDashboard() {
               </div>
             </section>
 
-            {/* Photos — touch-friendly */}
-            <section id="sec-photos" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
-              <p className="text-xs text-gray-600">Tap a photo to manage it. All photos display at 4:3.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                {(data.gallery_images || []).map((url, i) => {
-                  const isHero = url === data.hero_image_url
-                  return (
-                    <div key={url} className="relative rounded-lg overflow-hidden bg-white/5 cursor-pointer group" style={{ aspectRatio: '4/3' }}
-                      onClick={() => {
-                        // Mobile: action sheet. Desktop: keep hover overlay
-                        if (window.innerWidth < 768) setActionSheet({ url, index: i })
-                      }}>
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Hero</span>}
-                      {/* Desktop hover overlay */}
-                      <div className="hidden md:flex absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex-col items-center justify-center gap-1.5">
-                        {(data.gallery_images || []).length > 1 && (
-                          <div className="flex gap-1">
-                            <button onClick={e => { e.stopPropagation(); handlePhotoReorder(i, i - 1) }} disabled={i === 0} className="w-7 h-7 rounded bg-white/20 text-white text-xs font-bold hover:bg-white/30 disabled:opacity-30 flex items-center justify-center">←</button>
-                            <button onClick={e => { e.stopPropagation(); handlePhotoReorder(i, i + 1) }} disabled={i === (data.gallery_images || []).length - 1} className="w-7 h-7 rounded bg-white/20 text-white text-xs font-bold hover:bg-white/30 disabled:opacity-30 flex items-center justify-center">→</button>
-                          </div>
-                        )}
-                        <div className="flex gap-1">
-                          {!isHero && <button onClick={e => { e.stopPropagation(); handleSetHero(url) }} className="px-2 py-1 rounded bg-indigo-600 text-white text-[10px] font-bold hover:bg-indigo-500">Set Hero</button>}
-                          <button onClick={e => { e.stopPropagation(); setCropPhoto({ url, index: i }) }} className="px-2 py-1 rounded bg-white/20 text-white text-[10px] font-bold hover:bg-white/30">Crop</button>
-                          <button onClick={e => { e.stopPropagation(); handlePhotoRemove(url) }} className="px-2 py-1 rounded bg-red-600/80 text-white text-[10px] font-bold hover:bg-red-500">✕</button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-                <label className="rounded-lg border-2 border-dashed border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition cursor-pointer" style={{ aspectRatio: '4/3' }}>
-                  <span className="text-2xl">＋</span>
-                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'gallery') }} className="hidden" />
-                </label>
-              </div>
-            </section>
+            {/* Photos — drag to reorder */}
+            <PhotoGrid
+              galleryImages={data.gallery_images || []}
+              heroImageUrl={data.hero_image_url}
+              onReorder={handlePhotoDragEnd}
+              onSetHero={handleSetHero}
+              onCrop={(url, i) => setCropPhoto({ url, index: i })}
+              onRemove={handlePhotoRemove}
+              onActionSheet={(url, i) => setActionSheet({ url, index: i })}
+              onUpload={f => handlePhotoUpload(f, 'gallery')}
+            />
 
             {/* Bottom */}
             <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
