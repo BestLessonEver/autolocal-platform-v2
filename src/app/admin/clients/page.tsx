@@ -70,22 +70,33 @@ export default function AdminClientsPage() {
   async function loadData() {
     setLoading(true)
     try {
-      const adminKey = sessionStorage.getItem('adminKey') || prompt('Admin API Key:')
-      if (!adminKey) { setLoading(false); return }
-      sessionStorage.setItem('adminKey', adminKey)
-      const headers = { 'x-admin-key': adminKey }
+      // Try cookie-based auth first (middleware already verified admin email)
       const [clientsRes, previewsRes] = await Promise.all([
-        fetch('/api/admin/clients', { headers }),
-        fetch('/api/admin/previews', { headers }),
+        fetch('/api/admin/clients'),
+        fetch('/api/admin/previews'),
       ])
       if (clientsRes.status === 401 || previewsRes.status === 401) {
-        sessionStorage.removeItem('adminKey')
-        alert('Invalid admin key')
-        setLoading(false)
-        return
+        // Fallback: prompt for API key
+        const adminKey = sessionStorage.getItem('adminKey') || prompt('Admin API Key:')
+        if (!adminKey) { setLoading(false); return }
+        sessionStorage.setItem('adminKey', adminKey)
+        const headers = { 'x-admin-key': adminKey }
+        const [cr, pr] = await Promise.all([
+          fetch('/api/admin/clients', { headers }),
+          fetch('/api/admin/previews', { headers }),
+        ])
+        if (cr.status === 401 || pr.status === 401) {
+          sessionStorage.removeItem('adminKey')
+          alert('Invalid admin key')
+          setLoading(false)
+          return
+        }
+        if (cr.ok) setClients(await cr.json())
+        if (pr.ok) setPreviews(await pr.json())
+      } else {
+        if (clientsRes.ok) setClients(await clientsRes.json())
+        if (previewsRes.ok) setPreviews(await previewsRes.json())
       }
-      if (clientsRes.ok) setClients(await clientsRes.json())
-      if (previewsRes.ok) setPreviews(await previewsRes.json())
     } catch (e) {
       console.error('Failed to load data:', e)
     }

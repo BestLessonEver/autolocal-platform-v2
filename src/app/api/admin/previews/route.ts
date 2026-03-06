@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,15 +8,25 @@ const supabase = createClient(
 )
 
 const ADMIN_KEY = process.env.ADMIN_API_KEY
+const ADMIN_EMAILS = [
+  'brian@autolocal.ai',
+  'mrbriancarrion@gmail.com',
+  'bestlessoninfo@gmail.com',
+]
 
-function isAuthorized(req: NextRequest): boolean {
-  if (!ADMIN_KEY) return false
-  const header = req.headers.get('x-admin-key')
-  return header === ADMIN_KEY
+async function isAuthorized(req: NextRequest): Promise<boolean> {
+  if (ADMIN_KEY && req.headers.get('x-admin-key') === ADMIN_KEY) return true
+  const sb = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { get(name: string) { return req.cookies.get(name)?.value }, set() {}, remove() {} } }
+  )
+  const { data: { user } } = await sb.auth.getUser()
+  return !!user && ADMIN_EMAILS.includes(user.email || '')
 }
 
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!(await isAuthorized(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
