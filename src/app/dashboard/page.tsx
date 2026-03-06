@@ -289,7 +289,7 @@ function SubdomainField({ slug, onUpdate }: { slug: string; onUpdate: (s: string
       </div>
     )
   }
-  return <button onClick={() => setEditing(true)} className="text-xs text-gray-500 font-mono hover:text-indigo-400 transition truncate" title="Click to change subdomain">{slug}.autolocal.ai <span className="text-gray-700 ml-1">✎</span></button>
+  return <button onClick={() => setEditing(true)} className="text-xs text-gray-300 font-mono hover:text-indigo-400 transition truncate" title="Click to change subdomain">{slug}.autolocal.ai <span className="text-gray-500 ml-1">✎</span></button>
 }
 
 // ─── Photo Action Sheet (mobile) ────────────────────────────────────────────────
