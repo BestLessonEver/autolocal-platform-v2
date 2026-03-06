@@ -875,6 +875,46 @@ export default function ClientDashboard() {
         )}
       </div>
 
+      {/* ─── SEO & Discovery Tips ─── */}
+      <section className="px-4 py-6 space-y-4">
+        <h3 className="text-sm font-semibold text-gray-400">🔍 Get Found on Search & ChatGPT</h3>
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 space-y-4">
+          <p className="text-sm text-gray-400">Your site is automatically optimized with structured data, meta tags, and semantic HTML. Here&apos;s how to maximize your visibility:</p>
+          <div className="space-y-3">
+            {[
+              { icon: '📝', title: 'Write a detailed About section', desc: 'Search engines and AI assistants use your description to understand your business. Be specific — mention your city, services, and what makes you different.', field: 'about' as const },
+              { icon: '🏷️', title: 'List all your services with descriptions', desc: 'Each service becomes structured data that Google and ChatGPT can reference. Include prices when possible.', field: 'services' as const },
+              { icon: '📸', title: 'Upload quality photos with your hero image', desc: 'Google uses images in local search results. Your hero image shows up in social shares and AI summaries.', field: 'photos' as const },
+              { icon: '⏰', title: 'Keep your hours up to date', desc: 'Accurate hours build trust with search engines and prevent customers from showing up when you\'re closed.', field: 'hours' as const },
+              { icon: '📍', title: 'Add your full address', desc: 'A complete address helps you show up in "near me" searches and Google Maps results.', field: 'contact' as const },
+              { icon: '⭐', title: 'Get Google reviews', desc: 'Sites with 20+ reviews at 4.0+ stars get priority in local search. Ask happy customers to leave a review!', field: null },
+              { icon: '🌐', title: 'Connect a custom domain', desc: 'A branded domain (yourbusiness.com) signals authority to search engines vs. a subdomain.', field: null },
+              { icon: '🤖', title: 'How ChatGPT finds you', desc: 'ChatGPT and other AI assistants read your structured data (JSON-LD) — your business name, services, reviews, and location are all included automatically.', field: null },
+            ].map((tip, i) => {
+              const complete = tip.field === 'about' ? !!data.description
+                : tip.field === 'services' ? (data.services?.length ?? 0) > 0
+                : tip.field === 'photos' ? !!data.hero_image_url
+                : tip.field === 'hours' ? Object.keys(data.hours || {}).length > 0
+                : tip.field === 'contact' ? !!data.address
+                : null
+              return (
+                <div key={i} className="flex gap-3 items-start">
+                  <span className="text-lg flex-shrink-0">{tip.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-white">{tip.title}</p>
+                      {complete === true && <span className="text-green-400 text-xs">✓ Done</span>}
+                      {complete === false && <span className="text-yellow-400 text-xs">Missing</span>}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-6 px-4 border-t border-white/5 text-center">
         <p className="text-gray-600 text-sm">

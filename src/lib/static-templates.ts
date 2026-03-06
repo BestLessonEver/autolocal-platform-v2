@@ -997,13 +997,81 @@ export function generateStaticHtml(data: any, template: string): string {
   const renderFn = TEMPLATE_MAP[template] || TEMPLATE_MAP.bold
   const body = renderFn(data as SiteData)
 
+  const siteUrl = data.website_current || `https://${data.slug}.autolocal.ai`
+  const desc = esc(data.description || data.tagline || `${data.business_name} — serving ${data.city || 'the community'}`)
+  const title = `${esc(data.business_name)} — ${esc(data.city || '')}${data.state ? `, ${esc(data.state)}` : ''}`
+
+  // JSON-LD structured data for search engines + ChatGPT
+  const services = (data as SiteData).services || []
+
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: data.business_name,
+    ...(data.description && { description: data.description }),
+    ...(data.tagline && { slogan: data.tagline }),
+    url: siteUrl,
+    ...(data.logo_url && { logo: data.logo_url, image: data.hero_image_url || data.logo_url }),
+    ...(data.hero_image_url && { image: data.hero_image_url }),
+    ...(data.phone && { telephone: data.phone }),
+    ...((data.email || (data as SiteData).contact_email) && { email: (data as SiteData).contact_email || data.email }),
+    ...(data.address && {
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: data.address,
+        ...(data.city && { addressLocality: data.city }),
+        ...(data.state && { addressRegion: data.state }),
+        addressCountry: 'US',
+      }
+    }),
+    ...(data.google_rating && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: data.google_rating,
+        ...(data.google_review_count && { reviewCount: data.google_review_count }),
+        bestRating: 5,
+      }
+    }),
+    ...(services.length > 0 && {
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Services',
+        itemListElement: services.map(s => ({
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: s.name,
+            ...(s.description && { description: s.description }),
+          },
+          ...(s.price && { price: s.price }),
+        })),
+      }
+    }),
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(data.business_name)} — ${esc(data.city || '')}${data.state ? `, ${esc(data.state)}` : ''}</title>
-<meta name="description" content="${esc(data.description || data.tagline || `${data.business_name} — serving ${data.city || 'the community'}`)}">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<!-- Open Graph / Social sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${desc}">
+<meta property="og:url" content="${esc(siteUrl)}">
+${data.hero_image_url ? `<meta property="og:image" content="${esc(data.hero_image_url)}">` : ''}
+${data.logo_url ? `<meta property="og:image" content="${esc(data.logo_url)}">` : ''}
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${desc}">
+${data.hero_image_url ? `<meta name="twitter:image" content="${esc(data.hero_image_url)}">` : ''}
+<!-- Canonical URL -->
+<link rel="canonical" href="${esc(siteUrl)}">
+<!-- Structured Data for Search + AI -->
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 ${data.logo_url ? `<link rel="icon" href="${esc(data.logo_url)}" type="image/png">` : `<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">`}
 <script src="https://cdn.tailwindcss.com"></script>
 <style>*{scroll-behavior:smooth}body{margin:0}</style>
