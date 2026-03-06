@@ -35,6 +35,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* Google Ads tag */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17996760129" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'AW-17996760129');`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -65,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               offers: {
                 "@type": "Offer",
                 name: "Custom Local Business Website",
-                price: "499",
+                price: "99",
                 priceCurrency: "USD",
                 description: "Custom-designed, mobile-fast website delivered in 24 hours with 3 revision rounds and a money-back guarantee.",
               },
