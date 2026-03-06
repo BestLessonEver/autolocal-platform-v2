@@ -195,7 +195,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       },
       body: JSON.stringify({ slug: deploySlug }),
     }).then(r => r.json()).then(r => {
-      console.log(`🚀 Auto-deploy for ${deploySlug}: ${r?.success ? 'ok' : 'failed'}`)
+      if (process.env.DEBUG) console.log(`🚀 Auto-deploy for ${deploySlug}: ${r?.success ? 'ok' : 'failed'}`)
     }).catch(err => {
       console.error(`Deploy error for ${deploySlug}:`, err)
     })
