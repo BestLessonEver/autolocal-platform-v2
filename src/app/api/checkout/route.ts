@@ -4,8 +4,7 @@ import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PRICES = {
-  // $1 TEST — swap back to price_1T6ks96rjk1X08jTmlFFzV5k ($99) for launch
-  website: 'price_1T77nc6rjk1X08jT1bA3K1VW',
+  website: 'price_1T6ks96rjk1X08jTmlFFzV5k',     // $99 one-time
   hosting: 'price_1T6ksA6rjk1X08jT7oK5ebY3',   // $9/mo recurring
   change:  'price_1T6ksB6rjk1X08jTZBgOJ20p',    // $7 one-time (was $19)
   rush:    'price_1T6ksB6rjk1X08jTk506zhin',     // $29 one-time
