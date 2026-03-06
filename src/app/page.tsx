@@ -146,7 +146,7 @@ export default function HomePage() {
     e.preventDefault()
     setCheckoutLoading(true)
     try {
-      const product = orderForm.package === 'living' ? 'living' : 'website'
+      const product = 'website'
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -466,55 +466,28 @@ export default function HomePage() {
           PRICING
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5" id="pricing">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">Simple Pricing</h2>
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* Starter */}
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8">
-              <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Custom Website</p>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-5xl font-black text-white">$99</span>
-                <span className="text-gray-500">one-time</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">+ $9/mo hosting · Cancel anytime</p>
-              <ul className="space-y-3 mb-8">
-                {['Custom design for your brand', '4 design styles to choose from', 'Your real Google reviews & photos', '3 revision rounds', '2 free changes per month', 'SEO, SSL, mobile-optimized', 'Domain connection help (free)', 'Money-back guarantee'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
-                    <span className="text-green-400">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => scrollTo('order')}
-                className="w-full py-4 rounded-xl bg-white/10 border border-white/10 text-white font-bold hover:bg-white/20 transition"
-              >
-                Get Started — $99
-              </button>
+        <div className="max-w-xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-black mb-12">Simple Pricing</h2>
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 sm:p-10">
+            <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Custom Website</p>
+            <div className="flex items-baseline justify-center gap-2 mb-1">
+              <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$99</span>
+              <span className="text-gray-500">one-time</span>
             </div>
-
-            {/* Living Website */}
-            <div className="bg-gradient-to-b from-amber-500/5 to-orange-500/5 border-2 border-amber-500/30 rounded-2xl p-8 relative">
-              <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
-              <p className="text-sm text-amber-400 uppercase tracking-wide mb-2">Living Website 🚀</p>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-5xl font-black text-white">$99</span>
-                <span className="text-gray-500">+ $49/mo</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Hosting included · Cancel anytime</p>
-              <ul className="space-y-3 mb-8">
-                {['Everything in Custom Website', 'Unlimited changes included', 'Urgent requests — no rush fee', 'Priority support (24hr)', 'Hosting included in price', 'Monthly SEO updates (coming soon)', 'A/B testing (coming soon)', 'Speed monitoring (coming soon)'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
-                    <span className="text-amber-400">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => { setOrderForm(f => ({ ...f, package: 'living' })); scrollTo('order') }}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:brightness-110 transition"
-              >
-                Get Started — $99 + $49/mo
-              </button>
-            </div>
+            <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
+            <ul className="space-y-3 mb-8 text-left max-w-sm mx-auto">
+              {['Custom design for your brand', '5 design styles to choose from', 'Your real Google reviews & photos', 'SEO + ChatGPT structured data', '3 revision rounds', '2 free changes per month', 'SSL, mobile-optimized, fast', 'Domain connection help (free)', 'Money-back guarantee'].map((f, i) => (
+                <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <span className="text-green-400">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => scrollTo('order')}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
+            >
+              Get Started — $99
+            </button>
           </div>
         </div>
       </section>
@@ -529,7 +502,7 @@ export default function HomePage() {
             {[
               { quote: 'I was paying $150/month for a site that looked like 2015. AutoLocal replaced it in a day and it actually brings in calls now.', name: 'Sarah M.', biz: 'Salon Owner, Pearland TX' },
               { quote: 'Three design options, picked my favorite, two revisions and it was perfect. My patients comment on how nice the site looks.', name: 'Dr. Kevin R.', biz: 'Dental Practice, League City TX' },
-              { quote: 'Skeptical about 24 hours. They sent me the preview the next morning. My wife made me upgrade to the Living Website on the spot.', name: 'Marcus T.', biz: 'Home Contractor, Friendswood TX' },
+              { quote: 'Skeptical about 24 hours. They sent me the preview the next morning. My wife said "just buy it" on the spot.', name: 'Marcus T.', biz: 'Home Contractor, Friendswood TX' },
             ].map((t, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6">
                 <div className="flex gap-0.5 mb-4">
@@ -641,42 +614,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Package selector */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-4">Choose Your Package</label>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setOrderForm(f => ({ ...f, package: 'starter' }))}
-                  className={`p-5 rounded-xl border-2 text-left transition-all ${
-                    orderForm.package === 'starter' ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <p className="font-bold text-white text-lg mb-1">Custom Website</p>
-                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">$99</p>
-                  <p className="text-sm text-gray-400">One-time. Hosting $9/mo.</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderForm(f => ({ ...f, package: 'living' }))}
-                  className={`p-5 rounded-xl border-2 text-left transition-all relative ${
-                    orderForm.package === 'living' ? 'border-amber-500 bg-amber-500/10' : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <span className="absolute -top-3 right-4 bg-amber-500 text-black text-xs font-bold px-3 py-0.5 rounded-full">POPULAR</span>
-                  <p className="font-bold text-white text-lg mb-1">Living Website 🚀</p>
-                  <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">$99 + $49/mo</p>
-                  <p className="text-sm text-gray-400">Unlimited changes. Hosting included.</p>
-                </button>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={checkoutLoading}
               className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
             >
-              {checkoutLoading ? 'Redirecting to checkout...' : orderForm.package === 'living' ? 'Get My Website — $99 + $49/mo' : 'Get My Website — $99'}
+              {checkoutLoading ? 'Redirecting to checkout...' : 'Get My Website — $99'}
             </button>
 
             <div className="text-center space-y-1">
@@ -699,7 +642,7 @@ export default function HomePage() {
               { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google — reviews, photos, hours, contact info.' },
               { q: 'Can I see it before I pay?', a: 'Yes! Enter your business name above and see a live custom preview in 15 seconds. Totally free.' },
               { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any builder. SSL, speed, uptime all included. Cancel anytime. We help connect your domain for free.' },
-              { q: 'What if I want changes?', a: '3 revision rounds during the build. After launch, 2 free changes per month. Need more? $19 each, or upgrade to Living Website ($49/mo) for unlimited.' },
+              { q: 'What if I want changes?', a: '3 revision rounds during the build. After launch, 2 free changes per month included. Need more? Just $7 each.' },
               { q: 'I already have a website.', a: 'We build the new site separately. Once you approve it, we help point your domain to it. Zero downtime.' },
               { q: 'What if I don\'t have a domain?', a: 'We recommend Namecheap (~$9/year). We have a step-by-step guide at autolocal.ai/setup, or we\'ll do it for you free.' },
             ].map((item, i) => (
