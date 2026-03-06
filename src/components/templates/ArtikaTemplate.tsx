@@ -77,23 +77,23 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
             {data.business_name}
           </h1>
           {data.tagline && (
-            <p className="text-lg sm:text-xl font-light tracking-wide mb-3 artika-fade-up artika-fade-up-d1" style={{ color: '#6b6b6b' }}>
+            <p className="text-xl sm:text-2xl font-light tracking-wide mb-3 artika-fade-up artika-fade-up-d1" style={{ color: '#6b6b6b' }}>
               {data.tagline}
             </p>
           )}
           {data.google_rating && (data.google_review_count ?? 0) >= 20 && (
-            <p className="text-sm tracking-widest uppercase mb-8 artika-fade-up artika-fade-up-d2" style={{ color: accent }}>
+            <p className="text-base tracking-widest uppercase mb-8 artika-fade-up artika-fade-up-d2" style={{ color: accent }}>
               ★ {data.google_rating} · {data.google_review_count} reviews
             </p>
           )}
           {data.google_rating && (data.google_review_count ?? 0) < 20 && (
-            <p className="text-sm tracking-widest uppercase mb-8 artika-fade-up artika-fade-up-d2" style={{ color: accent }}>
+            <p className="text-base tracking-widest uppercase mb-8 artika-fade-up artika-fade-up-d2" style={{ color: accent }}>
               ★ {data.google_rating} on Google
             </p>
           )}
           <a
             href={data.cta_url || '#contact'}
-            className="inline-block px-10 py-4 rounded-full text-white text-sm font-medium tracking-widest uppercase transition-all hover:shadow-lg hover:scale-105 artika-fade-up artika-fade-up-d3"
+            className="inline-block px-10 py-4 rounded-full text-white text-base font-medium tracking-widest uppercase transition-all hover:shadow-lg hover:scale-105 artika-fade-up artika-fade-up-d3"
             style={{ backgroundColor: accent }}
           >
             {ctaText}
@@ -106,7 +106,7 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
         <div className="max-w-2xl mx-auto text-center artika-fade-up">
           {/* Decorative line */}
           <div className="w-12 h-px mx-auto mb-10" style={{ backgroundColor: accent }} />
-          <p className="font-light text-lg sm:text-xl leading-relaxed" style={{ color: '#5a5a5a' }}>
+          <p className="font-light text-xl sm:text-2xl leading-relaxed" style={{ color: '#5a5a5a' }}>
             {data.description || `Welcome to ${data.business_name}${data.city ? ` in ${data.city}` : ''}${data.state ? `, ${data.state}` : ''}. We are dedicated to providing an exceptional experience in a warm, welcoming environment.`}
           </p>
         </div>
@@ -116,13 +116,13 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       {services.length > 0 && (
         <section id="services" className="py-24 px-6">
           <div className="max-w-2xl mx-auto">
-            <p className="text-center text-xs font-light tracking-[0.35em] uppercase mb-16" style={{ color: accent }}>
+            <p className="text-center text-sm font-light tracking-[0.35em] uppercase mb-16" style={{ color: accent }}>
               Services
             </p>
             <div className="space-y-0">
               {services.map((s, i) => (
                 <div key={i} className="flex items-baseline gap-3 py-4 border-b" style={{ borderColor: '#e8e5df' }}>
-                  <span className="font-serif text-lg sm:text-xl font-light whitespace-nowrap" style={{ color: '#2a2a2a' }}>
+                  <span className="font-serif text-xl sm:text-2xl font-light whitespace-nowrap" style={{ color: '#2a2a2a' }}>
                     {s.name}
                   </span>
                   <span className="flex-1 border-b border-dotted" style={{ borderColor: '#d4d0c8', minWidth: '2rem' }} />
@@ -151,7 +151,7 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       {hasGallery && (
         <section className="py-24 px-6">
           <div className="max-w-5xl mx-auto">
-            <p className="text-center text-xs font-light tracking-[0.35em] uppercase mb-16" style={{ color: accent }}>
+            <p className="text-center text-sm font-light tracking-[0.35em] uppercase mb-16" style={{ color: accent }}>
               Gallery
             </p>
             <div
@@ -181,12 +181,12 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
         <section id="reviews" className="py-28 px-6">
           <div className="max-w-3xl mx-auto text-center">
             <p
-              className="font-serif font-light italic text-2xl sm:text-3xl lg:text-4xl leading-relaxed transition-opacity duration-500"
+              className="font-serif font-light italic text-3xl sm:text-4xl lg:text-5xl leading-relaxed transition-opacity duration-500"
               style={{ color: '#3a3a3a' }}
             >
               &ldquo;{reviews[reviewIdx].text}&rdquo;
             </p>
-            <p className="mt-8 text-xs tracking-[0.3em] uppercase font-light" style={{ color: '#8a8a8a' }}>
+            <p className="mt-8 text-sm tracking-[0.3em] uppercase font-light" style={{ color: '#8a8a8a' }}>
               — {reviews[reviewIdx].author}
             </p>
             {reviews.length > 1 && (
@@ -213,12 +213,12 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       {hasHours && (
         <section className="py-24 px-6">
           <div className="max-w-md mx-auto text-center">
-            <p className="text-xs font-light tracking-[0.35em] uppercase mb-12" style={{ color: accent }}>
+            <p className="text-sm font-light tracking-[0.35em] uppercase mb-12" style={{ color: accent }}>
               Hours
             </p>
             <div className="space-y-3">
               {daysOrder.map(day => hours[day] ? (
-                <div key={day} className="flex justify-between text-sm font-light">
+                <div key={day} className="flex justify-between text-base font-light">
                   <span style={{ color: '#5a5a5a' }}>{dayLabels[day]}</span>
                   <span style={{ color: '#8a8a8a' }}>{data.hours[day]}</span>
                 </div>
@@ -231,10 +231,10 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
       {/* ── Contact ──────────────────────────────────────────── */}
       <section id="contact" className="py-24 px-6">
         <div className="max-w-md mx-auto text-center">
-          <p className="text-xs font-light tracking-[0.35em] uppercase mb-12" style={{ color: accent }}>
+          <p className="text-sm font-light tracking-[0.35em] uppercase mb-12" style={{ color: accent }}>
             Contact
           </p>
-          <div className="space-y-4 text-sm font-light" style={{ color: '#5a5a5a' }}>
+          <div className="space-y-4 text-base font-light" style={{ color: '#5a5a5a' }}>
             {data.address && (
               <p>{data.address}{data.city ? `, ${data.city}` : ''}{data.state ? `, ${data.state}` : ''}</p>
             )}

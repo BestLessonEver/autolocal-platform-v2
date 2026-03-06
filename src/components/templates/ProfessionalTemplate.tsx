@@ -75,11 +75,11 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
       </header>
 
       {/* Hero — Image background on mobile, split on desktop */}
-      <section className="relative overflow-hidden bg-gray-50">
+      <section className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${primary}08 0%, ${primary}15 50%, ${accent}10 100%)` }}>
         {/* Mobile hero image */}
         <div className="lg:hidden relative h-[300px] sm:h-[400px]">
           <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50" />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent, ${primary}08)` }} />
         </div>
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 lg:min-h-[600px]">

@@ -73,6 +73,15 @@ function getGallery(d: SiteData): string[] {
   return d.gallery_images.filter(img => img !== d.hero_image_url)
 }
 
+
+function lightenHex(hex: string, amount: number): string {
+  const num = parseInt(hex.replace('#', ''), 16)
+  const r = Math.min(255, (num >> 16) + amount)
+  const g = Math.min(255, ((num >> 8) & 0x00FF) + amount)
+  const b = Math.min(255, (num & 0x0000FF) + amount)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 function isIndividual(d: SiteData): boolean {
   return d.site_mode === 'individual'
 }
@@ -126,9 +135,9 @@ function boldTemplate(d: SiteData): string {
   const p = d.brand_color_primary
   const a = d.brand_color_accent
   const heroImg = getHeroImg(d)
-  const ctaText = getCtaText(d)
-  const email = getEmail(d)
   const ind = isIndividual(d)
+  const ctaText = d.phone ? (ind ? 'Call Me' : 'Call Us') : getCtaText(d)
+  const email = getEmail(d)
   const year = new Date().getFullYear()
 
   return `
@@ -151,11 +160,11 @@ function boldTemplate(d: SiteData): string {
   </header>
 
   <!-- Hero -->
-  <section class="relative min-h-[85vh] flex items-center">
+  <section class="relative min-h-[85vh] flex items-end">
     <div class="absolute inset-0">
       <img src="${esc(heroImg)}" alt="" class="w-full h-full object-cover" style="object-position:center ${d.hero_crop ?? 50}%">
-      <div class="absolute inset-0 bg-black/60"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
+      <div class="absolute inset-0 bg-black/40"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
     </div>
     <div class="relative w-full">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -470,7 +479,7 @@ function professionalTemplate(d: SiteData): string {
   </header>
 
   <!-- Hero -->
-  <section class="relative overflow-hidden bg-gray-50">
+  <section class="relative overflow-hidden" style="background:linear-gradient(135deg, ${p}08 0%, ${p}15 50%, ${a}10 100%)">
     <div class="lg:hidden relative h-[300px] sm:h-[400px]">
       <img src="${esc(heroImg)}" alt="" class="w-full h-full object-cover" style="object-position:center ${d.hero_crop ?? 50}%">
       <div class="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50"></div>
@@ -766,9 +775,9 @@ function artikaTemplate(d: SiteData): string {
     <div class="relative z-10 px-6 max-w-3xl mx-auto artika-fade-up">
       ${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" class="h-16 w-16 mx-auto mb-8 rounded-full object-cover">` : ''}
       <h1 class="font-extralight text-5xl sm:text-7xl lg:text-8xl tracking-tight mb-4" style="color:#2a2a2a">${esc(d.business_name)}</h1>
-      ${d.tagline ? `<p class="text-lg sm:text-xl font-light tracking-wide mb-3 artika-fade-up artika-fade-up-d1" style="color:#6b6b6b">${esc(d.tagline)}</p>` : ''}
+      ${d.tagline ? `<p class="text-xl sm:text-2xl font-light tracking-wide mb-3 artika-fade-up artika-fade-up-d1" style="color:#6b6b6b">${esc(d.tagline)}</p>` : ''}
       ${d.google_rating ? `<p class="text-sm tracking-widest uppercase mb-8 artika-fade-up artika-fade-up-d2" style="color:${accent}">★ ${d.google_rating}${showReviewCount(d) ? ` · ${d.google_review_count} reviews` : ' on Google'}</p>` : ''}
-      <a href="${esc(d.cta_url || '#contact')}" class="inline-block px-10 py-4 rounded-full text-white text-sm font-medium tracking-widest uppercase transition-all hover:shadow-lg hover:scale-105 artika-fade-up artika-fade-up-d3" style="background:${accent}">${esc(ctaText)}</a>
+      <a href="${esc(d.cta_url || '#contact')}" class="inline-block px-10 py-4 rounded-full text-white text-base font-medium tracking-widest uppercase transition-all hover:shadow-lg hover:scale-105 artika-fade-up artika-fade-up-d3" style="background:${accent}">${esc(ctaText)}</a>
     </div>
   </section>
 
@@ -776,7 +785,7 @@ function artikaTemplate(d: SiteData): string {
   <section class="py-24 px-6">
     <div class="max-w-2xl mx-auto text-center">
       <div class="w-12 h-px mx-auto mb-10" style="background:${accent}"></div>
-      <p class="font-light text-lg sm:text-xl leading-relaxed" style="color:#5a5a5a">${esc(d.description || `Welcome to ${d.business_name}${d.city ? ` in ${d.city}` : ''}${d.state ? `, ${d.state}` : ''}.`)}</p>
+      <p class="font-light text-xl sm:text-2xl leading-relaxed" style="color:#5a5a5a">${esc(d.description || `Welcome to ${d.business_name}${d.city ? ` in ${d.city}` : ''}${d.state ? `, ${d.state}` : ''}.`)}</p>
     </div>
   </section>
 
@@ -784,11 +793,11 @@ function artikaTemplate(d: SiteData): string {
   ${d.services.length > 0 ? `
   <section id="services" class="py-24 px-6">
     <div class="max-w-2xl mx-auto">
-      <p class="text-center text-xs font-light tracking-[0.35em] uppercase mb-16" style="color:${accent}">Services</p>
+      <p class="text-center text-sm font-light tracking-[0.35em] uppercase mb-16" style="color:${accent}">Services</p>
       <div>
         ${d.services.map(s => `
         <div class="flex items-baseline gap-3 py-4 border-b" style="border-color:#e8e5df">
-          <span class="text-lg sm:text-xl font-light whitespace-nowrap" style="color:#2a2a2a">${esc(s.name)}</span>
+          <span class="text-xl sm:text-2xl font-light whitespace-nowrap" style="color:#2a2a2a">${esc(s.name)}</span>
           <span class="flex-1 border-b border-dotted" style="border-color:#d4d0c8;min-width:2rem"></span>
           ${s.price ? `<span class="text-sm font-light whitespace-nowrap" style="color:#6b6b6b">${esc(s.price)}</span>` : ''}
         </div>`).join('')}
@@ -800,7 +809,7 @@ function artikaTemplate(d: SiteData): string {
   ${gallery.length > 0 ? `
   <section class="py-24 px-6">
     <div class="max-w-5xl mx-auto">
-      <p class="text-center text-xs font-light tracking-[0.35em] uppercase mb-16" style="color:${accent}">Gallery</p>
+      <p class="text-center text-sm font-light tracking-[0.35em] uppercase mb-16" style="color:${accent}">Gallery</p>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3" style="grid-auto-rows:200px">
         ${gallery.map((img, i) => `<div class="overflow-hidden rounded-sm ${i === 0 ? 'row-span-2' : i === 3 ? 'col-span-2' : ''}"><img src="${esc(img)}" alt="" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"></div>`).join('')}
       </div>
@@ -811,8 +820,8 @@ function artikaTemplate(d: SiteData): string {
   ${d.reviews.length > 0 ? `
   <section id="reviews" class="py-28 px-6">
     <div class="max-w-3xl mx-auto text-center">
-      ${d.reviews.map((r, i) => `<p data-review-text class="font-light italic text-2xl sm:text-3xl lg:text-4xl leading-relaxed" style="color:#3a3a3a${i > 0 ? ';display:none' : ''}">&ldquo;${esc(r.text)}&rdquo;</p>
-      <p data-review-author class="mt-8 text-xs tracking-[0.3em] uppercase font-light" style="color:#8a8a8a${i > 0 ? ';display:none' : ''}">— ${esc(r.author)}</p>`).join('')}
+      ${d.reviews.map((r, i) => `<p data-review-text class="font-light italic text-3xl sm:text-4xl lg:text-5xl leading-relaxed" style="color:#3a3a3a${i > 0 ? ';display:none' : ''}">&ldquo;${esc(r.text)}&rdquo;</p>
+      <p data-review-author class="mt-8 text-sm tracking-[0.3em] uppercase font-light" style="color:#8a8a8a${i > 0 ? ';display:none' : ''}">— ${esc(r.author)}</p>`).join('')}
       ${d.reviews.length > 1 ? `<div class="flex justify-center gap-2 mt-10">${d.reviews.map((_, i) => `<button data-review-dot data-active-class="w-2 h-2 rounded-full transition-all" data-inactive-class="w-1.5 h-1.5 rounded-full transition-all" class="${i === 0 ? 'w-2 h-2 rounded-full' : 'w-1.5 h-1.5 rounded-full'}" style="background:${i === 0 ? accent : '#d4d0c8'};transform:${i === 0 ? 'scale(1.5)' : 'scale(1)'}"></button>`).join('')}</div>` : ''}
     </div>
   </section>` : ''}
@@ -821,7 +830,7 @@ function artikaTemplate(d: SiteData): string {
   ${Object.keys(d.hours).length > 0 ? `
   <section class="py-24 px-6">
     <div class="max-w-md mx-auto text-center">
-      <p class="text-xs font-light tracking-[0.35em] uppercase mb-12" style="color:${accent}">Hours</p>
+      <p class="text-sm font-light tracking-[0.35em] uppercase mb-12" style="color:${accent}">Hours</p>
       <div class="space-y-3">
         ${DAYS_ORDER.filter(day => d.hours[day]).map(day => `<div class="flex justify-between text-sm font-light"><span style="color:#5a5a5a">${DAY_LABELS[day]}</span><span style="color:#8a8a8a">${esc(d.hours[day])}</span></div>`).join('')}
       </div>
@@ -831,7 +840,7 @@ function artikaTemplate(d: SiteData): string {
   <!-- Contact -->
   <section id="contact" class="py-24 px-6">
     <div class="max-w-md mx-auto text-center">
-      <p class="text-xs font-light tracking-[0.35em] uppercase mb-12" style="color:${accent}">Contact</p>
+      <p class="text-sm font-light tracking-[0.35em] uppercase mb-12" style="color:${accent}">Contact</p>
       <div class="space-y-4 text-sm font-light" style="color:#5a5a5a">
         ${d.address ? `<p>${esc(d.address)}${d.city ? `, ${esc(d.city)}` : ''}${d.state ? `, ${esc(d.state)}` : ''}</p>` : ''}
         ${d.phone ? `<p><a href="tel:${esc(d.phone)}" class="hover:underline" style="color:${accent}">${esc(d.phone)}</a></p>` : ''}
@@ -844,7 +853,7 @@ function artikaTemplate(d: SiteData): string {
   <footer class="py-16 px-6 text-center">
     <div class="w-8 h-px mx-auto mb-8" style="background:#d4d0c8"></div>
     <p class="font-extralight text-xl mb-2" style="color:#2a2a2a">${esc(d.business_name)}</p>
-    <p class="text-xs tracking-widest uppercase mt-8" style="color:#b0ada6">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
+    <p class="text-sm tracking-widest uppercase mt-8" style="color:#b0ada6">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
   </footer>
   ${stickyContactBar(d)}
 </div>`
@@ -855,10 +864,13 @@ function artikaTemplate(d: SiteData): string {
 // ═══════════════════════════════════════════════════════
 function bdeTemplate(d: SiteData): string {
   const accent = d.brand_color_accent || '#6366f1'
-  const ctaText = getCtaText(d)
+  const ind = isIndividual(d)
+  const ctaText = d.phone ? (ind ? 'Call Me' : 'Call Us') : getCtaText(d)
+  const ctaHref = d.phone ? `tel:${esc(d.phone)}` : esc(d.cta_url || '#contact')
   const email = getEmail(d)
   const year = new Date().getFullYear()
   const gallery = getGallery(d)
+  const accentLight = lightenHex(accent, 60)
 
   const stats: { value: string; label: string }[] = []
   if (d.google_rating) stats.push({ value: `${d.google_rating}★`, label: 'Google Rating' })
@@ -867,6 +879,7 @@ function bdeTemplate(d: SiteData): string {
 
   return `
 <div class="min-h-screen bg-[#09090b] text-white">
+${d.logo_url ? `<div class="absolute top-0 left-0 z-20 p-6"><img src="${esc(d.logo_url)}" alt="" class="h-12 w-12 rounded-xl object-cover" /></div>` : ''}
 
   <!-- Hero -->
   <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -875,7 +888,7 @@ function bdeTemplate(d: SiteData): string {
     <div class="relative z-10 max-w-5xl mx-auto px-6 text-center flex flex-col items-center justify-center">
       <h1 class="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-6" style="text-shadow:0 4px 20px rgba(0,0,0,0.6)">${esc(d.business_name)}</h1>
       ${d.tagline ? `<p class="text-xl sm:text-2xl text-gray-200 max-w-2xl mx-auto mb-10 font-normal leading-relaxed" style="text-shadow:0 2px 10px rgba(0,0,0,0.5)">${esc(d.tagline)}</p>` : ''}
-      <a href="${esc(d.cta_url || '#contact')}" class="inline-flex items-center justify-center px-10 py-5 rounded-xl text-white text-lg font-bold shadow-lg transition-all hover:scale-105" style="background:linear-gradient(135deg,${accent},#a855f7);box-shadow:0 10px 40px -10px ${accent}40">${esc(ctaText)}</a>
+      <a href="${ctaHref}" class="inline-flex items-center justify-center px-10 py-5 rounded-xl text-white text-lg font-bold shadow-lg transition-all hover:scale-105" style="background:linear-gradient(135deg,${accent},${accentLight});box-shadow:0 10px 40px -10px ${accent}40">${esc(ctaText)}</a>
     </div>
   </section>
 
@@ -883,7 +896,7 @@ function bdeTemplate(d: SiteData): string {
   ${stats.length > 0 ? `
   <section class="bg-[#111113] border-y border-white/5">
     <div class="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-center divide-x divide-white/10">
-      ${stats.map(s => `<div class="px-8 py-2 text-center"><div class="text-2xl sm:text-3xl font-black" style="background:linear-gradient(135deg,${accent},#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(s.value)}</div><div class="text-xs uppercase tracking-widest text-gray-500 mt-1">${esc(s.label)}</div></div>`).join('')}
+      ${stats.map(s => `<div class="px-8 py-2 text-center"><div class="text-2xl sm:text-3xl font-black" style="background:linear-gradient(135deg,${accent},${accentLight});-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(s.value)}</div><div class="text-xs uppercase tracking-widest text-gray-500 mt-1">${esc(s.label)}</div></div>`).join('')}
     </div>
   </section>` : ''}
 
@@ -891,7 +904,7 @@ function bdeTemplate(d: SiteData): string {
   ${d.description ? `
   <section id="about" class="py-24">
     <div class="max-w-2xl mx-auto px-6">
-      <div class="h-1 w-20 rounded-full mb-8" style="background:linear-gradient(135deg,${accent},#a855f7)"></div>
+      <div class="h-1 w-20 rounded-full mb-8" style="background:linear-gradient(135deg,${accent},${accentLight})"></div>
       <p class="text-lg text-gray-300 leading-relaxed">${esc(d.description)}</p>
     </div>
   </section>` : ''}
@@ -906,7 +919,7 @@ function bdeTemplate(d: SiteData): string {
         <div class="group border border-white/10 rounded-2xl p-8 hover:border-white/25 transition-all bg-white/[0.02]">
           <h3 class="text-xl font-bold text-white mb-3">${esc(s.name)}</h3>
           ${s.description ? `<p class="text-gray-500 leading-relaxed mb-4">${esc(s.description)}</p>` : ''}
-          ${s.price ? `<span class="text-lg font-bold" style="background:linear-gradient(135deg,${accent},#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(s.price)}</span>` : ''}
+          ${s.price ? `<span class="text-lg font-bold" style="background:linear-gradient(135deg,${accent},${accentLight});-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(s.price)}</span>` : ''}
         </div>`).join('')}
       </div>
     </div>
@@ -927,10 +940,10 @@ function bdeTemplate(d: SiteData): string {
   ${d.reviews.length > 0 ? `
   <section id="reviews" class="py-24">
     <div class="max-w-3xl mx-auto px-6 text-center">
-      <div class="text-8xl font-black leading-none mb-4" style="background:linear-gradient(135deg,${accent},#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">&ldquo;</div>
+      <div class="text-8xl font-black leading-none mb-4" style="background:linear-gradient(135deg,${accent},${accentLight});-webkit-background-clip:text;-webkit-text-fill-color:transparent">&ldquo;</div>
       ${d.reviews.map((r, i) => `<p data-review-text class="text-2xl sm:text-3xl text-white leading-relaxed font-normal mb-8" ${i > 0 ? 'style="display:none"' : ''}>${esc(r.text)}</p>
       <p data-review-author class="text-gray-500 text-sm" ${i > 0 ? 'style="display:none"' : ''}>— ${esc(r.author)}${r.date ? `, ${esc(r.date)}` : ''}</p>`).join('')}
-      ${d.reviews.length > 1 ? `<div class="flex justify-center gap-2 mt-8">${d.reviews.map((_, i) => `<button data-review-dot data-active-class="h-1.5 w-8 rounded-full transition-all" data-inactive-class="h-1.5 w-3 rounded-full bg-gray-700 transition-all" class="${i === 0 ? 'h-1.5 w-8 rounded-full' : 'h-1.5 w-3 rounded-full bg-gray-700'}" ${i === 0 ? `style="background:linear-gradient(135deg,${accent},#a855f7)"` : ''}></button>`).join('')}</div>` : ''}
+      ${d.reviews.length > 1 ? `<div class="flex justify-center gap-2 mt-8">${d.reviews.map((_, i) => `<button data-review-dot data-active-class="h-1.5 w-8 rounded-full transition-all" data-inactive-class="h-1.5 w-3 rounded-full bg-gray-700 transition-all" class="${i === 0 ? 'h-1.5 w-8 rounded-full' : 'h-1.5 w-3 rounded-full bg-gray-700'}" ${i === 0 ? `style="background:linear-gradient(135deg,${accent},${accentLight})"` : ''}></button>`).join('')}</div>` : ''}
     </div>
   </section>` : ''}
 
@@ -949,7 +962,7 @@ function bdeTemplate(d: SiteData): string {
         <div>
           <h3 class="text-2xl font-black mb-8">Contact</h3>
           <div class="space-y-4 text-gray-400">
-            ${d.phone ? `<p><span class="text-gray-600 text-sm block mb-1">Phone</span><a href="tel:${esc(d.phone)}" class="text-lg font-bold" style="background:linear-gradient(135deg,${accent},#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(d.phone)}</a></p>` : ''}
+            ${d.phone ? `<p><span class="text-gray-600 text-sm block mb-1">Phone</span><a href="tel:${esc(d.phone)}" class="text-lg font-bold" style="background:linear-gradient(135deg,${accent},${accentLight});-webkit-background-clip:text;-webkit-text-fill-color:transparent">${esc(d.phone)}</a></p>` : ''}
             ${email ? `<p><span class="text-gray-600 text-sm block mb-1">Email</span><a href="mailto:${esc(email)}" class="hover:text-white transition">${esc(email)}</a></p>` : ''}
             ${d.address ? `<p><span class="text-gray-600 text-sm block mb-1">Address</span>${esc(d.address)}${d.city ? `, ${esc(d.city)}` : ''}${d.state ? `, ${esc(d.state)}` : ''}</p>` : ''}
           </div>

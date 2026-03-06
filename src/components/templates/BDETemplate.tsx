@@ -28,12 +28,19 @@ function FadeIn({ children, className = '' }: { children: React.ReactNode; class
 }
 
 /* ── Gradient helpers ── */
+function lightenColor(hex: string, amount: number): string {
+  const num = parseInt(hex.replace('#', ''), 16)
+  const r = Math.min(255, (num >> 16) + amount)
+  const g = Math.min(255, ((num >> 8) & 0x00FF) + amount)
+  const b = Math.min(255, (num & 0x0000FF) + amount)
+  return `rgb(${r}, ${g}, ${b})`
+}
 function gradientStyle(accent: string) {
-  return { backgroundImage: `linear-gradient(135deg, ${accent}, #a855f7)` }
+  return { backgroundImage: `linear-gradient(135deg, ${accent}, ${lightenColor(accent, 60)})` }
 }
 function gradientTextStyle(accent: string) {
   return {
-    backgroundImage: `linear-gradient(135deg, ${accent}, #a855f7)`,
+    backgroundImage: `linear-gradient(135deg, ${accent}, ${lightenColor(accent, 60)})`,
     WebkitBackgroundClip: 'text' as const,
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text' as const,
@@ -56,7 +63,9 @@ export default function BDETemplate({ data }: TemplateProps) {
   }, [reviews.length])
 
   const accent = data.brand_color_accent || '#6366f1'
-  const ctaText = getCtaButtonText(data)
+  const ind = data.site_mode === 'individual'
+  const ctaText = data.phone ? (ind ? 'Call Me' : 'Call Us') : getCtaButtonText(data)
+  const ctaHref = data.phone ? `tel:${data.phone}` : (data.cta_url || '#contact')
   const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
   const dayLabels: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
 
@@ -67,6 +76,13 @@ export default function BDETemplate({ data }: TemplateProps) {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white font-sans">
+
+      {/* ════════ TOP BAR WITH LOGO ════════ */}
+      {data.logo_url && (
+        <div className="absolute top-0 left-0 z-20 p-6">
+          <img src={data.logo_url} alt="" className="h-12 w-12 rounded-xl object-cover" />
+        </div>
+      )}
 
       {/* ════════ HERO ════════ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -93,7 +109,7 @@ export default function BDETemplate({ data }: TemplateProps) {
           )}
           <FadeIn>
             <a
-              href={data.cta_url || '#contact'}
+              href={ctaHref}
               className="inline-flex items-center justify-center px-10 py-5 rounded-xl text-white text-lg font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl"
               style={{
                 ...gradientStyle(accent),

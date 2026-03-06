@@ -40,7 +40,9 @@ export default function BoldTemplate({ data }: TemplateProps) {
   const heroImg = data.hero_image_url || HERO_IMAGES[data.category] || HERO_IMAGES.general
   const primary = data.brand_color_primary
   const accent = data.brand_color_accent
-  const ctaText = getCtaButtonText(data)
+  const ind = data.site_mode === 'individual'
+  const ctaText = data.phone ? (ind ? 'Call Me' : 'Call Us') : getCtaButtonText(data)
+  const ctaHref = data.phone ? `tel:${data.phone}` : (data.cta_url || '#contact')
 
   const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
   const dayLabels: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
@@ -61,7 +63,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
             <a href="#contact" className="hover:text-white transition">Contact</a>
           </nav>
           <a
-            href={data.cta_url || '#contact'}
+            href={ctaHref}
             className="px-6 py-2.5 rounded-lg text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             style={{ backgroundColor: primary }}
           >
@@ -70,15 +72,15 @@ export default function BoldTemplate({ data }: TemplateProps) {
         </div>
       </header>
 
-      {/* Hero — Full-bleed, high contrast */}
-      <section className="relative min-h-[85vh] flex items-center">
+      {/* Hero — Full-bleed, content bottom-left */}
+      <section className="relative min-h-[85vh] flex items-end">
         <div className="absolute inset-0">
           <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
         </div>
         <div className="relative w-full">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-20">
             <div className="max-w-3xl">
               {data.google_rating && (
                 <div className="flex items-center gap-3 mb-6">
@@ -94,7 +96,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
               )}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
-                  href={data.cta_url || '#contact'}
+                  href={ctaHref}
                   className="inline-flex items-center justify-center px-10 py-5 rounded-lg text-white text-lg font-bold shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 tracking-wide"
                   style={{ backgroundColor: primary }}
                 >
@@ -275,7 +277,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
           <h2 className="text-4xl sm:text-6xl font-black tracking-tight mb-6">Ready to Get Started?</h2>
           <p className="text-xl text-gray-400 mb-10 max-w-xl mx-auto">Contact us today and experience the difference.</p>
           <a
-            href={data.cta_url || '#contact'}
+            href={ctaHref}
             className="inline-flex px-12 py-5 rounded-lg text-white font-bold text-lg shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105"
             style={{ backgroundColor: primary }}
           >
