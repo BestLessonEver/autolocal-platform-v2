@@ -239,7 +239,7 @@ export default function HomePage() {
             {' '}Custom Website
           </h1>
           <p className="text-2xl sm:text-3xl text-gray-300 font-light mb-2">
-            Designed for your business. Delivered in 24 hours.
+            Get found on web search and ChatGPT
           </p>
           <p className="text-lg text-gray-500 mb-10">
             See a live preview with your real Google reviews, photos &amp; hours — in 15 seconds. Free.
