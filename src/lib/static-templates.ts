@@ -1004,7 +1004,7 @@ export function generateStaticHtml(data: any, template: string): string {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(data.business_name)} — ${esc(data.city || '')}${data.state ? `, ${esc(data.state)}` : ''}</title>
 <meta name="description" content="${esc(data.description || data.tagline || `${data.business_name} — serving ${data.city || 'the community'}`)}">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+${data.logo_url ? `<link rel="icon" href="${esc(data.logo_url)}" type="image/png">` : `<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">`}
 <script src="https://cdn.tailwindcss.com"></script>
 <style>*{scroll-behavior:smooth}body{margin:0}</style>
 </head>
