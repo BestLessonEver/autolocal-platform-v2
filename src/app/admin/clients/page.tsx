@@ -6,20 +6,16 @@ import { useState, useEffect } from 'react'
 interface Client {
   id: string
   business_name: string
-  contact_name: string
-  contact_email: string
+  owner_name: string | null
+  email: string
   phone: string | null
   website: string | null
-  package: string
+  package: string | null
   status: string
+  stripe_customer_id: string | null
   created_at: string
-  // from website_previews join
-  preview_slug?: string
   city?: string
   state?: string
-  google_rating?: number
-  google_review_count?: number
-  category?: string
 }
 
 interface Preview {
@@ -111,8 +107,8 @@ export default function AdminClientsPage() {
 
   const filteredClients = clients.filter(c =>
     c.business_name.toLowerCase().includes(search.toLowerCase()) ||
-    c.contact_name.toLowerCase().includes(search.toLowerCase()) ||
-    c.contact_email.toLowerCase().includes(search.toLowerCase())
+    c.owner_name || c.business_name.toLowerCase().includes(search.toLowerCase()) ||
+    c.email.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -306,12 +302,12 @@ export default function AdminClientsPage() {
                         {c.phone && <p className="text-xs text-gray-500">{c.phone}</p>}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-gray-300">{c.contact_name}</p>
-                        <p className="text-xs text-gray-500">{c.contact_email}</p>
+                        <p className="text-gray-300">{c.owner_name || c.business_name}</p>
+                        <p className="text-xs text-gray-500">{c.email}</p>
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-gray-300 text-xs font-medium">
-                          {PACKAGE_LABELS[c.package] || c.package}
+                          {(c.package && PACKAGE_LABELS[c.package]) || c.package || '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -327,7 +323,7 @@ export default function AdminClientsPage() {
                           // Find matching preview by business name or email
                           const match = previews.find(p =>
                             p.business_name.toLowerCase() === c.business_name.toLowerCase() ||
-                            p.email === c.contact_email
+                            (p.email && c.email && p.email === c.email)
                           )
                           const dashUrl = match
                             ? `/my-site/${match.id.substring(0, 8)}-${match.slug}`
