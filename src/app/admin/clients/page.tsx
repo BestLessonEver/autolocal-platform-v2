@@ -323,12 +323,24 @@ export default function AdminClientsPage() {
                         {new Date(c.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <a
-                          href={`/client/${c.id}`}
-                          className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
-                        >
-                          View
-                        </a>
+                        {(() => {
+                          // Find matching preview by business name or email
+                          const match = previews.find(p =>
+                            p.business_name.toLowerCase() === c.business_name.toLowerCase() ||
+                            p.email === c.contact_email
+                          )
+                          const dashUrl = match
+                            ? `/my-site/${match.id.substring(0, 8)}-${match.slug}`
+                            : `/client/${c.id}`
+                          return (
+                            <a
+                              href={dashUrl}
+                              className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
+                            >
+                              Dashboard
+                            </a>
+                          )
+                        })()}
                       </td>
                     </tr>
                   ))}
