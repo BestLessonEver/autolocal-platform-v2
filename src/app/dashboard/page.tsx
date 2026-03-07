@@ -747,16 +747,28 @@ export default function ClientDashboard() {
     const [moved] = gallery.splice(fromIdx, 1)
     gallery.splice(toIdx, 0, moved)
     setData(p => p ? { ...p, gallery_images: gallery } : p)
-    await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: gallery }) })
-    triggerDeploy(); refreshPreview()
+    const prevGallery = data.gallery_images || []
+    try {
+      const res = await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: gallery }) })
+      if (!res.ok) throw new Error('Reorder failed')
+      triggerDeploy(); refreshPreview()
+    } catch {
+      setData(p => p ? { ...p, gallery_images: prevGallery } : p)
+    }
   }
 
   const handlePhotoDragEnd = async (oldIndex: number, newIndex: number) => {
     if (!data) return
-    const newGallery = arrayMove(data.gallery_images || [], oldIndex, newIndex)
+    const prevGallery = data.gallery_images || []
+    const newGallery = arrayMove(prevGallery, oldIndex, newIndex)
     setData(p => p ? { ...p, gallery_images: newGallery } : p)
-    await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: newGallery }) })
-    triggerDeploy(); refreshPreview()
+    try {
+      const res = await fetch('/api/dashboard/me/photos', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reorder', gallery_images: newGallery }) })
+      if (!res.ok) throw new Error('Reorder failed')
+      triggerDeploy(); refreshPreview()
+    } catch {
+      setData(p => p ? { ...p, gallery_images: prevGallery } : p)
+    }
   }
 
   const handleSetHero = async (url: string) => {

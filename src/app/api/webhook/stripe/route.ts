@@ -209,7 +209,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .eq('status', 'active')
     .then(() => {})
 
-  console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
+  if (process.env.DEBUG) console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
 }
 
 export async function POST(req: Request) {
@@ -269,7 +269,7 @@ export async function POST(req: Request) {
           .from('website_previews')
           .update({ plan: 'starter' })
           .eq('email', email)
-        console.log(`⚠️ Subscription cancelled: ${email}`)
+        if (process.env.DEBUG) console.log(`⚠️ Subscription cancelled: ${email}`)
       }
       break
     }
