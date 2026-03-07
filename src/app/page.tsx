@@ -235,14 +235,14 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-[0.95] mb-6 tracking-tight">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$99</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Free</span>
             {' '}Custom Website
           </h1>
           <p className="text-2xl sm:text-3xl text-gray-300 font-light mb-2">
             Get found on web search and ChatGPT
           </p>
           <p className="text-lg text-gray-500 mb-10">
-            See a live preview with your real Google reviews, photos &amp; hours — in 15 seconds. Free.
+            See a live preview with your real Google reviews, photos &amp; hours — in 15 seconds. Just pay hosting.
           </p>
 
           {/* Preview Generator */}
@@ -362,20 +362,20 @@ export default function HomePage() {
             <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-6 text-center relative md:order-first">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">BEST VALUE</div>
               <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">AutoLocal</p>
-              <p className="text-5xl font-black text-white mb-2">$99</p>
-              <p className="text-xs text-gray-400 mb-6">Delivered in 24 hours</p>
+              <p className="text-5xl font-black text-white mb-2">Free</p>
+              <p className="text-xs text-gray-400 mb-6">Just $9/mo hosting</p>
               <ul className="text-left space-y-2.5 text-sm text-gray-200">
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Custom design for YOUR brand</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> See it before you pay</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 3 revision rounds</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Hosting from $9/mo</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Money-back guarantee</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> See it before you pay anything</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 1 revision round included</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Hosting just $9/mo · cancel anytime</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Cancel anytime guarantee</li>
               </ul>
               <button
                 onClick={() => scrollTo('order')}
                 className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition"
               >
-                Get Started →
+                Get Started Free →
               </button>
             </div>
 
@@ -420,7 +420,7 @@ export default function HomePage() {
             {[
               { num: '1', title: 'Type Your Business Name', desc: 'We pull your reviews, photos, hours, and contact info from Google automatically.', tag: '15 seconds' },
               { num: '2', title: 'Preview Your Custom Site', desc: 'See your business on a professional website. Switch between 4 unique designs.', tag: 'Instant preview' },
-              { num: '3', title: 'Love It? Pay $99.', desc: 'We connect your domain, go live, and handle everything. 3 revision rounds to nail it.', tag: 'Risk-free' },
+              { num: '3', title: 'Love It? Go Live.', desc: 'We connect your domain and handle everything. Just $9/mo hosting. Cancel anytime.', tag: 'Zero risk' },
             ].map((step, i) => (
               <div key={i} className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg shadow-indigo-500/20">{step.num}</div>
@@ -438,8 +438,8 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">Everything Included for $99</h2>
-          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">What agencies charge $5,000+ for. Delivered in 24 hours.</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">Everything Included — Free</h2>
+          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">What agencies charge $5,000+ for. Yours for $0 upfront.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { icon: '🎨', title: 'Custom Design', desc: 'Built around YOUR brand — your colors, photos, and style' },
@@ -466,28 +466,54 @@ export default function HomePage() {
           PRICING
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5" id="pricing">
-        <div className="max-w-xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-black mb-12">Simple Pricing</h2>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 sm:p-10">
-            <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">Custom Website</p>
-            <div className="flex items-baseline justify-center gap-2 mb-1">
-              <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$99</span>
-              <span className="text-gray-500">one-time</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Free Tier */}
+            <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-8 text-center relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">MOST POPULAR</div>
+              <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">Custom Website</p>
+              <div className="flex items-baseline justify-center gap-2 mb-1">
+                <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Free</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
+              <ul className="space-y-3 mb-8 text-left">
+                {['Custom design for your brand', 'Your real Google reviews & photos', 'SEO + ChatGPT structured data', '1 revision round', 'SSL, mobile-optimized, fast', 'Domain connection help (free)', 'Cancel anytime'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                    <span className="text-green-400">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => scrollTo('order')}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
+              >
+                Get Started Free
+              </button>
             </div>
-            <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
-            <ul className="space-y-3 mb-8 text-left max-w-sm mx-auto">
-              {['Custom design for your brand', '5 design styles to choose from', 'Your real Google reviews & photos', 'SEO + ChatGPT structured data', '3 revision rounds', '2 free changes per month', 'SSL, mobile-optimized, fast', 'Domain connection help (free)', 'Money-back guarantee'].map((f, i) => (
-                <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
-                  <span className="text-green-400">✓</span> {f}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => scrollTo('order')}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
-            >
-              Get Started — $99
-            </button>
+
+            {/* Premium Tier */}
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 text-center">
+              <p className="text-sm text-gray-400 uppercase tracking-wide mb-2">Premium</p>
+              <div className="flex items-baseline justify-center gap-2 mb-1">
+                <span className="text-6xl font-black text-white">$99</span>
+                <span className="text-gray-500">one-time</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
+              <ul className="space-y-3 mb-8 text-left">
+                {['Everything in Free, plus:', '5 design styles to choose from', '3 revision rounds', '2 free changes per month', 'Priority support', 'Custom color & font matching'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                    <span className={i === 0 ? 'text-indigo-400' : 'text-green-400'}>{i === 0 ? '⭐' : '✓'}</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => scrollTo('order')}
+                className="w-full py-4 rounded-xl bg-white/10 border border-white/20 text-white font-bold hover:bg-white/15 transition"
+              >
+                Go Premium — $99
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -527,10 +553,10 @@ export default function HomePage() {
       <section className="py-16 px-4 border-t border-white/5">
         <div className="max-w-2xl mx-auto text-center">
           <span className="text-5xl mb-6 block">🛡️</span>
-          <h2 className="text-3xl font-black mb-4">Love It or Don&apos;t Pay</h2>
+          <h2 className="text-3xl font-black mb-4">Zero Risk. Cancel Anytime.</h2>
           <p className="text-gray-400 leading-relaxed">
-            You get 3 rounds of revisions to get your website exactly right. 
-            If you&apos;re still not 100% satisfied, we refund every penny. No questions asked.
+            Your website is built for free. If you love it, hosting is just $9/mo. 
+            If you don&apos;t? Cancel anytime — no contracts, no cancellation fees, no questions asked.
           </p>
         </div>
       </section>
@@ -540,8 +566,8 @@ export default function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5 bg-white/[0.02]" id="order">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-2">Get Your $99 Custom Website</h2>
-          <p className="text-gray-400 text-center mb-10">Pay securely via Stripe. Preview in your inbox within 24 hours.</p>
+          <h2 className="text-3xl font-black text-center mb-2">Get Your Free Custom Website</h2>
+          <p className="text-gray-400 text-center mb-10">$0 to build. Just $9/mo hosting. Cancel anytime.</p>
           
           <form onSubmit={handleCheckout} className="space-y-6">
             {/* Business type */}
@@ -619,11 +645,11 @@ export default function HomePage() {
               disabled={checkoutLoading}
               className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
             >
-              {checkoutLoading ? 'Redirecting to checkout...' : 'Get My Website — $99'}
+              {checkoutLoading ? 'Redirecting to checkout...' : 'Get My Free Website'}
             </button>
 
             <div className="text-center space-y-1">
-              <p className="text-gray-500 text-sm">🛡️ Love it or get a full refund. 3 revision rounds to get it right.</p>
+              <p className="text-gray-500 text-sm">🛡️ Free to build. Cancel hosting anytime. Zero risk.</p>
               <p className="text-gray-600 text-xs">🔒 Secure payment powered by Stripe</p>
             </div>
           </form>
@@ -638,11 +664,11 @@ export default function HomePage() {
           <h2 className="text-3xl font-black text-center mb-12">Questions? Answers.</h2>
           <div className="space-y-4">
             {[
-              { q: 'How is this only $99?', a: 'We use AI-powered design tools that let us work 10x faster than a traditional agency. Same quality, fraction of the time and cost.' },
+              { q: 'How is the website really free?', a: 'We use AI-powered design tools that let us build sites 10x faster than a traditional agency. You only pay $9/mo for hosting — that covers servers, SSL, and support. We make money when you stay, so we\'re incentivized to build you something great.' },
               { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google — reviews, photos, hours, contact info.' },
               { q: 'Can I see it before I pay?', a: 'Yes! Enter your business name above and see a live custom preview in 15 seconds. Totally free.' },
-              { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any builder. SSL, speed, uptime all included. Cancel anytime. We help connect your domain for free.' },
-              { q: 'What if I want changes?', a: '3 revision rounds during the build. After launch, 2 free changes per month included. Need more? Just $7 each.' },
+              { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any website builder. SSL, speed, uptime all included. Cancel anytime. We help connect your domain for free.' },
+              { q: 'What if I want changes?', a: '1 revision round included free. Upgrade to Premium ($99 one-time) for 3 revision rounds and 2 free changes per month. Extra changes are just $7 each.' },
               { q: 'I already have a website.', a: 'We build the new site separately. Once you approve it, we help point your domain to it. Zero downtime.' },
               { q: 'What if I don\'t have a domain?', a: 'We recommend Namecheap (~$9/year). We have a step-by-step guide at autolocal.ai/setup, or we\'ll do it for you free.' },
             ].map((item, i) => (
@@ -664,14 +690,14 @@ export default function HomePage() {
       <section className="py-20 px-4 border-t border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/5 to-transparent" />
         <div className="relative z-10 max-w-xl mx-auto text-center">
-          <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-4">$99</p>
+          <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-4">Free</p>
           <h2 className="text-3xl font-black mb-4">Your Custom Website Is Waiting</h2>
-          <p className="text-gray-400 mb-8 text-lg">15 seconds to see it. 24 hours to own it. Zero risk.</p>
+          <p className="text-gray-400 mb-8 text-lg">15 seconds to see it. $0 to build it. Just $9/mo to keep it live.</p>
           <button
             onClick={() => scrollTo('order')}
             className="px-12 py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            Get My Website — $99
+            Get My Free Website
           </button>
         </div>
       </section>
