@@ -98,11 +98,11 @@ const SECTION_IDS = [
   { id: 'sec-template', label: 'Template' },
   { id: 'sec-brand', label: 'Brand' },
   { id: 'sec-hero', label: 'Hero' },
+  { id: 'sec-photos', label: 'Photos' },
   { id: 'sec-contact', label: 'Contact' },
   { id: 'sec-about', label: 'About' },
   { id: 'sec-services', label: 'Services' },
   { id: 'sec-hours', label: 'Hours' },
-  { id: 'sec-photos', label: 'Photos' },
   { id: 'sec-seo-tips', label: '🔍 SEO' },
 ]
 
@@ -977,9 +977,15 @@ export default function ClientDashboard() {
             {/* Template Carousel */}
             <section id="sec-template" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-gray-400 mb-3">Design Template</h3>
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="flex gap-3 overflow-x-auto pb-2" ref={el => {
+                if (el) {
+                  const active = el.querySelector('[data-active-template]') as HTMLElement
+                  if (active) active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
+                }
+              }}>
                 {TEMPLATES.map(t => (
                   <button key={t.id} onClick={() => updateFieldNow('template', t.id)}
+                    {...(data.template === t.id ? { 'data-active-template': true } : {})}
                     className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition min-w-[80px] sm:min-w-[90px] ${
                       data.template === t.id ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10' : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
                     }`}>
@@ -993,9 +999,21 @@ export default function ClientDashboard() {
             {/* Brand */}
             <BrandControls data={data} onUpdate={mergeUpdate} onDeploy={triggerDeploy} />
 
+            {/* Headline & Tagline */}
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Headline</label>
+                <InlineEdit value={data.business_name} onChange={v => updateField('business_name', v)} className="text-xl font-black" placeholder="Your Business Name" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Tagline</label>
+                <InlineEdit value={data.tagline || ''} onChange={v => updateField('tagline', v)} className="text-gray-300" placeholder="A short description" />
+              </div>
+            </section>
+
             {/* Hero */}
             <section id="sec-hero" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-400">Hero</h3>
+              <h3 className="text-sm font-semibold text-gray-400">Hero Image</h3>
               <div className="relative group rounded-xl overflow-hidden bg-white/5" style={{ aspectRatio: '4/3', maxHeight: '300px' }}>
                 {data.hero_image_url ? (
                   <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop || 50}%` }} />
@@ -1007,7 +1025,6 @@ export default function ClientDashboard() {
                   <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'hero') }} className="hidden" />
                 </label>
               </div>
-              {/* Hero Crop Slider */}
               {data.hero_image_url && (
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Image Position</label>
@@ -1021,15 +1038,19 @@ export default function ClientDashboard() {
                   <div className="flex justify-between text-[10px] text-gray-600 mt-0.5"><span>Top</span><span>Center</span><span>Bottom</span></div>
                 </div>
               )}
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Headline</label>
-                <InlineEdit value={data.business_name} onChange={v => updateField('business_name', v)} className="text-xl font-black" placeholder="Your Business Name" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Tagline</label>
-                <InlineEdit value={data.tagline || ''} onChange={v => updateField('tagline', v)} className="text-gray-300" placeholder="A short description" />
-              </div>
             </section>
+
+            {/* Photos */}
+            <PhotoGrid
+              galleryImages={data.gallery_images || []}
+              heroImageUrl={data.hero_image_url}
+              onReorder={handlePhotoDragEnd}
+              onSetHero={handleSetHero}
+              onCrop={(url, i) => setCropPhoto({ url, index: i })}
+              onRemove={handlePhotoRemove}
+              onActionSheet={(url, i) => setActionSheet({ url, index: i })}
+              onUpload={f => handlePhotoUpload(f, 'gallery')}
+            />
 
             {/* Contact */}
             <section id="sec-contact" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
@@ -1126,18 +1147,6 @@ export default function ClientDashboard() {
                 })}
               </div>
             </section>
-
-            {/* Photos — drag to reorder */}
-            <PhotoGrid
-              galleryImages={data.gallery_images || []}
-              heroImageUrl={data.hero_image_url}
-              onReorder={handlePhotoDragEnd}
-              onSetHero={handleSetHero}
-              onCrop={(url, i) => setCropPhoto({ url, index: i })}
-              onRemove={handlePhotoRemove}
-              onActionSheet={(url, i) => setActionSheet({ url, index: i })}
-              onUpload={f => handlePhotoUpload(f, 'gallery')}
-            />
 
             {/* Bottom */}
             <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
