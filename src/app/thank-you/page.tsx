@@ -86,7 +86,7 @@ function ThankYouContent() {
               </div>
               <div>
                 <p className="text-white text-sm font-medium">Your custom website is ready!</p>
-                <p className="text-gray-500 text-xs">Payment confirmed — your receipt is in your email</p>
+                <p className="text-gray-500 text-xs">Built with your real Google reviews, photos &amp; hours</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -94,8 +94,8 @@ function ThankYouContent() {
                 <span className="text-indigo-400 text-xs font-bold">2</span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Check your email for login info</p>
-                <p className="text-gray-500 text-xs">We sent a magic link — one click to get in</p>
+                <p className="text-white text-sm font-medium">Check your email for your dashboard link</p>
+                <p className="text-gray-500 text-xs">We sent a magic link — one click to log in and edit</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -103,8 +103,8 @@ function ThankYouContent() {
                 <span className="text-gray-400 text-xs font-bold">3</span>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Preview your site & make changes</p>
-                <p className="text-gray-500 text-xs">Edit text, upload photos, pick colors from your dashboard</p>
+                <p className="text-white text-sm font-medium">Love it? Go live — first month free</p>
+                <p className="text-gray-500 text-xs">Activate hosting from your dashboard. $0 today, $9/mo after.</p>
               </div>
             </div>
           </div>

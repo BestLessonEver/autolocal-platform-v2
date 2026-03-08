@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { internalAuthHeader } from '@/lib/internal-auth'
 
 // ============================================================
 // Config — fail fast on missing credentials
@@ -20,6 +21,74 @@ const supabase = createClient(
 const GOOGLE_PLACES_KEY = process.env.GOOGLE_PLACES_API_KEY
 if (!GOOGLE_PLACES_KEY) {
   console.error('[generate-preview] GOOGLE_PLACES_API_KEY not set — Google Places lookups will fail')
+}
+
+// ============================================================
+// Welcome email for free preview
+// ============================================================
+
+async function sendPreviewEmail(to: string, contactName: string, businessName: string, slug: string) {
+  const firstName = contactName?.split(' ')[0] || 'there'
+
+  // Generate magic link for dashboard access
+  const { data } = await supabase.auth.admin.generateLink({
+    type: 'magiclink',
+    email: to,
+    options: { redirectTo: 'https://autolocal.ai/auth/callback?next=/dashboard' },
+  })
+  const magicLinkUrl = data?.properties?.action_link || 'https://autolocal.ai/login'
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
+        <tr><td align="center" style="padding-bottom:32px;">
+          <span style="font-size:24px;font-weight:800;color:#ffffff;">⚡ AutoLocal.ai</span>
+        </td></tr>
+        <tr><td style="background-color:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;">
+          <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 16px;">Hi ${firstName}, your website is ready! 🎉</h1>
+          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 8px;">
+            We just built a custom website for <strong style="color:#ffffff;">${businessName}</strong> using your real Google reviews, photos, and business info.
+          </p>
+          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
+            Here's what you can do next:
+          </p>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Preview your custom website</span></td></tr>
+            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Edit text, photos, colors, and template from your dashboard</span></td></tr>
+            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Love it? Go live for $0 today (first month free)</span></td></tr>
+          </table>
+          <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Go to My Dashboard →</a>
+          <p style="color:#52525b;font-size:13px;margin:24px 0 0;">
+            Or preview your site directly: <a href="https://autolocal.ai/preview/${slug}" style="color:#6366f1;">autolocal.ai/preview/${slug}</a>
+          </p>
+          <p style="color:#52525b;font-size:13px;margin:12px 0 0;">
+            You can sign in anytime at <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> using this email.
+          </p>
+        </td></tr>
+        <tr><td align="center" style="padding-top:24px;">
+          <p style="color:#3f3f46;font-size:12px;margin:0;">Questions? Reply to this email or reach us at brian@autolocal.ai</p>
+          <p style="color:#27272a;font-size:11px;margin:12px 0 0;">AutoLocal.ai · Custom websites for local businesses</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  await fetch('https://autolocal.ai/api/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': internalAuthHeader() },
+    body: JSON.stringify({
+      to,
+      subject: `Your ${businessName} website is ready! 🎉`,
+      html,
+    }),
+  })
 }
 
 // ============================================================
@@ -148,6 +217,7 @@ export async function POST(req: NextRequest) {
     const city = sanitizeInput(body.city || '')
     const state = sanitizeInput(body.state || '')
     const email = sanitizeInput(body.email || '')
+    const contactName = sanitizeInput(body.contactName || '')
 
     if (!businessName) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 })
@@ -316,6 +386,13 @@ export async function POST(req: NextRequest) {
           email,
         })
         .then(() => {})
+    }
+
+    // Send welcome email with magic link (fire and forget)
+    if (email) {
+      sendPreviewEmail(email, contactName || name, name, fullSlug).catch(err =>
+        console.error('[generate-preview] Email send failed:', err)
+      )
     }
 
     log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
