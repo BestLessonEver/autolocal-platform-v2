@@ -503,13 +503,14 @@ function SortablePhoto({
 // ─── Photo Grid with Drag ───────────────────────────────────────────────────────
 
 function PhotoGrid({
-  galleryImages, heroImageUrl, onReorder, onSetHero, onCrop, onRemove, onActionSheet, onUpload,
+  galleryImages, heroImageUrl, onReorder, onSetHero, onCrop, onRemove, onActionSheet, onUpload, googleSource,
 }: {
   galleryImages: string[]; heroImageUrl: string | null
   onReorder: (oldIndex: number, newIndex: number) => void
   onSetHero: (url: string) => void; onCrop: (url: string, i: number) => void
   onRemove: (url: string) => void; onActionSheet: (url: string, i: number) => void
   onUpload: (f: File) => void
+  googleSource?: boolean
 }) {
   const pointerSensor = useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
@@ -525,7 +526,10 @@ function PhotoGrid({
 
   return (
     <section id="sec-photos" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
-      <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-gray-400">Photos</h3>
+        {googleSource && <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] text-green-400 font-medium">✓ Google</span>}
+      </div>
       <p className="text-xs text-gray-600">Hold and drag to reorder. Tap to manage. All photos display at 4:3.</p>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={galleryImages} strategy={rectSortingStrategy}>
@@ -1050,11 +1054,15 @@ export default function ClientDashboard() {
               onRemove={handlePhotoRemove}
               onActionSheet={(url, i) => setActionSheet({ url, index: i })}
               onUpload={f => handlePhotoUpload(f, 'gallery')}
+              googleSource={!!data.google_rating}
             />
 
             {/* Contact */}
             <section id="sec-contact" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-400">Contact Info</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-400">Contact Info</h3>
+                {data.google_rating && <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] text-green-400 font-medium">✓ Google</span>}
+              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 <div><label className="block text-xs text-gray-500 mb-1">📞 Phone</label><InlineEdit value={data.phone || ''} onChange={v => updateField('phone', v)} className="text-sm" placeholder="(555) 123-4567" /></div>
                 <div><label className="block text-xs text-gray-500 mb-1">📧 Email</label><InlineEdit value={data.contact_email || data.email || ''} onChange={v => updateField('display_email', v)} className="text-sm" placeholder="you@example.com" /></div>
@@ -1115,7 +1123,10 @@ export default function ClientDashboard() {
             {/* Hours */}
             <section id="sec-hours" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-400">Hours</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-400">Hours</h3>
+                  {data.google_rating && <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] text-green-400 font-medium">✓ Google</span>}
+                </div>
                 <button onClick={copyToWeekdays} className="text-xs text-indigo-400 hover:text-indigo-300 transition">Copy Mon → weekdays</button>
               </div>
               <div className="space-y-2">
