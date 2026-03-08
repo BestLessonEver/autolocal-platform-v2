@@ -63,7 +63,7 @@ const TEMPLATES = [
   { id: 'professional', name: 'Professional', emoji: '💼' },
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
-  { id: 'myspace', name: 'MySpace', emoji: '🎵' },
+  { id: 'myspace', name: 'YourSpace', emoji: '🎵' },
   { id: 'aim', name: 'AIM', emoji: '💬' },
   { id: 'win95', name: 'Win95', emoji: '🖥️' },
   { id: 'pokemon', name: 'Pokémon', emoji: '⚡' },
