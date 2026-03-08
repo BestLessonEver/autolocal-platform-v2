@@ -37,6 +37,7 @@ interface SiteData {
   view_count: number
   created_at: string
   plan: 'starter' | 'living'
+  hosting_status: 'preview' | 'active' | 'expired'
   changes_this_month: number
   free_changes_remaining: number
   unlimited_changes: boolean
@@ -868,10 +869,10 @@ export default function ClientDashboard() {
           {/* Deploy Badge */}
           <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
             deploying ? 'bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse'
-              : data.status === 'published' ? 'bg-green-500/20 text-green-400 border border-green-500/20'
-              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'
+              : data.hosting_status === 'active' ? 'bg-green-500/20 text-green-400 border border-green-500/20'
+              : 'bg-purple-500/20 text-purple-400 border border-purple-500/20'
           }`}>
-            {deploying ? '⟳ Deploying...' : data.status === 'published' ? '🟢 LIVE' : '🟡 DRAFT'}
+            {deploying ? '⟳ Deploying...' : data.hosting_status === 'active' ? '🟢 LIVE' : '👁️ PREVIEW'}
           </span>
 
           {/* Desktop-only controls */}
@@ -891,7 +892,7 @@ export default function ClientDashboard() {
 
             <SaveStatus saving={saving} lastSaved={lastSaved} undoData={undoData} onUndo={async () => { await undo(); const res = await fetch('/api/dashboard/me'); if (res.ok) setData(await res.json()) }} />
 
-            <span className="text-xs text-gray-500">{data.plan === 'living' ? '🚀 Living — $49/mo' : '📄 Starter — $9/mo'}</span>
+            <span className="text-xs text-gray-500">{data.hosting_status === 'active' ? '🟢 Hosting — $9/mo' : '👁️ Free Preview'}</span>
 
             <a href={data.website_url || data.preview_url} target="_blank" className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">View Site ↗</a>
 
@@ -907,6 +908,40 @@ export default function ClientDashboard() {
           </div>
         </div>
       </header>
+
+      {/* ═══ Go Live Banner (when hosting not active) ═══ */}
+      {data.hosting_status !== 'active' && (
+        <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border-b border-indigo-500/30">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-lg">🚀</span>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-white">Ready to go live?</p>
+                <p className="text-xs text-gray-400 truncate">Your site is in preview mode. Activate hosting to get your own {data.slug}.autolocal.ai URL — first month free!</p>
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                const res = await fetch('/api/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    product: 'hosting',
+                    email: userEmail,
+                    businessName: data.business_name,
+                    slug: data.slug,
+                  }),
+                })
+                const result = await res.json()
+                if (result.url) window.location.href = result.url
+              }}
+              className="shrink-0 px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
+            >
+              Go Live — $0 Today
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ═══ Section Nav Pills (mobile + tablet) ═══ */}
       <SectionNav activeSection={activeSection} />

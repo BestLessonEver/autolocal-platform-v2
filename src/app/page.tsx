@@ -466,54 +466,38 @@ export default function HomePage() {
           PRICING
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5" id="pricing">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-black mb-12">Simple Pricing</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Free Tier */}
-            <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-8 text-center relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">MOST POPULAR</div>
-              <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">Custom Website</p>
-              <div className="flex items-baseline justify-center gap-2 mb-1">
-                <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Free</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
-              <ul className="space-y-3 mb-8 text-left">
-                {['Custom design for your brand', 'Your real Google reviews & photos', 'SEO + ChatGPT structured data', '1 revision round', 'SSL, mobile-optimized, fast', 'Domain connection help (free)', 'Cancel anytime'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
-                    <span className="text-green-400">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => scrollTo('order')}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
-              >
-                Get Started Free
-              </button>
+          <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-8 text-center relative max-w-md mx-auto">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full">FREE TO START</div>
+            <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">Custom Website + Hosting</p>
+            <div className="flex items-baseline justify-center gap-2 mb-1">
+              <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$0</span>
             </div>
-
-            {/* Premium Tier */}
-            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8 text-center">
-              <p className="text-sm text-gray-400 uppercase tracking-wide mb-2">Premium</p>
-              <div className="flex items-baseline justify-center gap-2 mb-1">
-                <span className="text-6xl font-black text-white">$99</span>
-                <span className="text-gray-500">one-time</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-8">+ $9/mo hosting · Cancel anytime</p>
-              <ul className="space-y-3 mb-8 text-left">
-                {['Everything in Free, plus:', '5 design styles to choose from', '3 revision rounds', '2 free changes per month', 'Priority support', 'Custom color & font matching'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
-                    <span className={i === 0 ? 'text-indigo-400' : 'text-green-400'}>{i === 0 ? '⭐' : '✓'}</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => scrollTo('order')}
-                className="w-full py-4 rounded-xl bg-white/10 border border-white/20 text-white font-bold hover:bg-white/15 transition"
-              >
-                Go Premium — $99
-              </button>
-            </div>
+            <p className="text-sm text-gray-500 mb-2">First month free · Then $9/mo</p>
+            <p className="text-xs text-gray-600 mb-8">Cancel anytime · No contracts</p>
+            <ul className="space-y-3 mb-8 text-left">
+              {[
+                'Custom design for your brand',
+                'Your real Google reviews & photos',
+                '10 unique template styles',
+                'SEO + ChatGPT structured data',
+                'SSL, mobile-optimized, fast',
+                'Dashboard to edit anytime',
+                'Domain connection help (free)',
+                'First month completely free',
+              ].map((f, i) => (
+                <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <span className="text-green-400">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => scrollTo('order')}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
+            >
+              Get My Free Website →
+            </button>
           </div>
         </div>
       </section>
@@ -569,28 +553,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-black text-center mb-2">Get Your Free Custom Website</h2>
           <p className="text-gray-400 text-center mb-10">$0 to build. Just $9/mo hosting. Cancel anytime.</p>
           
-          <form onSubmit={handleCheckout} className="space-y-6">
-            {/* Business type */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-3">What type of business? *</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {BUSINESS_TYPES.map(type => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setOrderForm(f => ({ ...f, businessType: type }))}
-                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                      orderForm.businessType === type
-                        ? 'bg-indigo-600 text-white border border-indigo-500'
-                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/30'
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
+          <form onSubmit={handlePreview} className="space-y-6">
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">Business Name *</label>
@@ -604,14 +567,13 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Your Name *</label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">City</label>
                 <input
-                  required
                   type="text"
-                  value={orderForm.contactName}
-                  onChange={e => setOrderForm(f => ({ ...f, contactName: e.target.value }))}
+                  value={city}
+                  onChange={e => setCity(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
-                  placeholder="Joe Smith"
+                  placeholder="Houston, TX"
                 />
               </div>
             </div>
@@ -622,35 +584,35 @@ export default function HomePage() {
                 <input
                   required
                   type="email"
-                  value={orderForm.email || email}
-                  onChange={e => setOrderForm(f => ({ ...f, email: e.target.value }))}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
                   placeholder="joe@email.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Phone</label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Your Name</label>
                 <input
-                  type="tel"
-                  value={orderForm.phone}
-                  onChange={e => setOrderForm(f => ({ ...f, phone: e.target.value }))}
+                  type="text"
+                  value={contactName}
+                  onChange={e => setContactName(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
-                  placeholder="(555) 123-4567"
+                  placeholder="Joe Smith"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={checkoutLoading}
+              disabled={searching}
               className="w-full py-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl hover:shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
             >
-              {checkoutLoading ? 'Redirecting to checkout...' : 'Get My Free Website'}
+              {searching ? 'Searching...' : 'Build My Free Website ✨'}
             </button>
 
             <div className="text-center space-y-1">
-              <p className="text-gray-500 text-sm">🛡️ Free to build. Cancel hosting anytime. Zero risk.</p>
-              <p className="text-gray-600 text-xs">🔒 Secure payment powered by Stripe</p>
+              <p className="text-gray-500 text-sm">🛡️ 100% free. No credit card required.</p>
+              <p className="text-gray-600 text-xs">See your custom site in 15 seconds</p>
             </div>
           </form>
         </div>
@@ -668,7 +630,7 @@ export default function HomePage() {
               { q: 'What do I need to provide?', a: 'Just your business name. We pull everything else from Google — reviews, photos, hours, contact info.' },
               { q: 'Can I see it before I pay?', a: 'Yes! Enter your business name above and see a live custom preview in 15 seconds. Totally free.' },
               { q: 'How does hosting work?', a: 'Hosting is $9/month — cheaper than any website builder. SSL, speed, uptime all included. Cancel anytime. We help connect your domain for free.' },
-              { q: 'What if I want changes?', a: '1 revision round included free. Upgrade to Premium ($99 one-time) for 3 revision rounds and 2 free changes per month. Extra changes are just $7 each.' },
+              { q: 'What if I want changes?', a: 'You get a full dashboard to edit your site anytime — text, photos, template, colors. Need a custom change? Just $7.' },
               { q: 'I already have a website.', a: 'We build the new site separately. Once you approve it, we help point your domain to it. Zero downtime.' },
               { q: 'What if I don\'t have a domain?', a: 'We recommend Namecheap (~$9/year). We have a step-by-step guide at autolocal.ai/setup, or we\'ll do it for you free.' },
             ].map((item, i) => (

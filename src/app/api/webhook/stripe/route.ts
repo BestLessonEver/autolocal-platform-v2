@@ -112,8 +112,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const businessName = metadata.business_name || ''
   const contactName = metadata.contact_name || ''
   const phone = metadata.phone || ''
-  const businessType = metadata.business_type || ''
-  const product = metadata.product || 'website'
+  const slug = metadata.slug || slugify(businessName)
   const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id || null
 
   if (!email || !businessName) {
@@ -121,9 +120,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return
   }
 
-  const slug = slugify(businessName)
-
-  // Check if preview already exists for this business
+  // Update preview record — mark as hosting active
   const { data: existing } = await supabase
     .from('website_previews')
     .select('id')
@@ -132,34 +129,17 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .single()
 
   if (existing) {
-    // Link existing preview to customer email
     await supabase
       .from('website_previews')
       .update({
         email,
-        status: 'paid',
-        plan: product === 'living' ? 'living' : 'starter',
+        hosting_status: 'active',
+        stripe_customer_id: stripeCustomerId,
       })
       .eq('id', existing.id)
-  } else {
-    // Create new preview record — site will be built manually or via pipeline
-    await supabase.from('website_previews').insert({
-      slug,
-      business_name: businessName,
-      email,
-      category: businessType || 'business',
-      status: 'paid',
-      plan: product === 'living' ? 'living' : 'starter',
-      template: 'bold',
-      brand_color_primary: '#0f172a',
-      brand_color_secondary: '#1e293b',
-      brand_color_accent: '#3b82f6',
-      services: [],
-      view_count: 0,
-    })
   }
 
-  // Create/update client record
+  // Update client record
   const { data: existingClient } = await supabase
     .from('clients')
     .select('id')
@@ -167,12 +147,17 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .limit(1)
     .single()
 
-  if (!existingClient) {
+  if (existingClient) {
+    await supabase.from('clients').update({
+      status: 'active',
+      stripe_customer_id: stripeCustomerId,
+    }).eq('id', existingClient.id)
+  } else {
     const { error: clientErr } = await supabase.from('clients').insert({
       business_name: businessName,
       email,
       phone: phone || null,
-      status: 'paid',
+      status: 'active',
       stripe_customer_id: stripeCustomerId,
     })
     if (clientErr) {
@@ -180,24 +165,23 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Send welcome email — check if we have Google data
+  // Send welcome email
   const hasGoogleData = existing !== null && existing !== undefined
   await sendWelcomeEmail(email, contactName, businessName, hasGoogleData)
 
-  // Auto-deploy to Vercel with {slug}.autolocal.ai subdomain
-  const deploySlug = slug
-  if (deploySlug) {
+  // Auto-deploy to Vercel — site goes LIVE only after hosting is activated
+  if (slug) {
     fetch(`https://autolocal.ai/api/deploy`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': internalAuthHeader(),
       },
-      body: JSON.stringify({ slug: deploySlug }),
+      body: JSON.stringify({ slug }),
     }).then(r => r.json()).then(r => {
-      if (process.env.DEBUG) console.log(`🚀 Auto-deploy for ${deploySlug}: ${r?.success ? 'ok' : 'failed'}`)
+      if (process.env.DEBUG) console.log(`🚀 Auto-deploy for ${slug}: ${r?.success ? 'ok' : 'failed'}`)
     }).catch(err => {
-      console.error(`Deploy error for ${deploySlug}:`, err)
+      console.error(`Deploy error for ${slug}:`, err)
     })
   }
 
@@ -209,7 +193,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .eq('status', 'active')
     .then(() => {})
 
-  if (process.env.DEBUG) console.log(`✅ Checkout complete: ${businessName} (${email}) — ${product}`)
+  if (process.env.DEBUG) console.log(`✅ Hosting activated: ${businessName} (${email})`)
 }
 
 export async function POST(req: Request) {
@@ -261,15 +245,15 @@ export async function POST(req: Request) {
     }
 
     case 'customer.subscription.deleted': {
-      // Handle subscription cancellation — downgrade to starter
+      // Handle subscription cancellation — mark hosting as expired
       const subscription = event.data.object as Stripe.Subscription
-      const email = subscription.metadata?.email
-      if (email) {
+      const subEmail = subscription.metadata?.email
+      if (subEmail) {
         await supabase
           .from('website_previews')
-          .update({ plan: 'starter' })
-          .eq('email', email)
-        if (process.env.DEBUG) console.log(`⚠️ Subscription cancelled: ${email}`)
+          .update({ hosting_status: 'expired' })
+          .eq('email', subEmail)
+        if (process.env.DEBUG) console.log(`⚠️ Hosting cancelled: ${subEmail}`)
       }
       break
     }

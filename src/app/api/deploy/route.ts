@@ -109,7 +109,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Preview not found' }, { status: 404 })
     }
 
-    // 2. Mark as deploying
+    // 2. Check hosting status — only deploy if active
+    if (data.hosting_status !== 'active') {
+      return NextResponse.json({ error: 'Hosting not active. Activate hosting to deploy.', needsHosting: true }, { status: 402 })
+    }
+
+    // 3. Mark as deploying
     await supabase
       .from('website_previews')
       .update({ deploy_status: 'deploying' })

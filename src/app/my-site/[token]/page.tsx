@@ -33,6 +33,7 @@ interface SiteData {
   view_count: number
   created_at: string
   plan: 'starter' | 'living'
+  hosting_status: 'preview' | 'active' | 'expired'
   changes_this_month: number
   free_changes_remaining: number
   unlimited_changes: boolean
@@ -463,11 +464,11 @@ export default function ClientDashboard() {
 
           {/* Status Badge */}
           <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-            data.status === 'published'
+            data.hosting_status === 'active'
               ? 'bg-green-500/20 text-green-400 border border-green-500/20'
-              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20'
+              : 'bg-purple-500/20 text-purple-400 border border-purple-500/20'
           }`}>
-            {data.status === 'published' ? '🟢 LIVE' : '🟡 DRAFT'}
+            {data.hosting_status === 'active' ? '🟢 LIVE' : '👁️ PREVIEW'}
           </span>
 
           {/* Subdomain */}
@@ -494,7 +495,7 @@ export default function ClientDashboard() {
 
           {/* Billing */}
           <span className="hidden md:inline text-xs text-gray-500">
-            {data.plan === 'living' ? '🚀 Living — $49/mo' : '📄 Starter — $9/mo'}
+            {data.hosting_status === 'active' ? '🟢 Hosting — $9/mo' : '👁️ Free Preview'}
           </span>
 
           {/* View Site */}
@@ -507,6 +508,40 @@ export default function ClientDashboard() {
           </a>
         </div>
       </header>
+
+      {/* ═══ Go Live Banner (when hosting not active) ═══ */}
+      {data.hosting_status !== 'active' && (
+        <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border-b border-indigo-500/30">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-lg">🚀</span>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-white">Ready to go live?</p>
+                <p className="text-xs text-gray-400 truncate">Activate hosting to get your own {data.slug}.autolocal.ai URL — first month free!</p>
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                const res = await fetch('/api/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    product: 'hosting',
+                    email: data.email || data.contact_email || '',
+                    businessName: data.business_name,
+                    slug: data.slug,
+                  }),
+                })
+                const result = await res.json()
+                if (result.url) window.location.href = result.url
+              }}
+              className="shrink-0 px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
+            >
+              Go Live — $0 Today
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ═══ Main Layout ═══ */}
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -808,7 +843,7 @@ export default function ClientDashboard() {
               {/* Billing + Feedback row */}
               <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-white/[0.06] text-xs text-gray-500">
                 <span>
-                  {data.plan === 'living' ? '🚀 Living Website — $49/mo' : '📄 Starter — $9/mo'}
+                  {data.hosting_status === 'active' ? '🟢 Hosting Active — $9/mo' : '👁️ Free Preview Mode'}
                 </span>
                 <a href="/api/billing-portal" className="text-indigo-400 hover:underline">Manage Billing</a>
                 <span className="text-gray-700">·</span>
