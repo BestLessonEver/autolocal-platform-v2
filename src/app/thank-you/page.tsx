@@ -60,22 +60,6 @@ function ThankYouContent() {
         </p>
         <p className="text-gray-500 mb-8">Check your email for your dashboard login link.</p>
 
-        {/* Preview Card */}
-        {previewUrl && (
-          <a href={previewUrl} target="_blank" className="block bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 mb-8 hover:border-indigo-500/30 transition group">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-3xl shrink-0">
-                🌐
-              </div>
-              <div className="text-left flex-1">
-                <p className="text-white font-bold group-hover:text-indigo-400 transition">View Your Website Preview</p>
-                <p className="text-gray-500 text-sm">See your site live — customize text, colors, and more</p>
-              </div>
-              <span className="text-gray-600 group-hover:text-indigo-400 transition text-xl">→</span>
-            </div>
-          </a>
-        )}
-
         {/* Next Steps */}
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 mb-8 text-left">
           <h3 className="font-bold text-white text-sm mb-4">What happens next</h3>
@@ -110,23 +94,12 @@ function ThankYouContent() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="/dashboard"
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:shadow-lg hover:shadow-indigo-500/20 transition"
-          >
-            Go to My Dashboard →
-          </a>
-          {previewUrl && (
-            <a
-              href={previewUrl}
-              target="_blank"
-              className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-medium hover:text-white hover:border-white/20 transition"
-            >
-              View My Site
-            </a>
-          )}
-        </div>
+        <a
+          href="/dashboard"
+          className="inline-block px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold hover:shadow-lg hover:shadow-indigo-500/20 transition hover:scale-[1.02] active:scale-[0.98]"
+        >
+          Go to My Dashboard →
+        </a>
 
         <p className="text-gray-600 text-sm mt-10">
           Questions? Email <a href="mailto:brian@autolocal.ai" className="text-indigo-400 hover:underline">brian@autolocal.ai</a>
