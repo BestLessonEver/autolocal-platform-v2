@@ -1184,20 +1184,9 @@ export default function ClientDashboard() {
             </section>
 
             {/* Bottom */}
-            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">Need something special?</h3>
-                {changeSubmitted ? <p className="text-sm text-green-400">✅ Request submitted!</p> : (
-                  <div className="flex gap-2">
-                    <input value={changeMessage} onChange={e => setChangeMessage(e.target.value)} placeholder="Describe what you'd like changed..."
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-gray-500 outline-none focus:border-indigo-500 transition"
-                      onKeyDown={e => { if (e.key === 'Enter') submitChange() }} />
-                    <button onClick={submitChange} disabled={submittingChange || !changeMessage.trim()} className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition disabled:opacity-40">{submittingChange ? '...' : 'Submit'}</button>
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-white/[0.06] text-xs text-gray-500">
-                <span>{data.plan === 'living' ? '🚀 Living — $49/mo' : '📄 Starter — $9/mo'}</span>
+            <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
+              <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                <span>{data.hosting_status === 'active' ? '🟢 Hosting — $9/mo' : '📄 Free Preview'}</span>
                 <button onClick={async () => { try { const res = await fetch('/api/billing-portal', { method: 'POST' }); const d = await res.json(); if (d.url) window.location.href = d.url } catch { /* */ } }} className="text-indigo-400 hover:underline">Manage Billing</button>
                 <span className="text-gray-700">·</span>
                 <a href="mailto:support@autolocal.ai?subject=Feedback" className="hover:text-gray-300 transition">💡 Feedback</a>
