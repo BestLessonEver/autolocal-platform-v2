@@ -90,6 +90,14 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
     hero_crop: (data as any).hero_crop ?? 50,
   })
 
+  // Detect if loaded in an iframe (compact mode for dashboard preview)
+  const [isCompact, setIsCompact] = useState(false)
+  useEffect(() => {
+    if (window.self !== window.top) {
+      setIsCompact(true)
+    }
+  }, [])
+
   // Delay banner appearance by 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => setBannerVisible(true), 3000)
@@ -147,8 +155,26 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
 
   return (
     <>
-      {/* Preview Banner — slides in after 3 seconds */}
-      <div
+      {/* Compact mode CSS — shrinks hero when loaded in dashboard iframe */}
+      {isCompact && (
+        <style>{`
+          [class*="min-h-screen"], [class*="h-screen"], [class*="min-h-[100vh]"], [class*="h-[100vh]"] {
+            min-height: auto !important;
+            height: auto !important;
+          }
+          section:first-of-type, [class*="hero"], header + div, main > div:first-child {
+            max-height: 300px !important;
+            overflow: hidden !important;
+          }
+          img[class*="object-cover"][class*="h-full"],
+          img[class*="object-cover"][class*="h-screen"],
+          img[class*="object-cover"][class*="min-h-"] {
+            max-height: 300px !important;
+          }
+        `}</style>
+      )}
+      {/* Preview Banner — slides in after 3 seconds (hidden in iframe) */}
+      {!isCompact && <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
           bannerVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         }`}
@@ -237,10 +263,10 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
           </button>
         </div>
         )}
-      </div>
+      </div>}
 
-      {/* Edit Panel — slides down below banner */}
-      {editOpen && (
+      {/* Edit Panel — slides down below banner (hidden in iframe) */}
+      {!isCompact && editOpen && (
         <div className="fixed top-[145px] sm:top-[130px] left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-lg">
           <div className="max-w-2xl mx-auto px-4 py-4 space-y-3">
             <div className="grid grid-cols-2 gap-3">
