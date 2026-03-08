@@ -500,7 +500,7 @@ export default function ClientDashboard() {
 
           {/* View Site */}
           <a
-            href={data.preview_url}
+            href={`/preview/${data.slug}?token=${token}`}
             target="_blank"
             className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition"
           >
@@ -859,7 +859,7 @@ export default function ClientDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</h3>
                 <a
-                  href={data.preview_url}
+                  href={`/preview/${data.slug}?token=${token}`}
                   target="_blank"
                   className="text-xs text-indigo-400 hover:underline"
                 >

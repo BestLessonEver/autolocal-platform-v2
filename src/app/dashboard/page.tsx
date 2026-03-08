@@ -605,7 +605,7 @@ function MobileMenu({ data, onLogout, onClose, onSubdomainUpdate, onSiteTypeTogg
         </div>
 
         {/* Actions */}
-        <a href={data.website_url || data.preview_url} target="_blank" className="block w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">View Site ↗</a>
+        <a href={`/preview/${data.slug}`} target="_blank" className="block w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">View Site ↗</a>
         <button onClick={onLogout} className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-sm font-bold hover:text-white transition">Sign Out</button>
       </div>
     </div>
@@ -902,7 +902,7 @@ export default function ClientDashboard() {
 
             <span className="text-xs text-gray-500">{data.hosting_status === 'active' ? '🟢 Hosting — $9/mo' : '👁️ Free Preview'}</span>
 
-            <a href={data.website_url || data.preview_url} target="_blank" className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">View Site ↗</a>
+            <a href={`/preview/${data.slug}`} target="_blank" className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">View Site ↗</a>
 
             <button onClick={handleLogout} className="shrink-0 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white transition">Sign Out</button>
           </div>
@@ -1176,7 +1176,7 @@ export default function ClientDashboard() {
             <div className="sticky top-20">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</h3>
-                <a href={data.preview_url || data.website_url} target="_blank" className="text-xs text-indigo-400 hover:underline">Full size ↗</a>
+                <a href={`/preview/${data.slug}`} target="_blank" className="text-xs text-indigo-400 hover:underline">Full size ↗</a>
               </div>
               <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '270px' }}>
                 <iframe key={previewKey} src={`/preview/${data.slug}?t=${previewKey}`} className="w-[1280px] h-[800px] origin-top-left" style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }} title="Live Preview" />
@@ -1191,8 +1191,8 @@ export default function ClientDashboard() {
         <button onClick={() => setMobilePreview(true)} className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-bold flex items-center justify-center gap-2">
           👁 Preview
         </button>
-        <a href={data.website_url || data.preview_url} target="_blank" className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">
-          View Live Site ↗
+        <a href={`/preview/${data.slug}`} target="_blank" className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">
+          View Site ↗
         </a>
       </div>
 
