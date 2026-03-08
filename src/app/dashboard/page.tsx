@@ -221,7 +221,7 @@ function InlineEdit({
     }
     return <input ref={inputRef as React.RefObject<HTMLInputElement>} value={draft} onChange={e => setDraft(e.target.value)} onBlur={commit}
       onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setDraft(value); setEditing(false) } }}
-      className={`px-3 py-1 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none ${className}`} placeholder={placeholder} />
+      className={`w-full px-3 py-1 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none ${className}`} placeholder={placeholder} />
   }
 
   return <span onClick={() => setEditing(true)} className={`cursor-pointer hover:bg-white/5 rounded px-1 -mx-1 transition inline-block ${!value ? 'text-gray-600 italic' : ''} ${className}`} title="Click to edit">{value || placeholder}</span>

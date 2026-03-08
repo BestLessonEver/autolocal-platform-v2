@@ -194,7 +194,7 @@ function InlineEdit({
           if (e.key === 'Enter') commit()
           if (e.key === 'Escape') { setDraft(value); setEditing(false) }
         }}
-        className={`px-3 py-1 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none ${className}`}
+        className={`w-full px-3 py-1 rounded-lg bg-white/5 border border-indigo-500/50 text-white outline-none ${className}`}
         placeholder={placeholder}
       />
     )
