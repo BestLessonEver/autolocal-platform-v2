@@ -1006,7 +1006,8 @@ export default function ClientDashboard() {
             <section id="sec-template" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-gray-400 mb-3">Design Template</h3>
               <div className="flex gap-3 overflow-x-auto pb-2" ref={el => {
-                if (el) {
+                if (el && !el.dataset.scrolled) {
+                  el.dataset.scrolled = '1'
                   const active = el.querySelector('[data-active-template]') as HTMLElement
                   if (active) active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
                 }
