@@ -1,0 +1,43 @@
+#!/bin/bash
+# AutoLocal Nightly Optimization
+# Runs overnight to refresh Google data, optimize copy, and redeploy improved sites
+# Usage: bash scripts/nightly-optimize.sh [--dry-run]
+#
+# Requires ADMIN_API_KEY env var or reads from Railway
+
+set -euo pipefail
+
+BASE_URL="https://autolocal-platform-v2-production.up.railway.app"
+API_KEY="${ADMIN_API_KEY:-autolocal-admin-f64ef3c27f3268dc17d22572}"
+DRY_RUN=false
+
+if [[ "${1:-}" == "--dry-run" ]]; then
+  DRY_RUN=true
+fi
+
+echo "🌙 AutoLocal Nightly Optimization"
+echo "   Time: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+echo "   Dry run: $DRY_RUN"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+BODY="{\"dryRun\": $DRY_RUN}"
+
+response=$(curl -sS --max-time 120 \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $API_KEY" \
+  -d "$BODY" \
+  "$BASE_URL/api/optimize" 2>&1)
+
+echo "$response" | python3 -m json.tool 2>/dev/null || echo "$response"
+
+# Check for errors
+if echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if 'summary' in d else 1)" 2>/dev/null; then
+  sites_changed=$(echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin)['summary']['sitesChanged'])")
+  echo ""
+  echo "✅ Optimization complete — $sites_changed site(s) improved"
+else
+  echo ""
+  echo "❌ Optimization failed"
+  exit 1
+fi
