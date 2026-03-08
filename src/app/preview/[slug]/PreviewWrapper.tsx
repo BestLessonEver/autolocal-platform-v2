@@ -9,6 +9,11 @@ import ProfessionalTemplate from '@/components/templates/ProfessionalTemplate'
 import ClutchTemplate from '@/components/templates/ClutchTemplate'
 import ArtikaTemplate from '@/components/templates/ArtikaTemplate'
 import BDETemplate from '@/components/templates/BDETemplate'
+import MySpaceTemplate from '@/components/templates/MySpaceTemplate'
+import AIMTemplate from '@/components/templates/AIMTemplate'
+import Win95Template from '@/components/templates/Win95Template'
+import PokemonTemplate from '@/components/templates/PokemonTemplate'
+import ReceiptTemplate from '@/components/templates/ReceiptTemplate'
 
 class TemplateErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -39,13 +44,19 @@ class TemplateErrorBoundary extends Component<
   }
 }
 
-const TEMPLATE_MAP: Record<TemplateName, React.ComponentType<{ data: PreviewData }>> = {
+const TEMPLATE_MAP: Record<string, React.ComponentType<{ data: PreviewData }>> = {
   bold: BoldTemplate,
   elegant: ElegantTemplate,
   professional: ProfessionalTemplate,
   clutch: ClutchTemplate,
   artika: ArtikaTemplate,
   bde: BDETemplate,
+  modern: BDETemplate,
+  myspace: MySpaceTemplate,
+  aim: AIMTemplate,
+  win95: Win95Template,
+  pokemon: PokemonTemplate,
+  receipt: ReceiptTemplate,
 }
 
 const TEMPLATE_OPTIONS: { key: TemplateName; label: string; icon: string }[] = [

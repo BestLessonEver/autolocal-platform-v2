@@ -983,6 +983,201 @@ ${d.logo_url ? `<div class="absolute top-0 left-0 z-20 p-6"><img src="${esc(d.lo
 // ═══════════════════════════════════════════════════════
 // MAIN EXPORT
 // ═══════════════════════════════════════════════════════
+// NOVELTY TEMPLATES
+// ═══════════════════════════════════════════════════════
+
+function myspaceTemplate(d: SiteData): string {
+  const accent = d.brand_color_accent || '#ff00ff'
+  const ind = isIndividual(d)
+  const gallery = getGallery(d)
+  const email = getEmail(d)
+  const heroImg = getHeroImg(d)
+  const daysHtml = DAYS_ORDER.map(day => d.hours[day] ? `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #1a1a1a"><span style="color:#999">${DAY_LABELS[day]?.substring(0,3)}</span><span style="color:#ccc">${esc(d.hours[day])}</span></div>` : '').join('')
+  const servicesHtml = d.services.map(s => `<div style="margin-bottom:6px"><span style="color:${accent};font-weight:bold">${esc(s.name)}</span>${s.price ? `<span style="color:#888;margin-left:8px">${esc(s.price)}</span>` : ''}${s.description ? `<div style="color:#999;font-size:10px;margin-top:2px">${esc(s.description)}</div>` : ''}</div>`).join('')
+  const galleryHtml = gallery.slice(0, 8).map((img, i) => `<div style="text-align:center"><img src="${esc(img)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border:1px solid ${accent}"><div style="color:#5599ff;font-size:9px;margin-top:2px">Friend #${i+1}</div></div>`).join('')
+  const reviewsHtml = d.reviews.map(r => `<div style="background:#111;border:1px solid #2a2a2a;padding:8px;margin-bottom:6px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#5599ff;font-weight:bold;text-decoration:underline">${esc(r.author)}</span><span style="color:#666;font-size:9px">${esc(r.date || 'Posted recently')}</span></div><div style="color:#ccc">"${esc(r.text)}"</div></div>`).join('')
+  const visitors = d.google_review_count ? d.google_review_count * 47 : 1337
+
+  return `
+<div style="min-height:100vh;background:#000;color:#ddd;font-family:Verdana,Arial,sans-serif;font-size:11px">
+<style>.ms-link{color:#5599ff;text-decoration:underline;cursor:pointer}.ms-link:hover{color:#ff66cc}.ms-section{background:#1a1a2e;border:1px solid #333;margin-bottom:8px}.ms-sh{background:#0d0d1a;color:${accent};padding:4px 8px;font-weight:bold;font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #333}</style>
+<div style="background:#003;border-bottom:2px solid ${accent};padding:6px 16px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:bold;color:#fff;font-size:14px">MySpace</span><div style="display:flex;gap:12px;font-size:10px"><span class="ms-link">Home</span><span class="ms-link">Browse</span><span class="ms-link">Search</span></div></div>
+<div style="background:#111;border:1px solid #444;padding:6px 10px;display:flex;align-items:center;gap:8px"><span style="color:#888;font-size:10px">▶</span><div style="flex:1"><div style="color:#ccc;font-size:10px">♫ Now Playing</div><div style="color:${accent};font-size:11px;font-weight:bold">${esc(d.business_name)} — Theme Song</div></div></div>
+<div style="background:linear-gradient(180deg,#003366 0%,#001a33 100%);color:white;padding:8px 12px;font-weight:bold;font-size:13px;border-bottom:2px solid ${accent}">${esc(d.business_name)} <span style="color:#0f0;font-size:10px;margin-left:8px">● Online Now!</span></div>
+<div style="display:flex;max-width:960px;margin:0 auto">
+<div style="width:240px;flex-shrink:0;padding:8px">
+<div class="ms-section"><div style="padding:4px"><img src="${esc(heroImg)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;border:2px solid ${accent}"></div><div style="padding:6px;text-align:center"><div style="color:#fff;font-weight:bold;font-size:13px">"${esc(d.tagline || d.business_name)}"</div>${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" style="width:40px;height:40px;border-radius:50%;margin:6px auto;display:block;object-fit:cover">` : ''}<div style="color:#999;font-size:10px;margin-top:4px">${ind ? 'Individual' : 'Business'} / ${esc(d.city || 'Somewhere')}, ${esc(d.state || 'US')}</div></div></div>
+<div class="ms-section"><div class="ms-sh">Contacting ${ind ? 'Me' : 'Us'}</div><div style="padding:6px">${d.phone ? `<div style="padding:4px;border-bottom:1px solid #222"><a href="tel:${esc(d.phone)}" class="ms-link">📞 ${ind ? 'Call Me' : 'Call Us'}</a></div>` : ''}${email ? `<div style="padding:4px;border-bottom:1px solid #222"><a href="mailto:${esc(email)}" class="ms-link">✉️ Send Message</a></div>` : ''}<div style="padding:4px"><span class="ms-link" style="color:${accent}">⭐ Add to Friends</span></div></div></div>
+</div>
+<div style="flex:1;padding:8px;min-width:0">
+${d.description ? `<div class="ms-section"><div class="ms-sh">About ${ind ? 'Me' : 'Us'}</div><div style="padding:8px;color:#ccc;line-height:1.6">${esc(d.description)}</div></div>` : ''}
+<div style="background:linear-gradient(90deg,transparent,${accent}44,transparent);height:2px;margin:8px 0"></div>
+${d.services.length > 0 ? `<div class="ms-section"><div class="ms-sh">${ind ? 'My Services' : 'Our Services'}</div><div style="padding:8px">${servicesHtml}</div></div>` : ''}
+${gallery.length > 0 ? `<div class="ms-section"><div class="ms-sh">${esc(d.business_name)}'s Top ${Math.min(gallery.length, 8)} Friends</div><div style="padding:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${galleryHtml}</div></div>` : ''}
+${Object.keys(d.hours).length > 0 ? `<div class="ms-section"><div class="ms-sh">Hours</div><div style="padding:8px">${daysHtml}</div></div>` : ''}
+${d.reviews.length > 0 ? `<div class="ms-section"><div class="ms-sh">${esc(d.business_name)}'s Comments (${d.reviews.length})</div><div style="padding:8px">${reviewsHtml}</div></div>` : ''}
+</div></div>
+<div style="text-align:center;padding:16px;border-top:1px solid #222"><div style="display:inline-block;background:#111;border:1px solid #333;padding:2px 8px;font-size:10px;color:#0f0;font-family:monospace">Visitors: ${visitors}</div><div style="color:#444;font-size:8px;margin-top:8px">Powered by AutoLocal.ai</div></div>
+${stickyContactBar(d)}
+</div>`
+}
+
+function aimTemplate(d: SiteData): string {
+  const ind = isIndividual(d)
+  const gallery = getGallery(d)
+  const email = getEmail(d)
+  const warningLevel = d.google_rating ? Math.round((d.google_rating / 5) * 100) : 0
+  const servBuddies = d.services.map(s => `<div style="padding:2px 4px 2px 20px;font-size:11px;display:flex;align-items:center;gap:4px"><span style="color:#0a0;font-size:8px">●</span><span>${esc(s.name)}</span>${s.price ? `<span style="color:#888;font-size:9px;margin-left:auto">${esc(s.price)}</span>` : ''}</div>`).join('')
+  const hoursBuddies = DAYS_ORDER.map(day => d.hours[day] ? `<div style="padding:2px 4px 2px 20px;font-size:11px;display:flex;align-items:center;gap:4px"><span style="color:${d.hours[day].toLowerCase()==='closed' ? '#c80' : '#0a0'};font-size:8px">●</span><span>${DAY_LABELS[day]?.substring(0,3)}: ${esc(d.hours[day])}</span></div>` : '').join('')
+  const chatMsgs = d.reviews.map(r => `<div style="padding:4px 8px;line-height:1.5"><span style="font-weight:bold;color:#060">${esc(r.author)}:</span> "${esc(r.text)}" ${'⭐'.repeat(r.rating)}</div>`).join('')
+
+  return `
+<div style="min-height:100vh;background:#d4d0c8;font-family:Tahoma,Arial,sans-serif;font-size:12px;color:#000">
+<style>.aim-w{background:#ece9d8;border:2px outset #dfdfdf;box-shadow:2px 2px 8px rgba(0,0,0,.3)}.aim-tb{background:linear-gradient(180deg,#0058a8,#003c7a);color:white;padding:3px 6px;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:bold}.aim-btn{width:16px;height:14px;background:#c0c0c0;border:1px outset #dfdfdf;display:inline-flex;align-items:center;justify-content:center;font-size:9px}.aim-bg{background:#d4d0c8;padding:2px 4px;font-weight:bold;font-size:11px;cursor:pointer;border-bottom:1px solid #bbb}</style>
+<div style="display:flex;max-width:900px;margin:0 auto;padding:20px;gap:12px;min-height:100vh">
+<div class="aim-w" style="width:220px;flex-shrink:0;display:flex;flex-direction:column">
+<div class="aim-tb"><span>${ind ? 'My' : 'Our'} Buddy List</span><div style="display:flex;gap:2px"><div class="aim-btn">_</div><div class="aim-btn">□</div><div class="aim-btn">✕</div></div></div>
+<div style="text-align:center;padding:8px;background:#fff;border-bottom:1px solid #bbb">${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:cover">` : '<div style="font-size:36px">🏃</div>'}<div style="font-size:10px;color:#666;margin-top:2px">${esc(d.business_name)}</div></div>
+<div style="flex:1;overflow:auto;background:#fff">
+${d.services.length > 0 ? `<div><div class="aim-bg">📂 Services (${d.services.length})</div>${servBuddies}</div>` : ''}
+${Object.keys(d.hours).length > 0 ? `<div><div class="aim-bg">📂 Hours</div>${hoursBuddies}</div>` : ''}
+<div><div class="aim-bg">📂 Contact</div>${d.phone ? `<div style="padding:2px 4px 2px 20px;font-size:11px"><span style="color:#0a0;font-size:8px">●</span> <a href="tel:${esc(d.phone)}" style="color:inherit;text-decoration:none">${esc(d.phone)}</a></div>` : ''}${email ? `<div style="padding:2px 4px 2px 20px;font-size:10px"><span style="color:#0a0;font-size:8px">●</span> ${esc(email)}</div>` : ''}</div>
+${gallery.length > 0 ? `<div><div class="aim-bg">📂 Photos (${gallery.length})</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:4px">${gallery.slice(0,9).map(img => `<img src="${esc(img)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover">`).join('')}</div></div>` : ''}
+</div>
+<div style="background:#ffffcc;border:1px solid #cc9;padding:6px;text-align:center;font-size:10px"><div style="font-weight:bold;color:#630">📢 ${esc(d.tagline || 'Visit ' + d.business_name + '!')}</div>${d.phone ? `<a href="tel:${esc(d.phone)}" style="color:#06c;font-weight:bold;font-size:11px">${ind ? 'Call Me' : 'Call Us'}: ${esc(d.phone)}</a>` : ''}</div>
+</div>
+<div class="aim-w" style="flex:1;display:flex;flex-direction:column">
+<div class="aim-tb"><span>💬 Instant Message with ${esc(d.business_name)}</span><div style="display:flex;gap:2px"><div class="aim-btn">_</div><div class="aim-btn">□</div><div class="aim-btn">✕</div></div></div>
+${d.google_rating ? `<div style="background:#ece9d8;padding:2px 8px;border-bottom:1px solid #bbb;display:flex;align-items:center;gap:6px;font-size:10px"><span>Warning Level:</span><div style="flex:1;max-width:120px;height:10px;background:#fff;border:1px inset #888"><div style="width:${warningLevel}%;height:100%;background:${warningLevel>80?'#0a0':warningLevel>60?'#ca0':'#c00'}"></div></div><span style="font-weight:bold">${warningLevel}%</span><span style="color:#888">(${d.google_rating}★)</span></div>` : ''}
+${d.hero_image_url ? `<div style="padding:8px;background:#fff;border-bottom:1px solid #bbb"><img src="${esc(d.hero_image_url)}" alt="" style="width:100%;max-height:250px;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;border:1px solid #ccc"></div>` : ''}
+<div style="flex:1;background:#fff;overflow:auto;padding:4px">
+<div style="padding:4px 8px;line-height:1.5"><span style="font-weight:bold;color:#00c">${esc(d.business_name)}:</span> 🚪 ${esc(d.business_name)} has entered the chat</div>
+${d.description ? `<div style="padding:4px 8px;line-height:1.5"><span style="font-weight:bold;color:#00c">${esc(d.business_name)}:</span> ${esc(d.description)}</div>` : ''}
+${d.services.length > 0 ? `<div style="padding:4px 8px"><span style="font-weight:bold;color:#c00">You:</span> What services do you offer?</div><div style="padding:4px 8px"><span style="font-weight:bold;color:#00c">${esc(d.business_name)}:</span> ${ind ? 'I offer' : 'We offer'}: ${d.services.map(s => esc(s.name)).join(', ')}</div>` : ''}
+${d.reviews.length > 0 ? `<div style="border-top:1px solid #eee;margin-top:8px;padding-top:8px;padding-left:8px;color:#888;font-size:10px">— What people are saying —</div>${chatMsgs}` : ''}
+</div>
+<div style="padding:4px;background:#ece9d8;border-top:1px solid #bbb"><textarea style="width:100%;border:2px inset #888;padding:4px;font-family:Tahoma,Arial,sans-serif;font-size:12px;background:white;resize:none" rows="2" placeholder="Send a message..." readonly></textarea><div style="display:flex;justify-content:flex-end;gap:4px;margin-top:4px"><a href="${d.phone ? `tel:${esc(d.phone)}` : '#'}" style="padding:3px 16px;background:#ece9d8;border:2px outset #dfdfdf;font-size:11px;font-weight:bold;text-decoration:none;color:#000">${d.phone ? (ind ? 'Call Me' : 'Call Us') : 'Send'}</a></div></div>
+<div style="background:#ece9d8;padding:2px 6px;border-top:1px solid #bbb;font-size:9px;color:#888;text-align:center">Powered by AutoLocal.ai</div>
+</div></div>
+${stickyContactBar(d)}
+</div>`
+}
+
+function win95Template(d: SiteData): string {
+  const ind = isIndividual(d)
+  const gallery = getGallery(d)
+  const email = getEmail(d)
+  const servicesHtml = d.services.map(s => `<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid #a0a0a0"><div style="width:13px;height:13px;border:2px inset #808080;background:white;display:inline-flex;align-items:center;justify-content:center;font-size:10px;margin-right:6px">✓</div><div style="flex:1"><span style="font-weight:bold">${esc(s.name)}</span>${s.price ? `<span style="color:#000080;margin-left:8px">${esc(s.price)}</span>` : ''}${s.description ? `<div style="color:#444;font-size:10px;margin-top:2px">${esc(s.description)}</div>` : ''}</div></div>`).join('')
+  const galleryHtml = gallery.map((img, i) => `<div style="text-align:center"><div style="border:1px solid #808080;padding:2px;background:#fff"><img src="${esc(img)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;display:block"></div><div style="font-size:9px;color:#444;margin-top:2px">photo_${i+1}.jpg</div></div>`).join('')
+  const hoursHtml = DAYS_ORDER.map(day => `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #ccc"><span style="font-weight:${d.hours[day]?'bold':'normal'};color:${d.hours[day]?'#000':'#888'}">${DAY_LABELS[day]}</span><span>${esc(d.hours[day] || 'Closed')}</span></div>`).join('')
+  const reviewsHtml = d.reviews.map(r => `<div style="border:2px inset #808080;background:#fff;padding:8px;margin-bottom:6px"><div style="display:flex;justify-content:space-between"><span style="font-weight:bold;color:#000080">${esc(r.author)}</span><span style="color:#888;font-size:9px">${esc(r.date||'')}</span></div><div style="color:#c80;font-size:10px">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><div style="margin-top:4px">"${esc(r.text)}"</div></div>`).join('')
+
+  return `
+<div style="min-height:100vh;background:#008080;font-family:'MS Sans Serif',Tahoma,Arial,sans-serif;font-size:11px;color:#000;cursor:default;padding-bottom:36px">
+<style>.w95-w{background:#c0c0c0;border:2px outset #dfdfdf;box-shadow:2px 2px 0 #000}.w95-tb{background:#000080;color:white;padding:2px 4px;display:flex;align-items:center;justify-content:space-between;font-weight:bold;font-size:11px}.w95-b{width:16px;height:14px;background:#c0c0c0;border:1px outset #dfdfdf;display:inline-flex;align-items:center;justify-content:center;font-size:8px}.w95-btn{padding:3px 16px;border:2px outset #dfdfdf;background:#c0c0c0;font-family:inherit;font-size:11px;cursor:pointer;text-decoration:none;color:#000;display:inline-block}</style>
+<div style="padding:16px;display:flex;flex-direction:column;gap:24px;position:absolute;top:0;left:8px">
+<div style="text-align:center;width:64px"><div style="font-size:32px">💻</div><div style="color:white;font-size:11px;text-shadow:1px 1px 0 #000">My Computer</div></div>
+<div style="text-align:center;width:64px"><div style="font-size:32px">📁</div><div style="color:white;font-size:11px;text-shadow:1px 1px 0 #000">My Documents</div></div>
+</div>
+<div class="w95-w" style="max-width:720px;margin:24px auto">
+<div class="w95-tb"><div style="display:flex;align-items:center;gap:4px">${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" style="width:16px;height:16px;object-fit:cover">` : ''}<span>${esc(d.business_name)} — Properties</span></div><div style="display:flex;gap:2px"><div class="w95-b">_</div><div class="w95-b">□</div><div class="w95-b">✕</div></div></div>
+<div style="background:#c0c0c0;padding:1px 0;border-bottom:1px solid #808080"><span style="padding:1px 8px;font-size:11px">File</span><span style="padding:1px 8px;font-size:11px">Edit</span><span style="padding:1px 8px;font-size:11px">View</span><span style="padding:1px 8px;font-size:11px">Help</span></div>
+${d.hero_image_url ? `<div style="padding:8px 8px 0"><div style="border:2px inset #808080;background:#fff;padding:2px"><img src="${esc(d.hero_image_url)}" alt="" style="width:100%;max-height:280px;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;display:block"></div></div>` : ''}
+<div style="margin:0 8px 8px;border:2px inset #808080;background:#c0c0c0;padding:12px;min-height:300px">
+<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">${d.logo_url ? `<img src="${esc(d.logo_url)}" alt="" style="width:48px;height:48px;object-fit:cover;border:1px solid #808080">` : ''}<div><div style="font-weight:bold;font-size:14px">${esc(d.business_name)}</div>${d.tagline ? `<div style="color:#444;margin-top:2px">${esc(d.tagline)}</div>` : ''}${d.google_rating ? `<div style="margin-top:4px;color:#000080">★ ${d.google_rating}/5${d.google_review_count >= 20 ? ` (${d.google_review_count} reviews)` : ''}</div>` : ''}</div></div>
+${d.description ? `<div style="border:2px inset #808080;background:#fff;padding:8px;line-height:1.6;margin-bottom:12px">${esc(d.description)}</div>` : ''}
+<div style="font-weight:bold;margin-bottom:4px">📋 Contact Information:</div>
+<div style="border:2px inset #808080;background:#fff;padding:8px;margin-bottom:12px">${d.phone ? `<div>📞 Phone: <a href="tel:${esc(d.phone)}" style="color:#000080">${esc(d.phone)}</a></div>` : ''}${email ? `<div>✉️ Email: <a href="mailto:${esc(email)}" style="color:#000080">${esc(email)}</a></div>` : ''}${d.address ? `<div>📍 Address: ${esc(d.address)}${d.city ? ', '+esc(d.city) : ''}${d.state ? ', '+esc(d.state) : ''}</div>` : ''}</div>
+${d.services.length > 0 ? `<div style="font-weight:bold;margin-bottom:8px">📋 Available Services:</div>${servicesHtml}` : ''}
+${gallery.length > 0 ? `<div style="font-weight:bold;margin:12px 0 8px">📁 My Pictures</div><div style="border:2px inset #808080;background:#fff;padding:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px">${galleryHtml}</div>` : ''}
+${Object.keys(d.hours).length > 0 ? `<div style="font-weight:bold;margin:12px 0 8px">🕐 Business Hours:</div><div style="border:2px inset #808080;background:#fff;padding:8px">${hoursHtml}</div>` : ''}
+${d.reviews.length > 0 ? `<div style="font-weight:bold;margin:12px 0 8px">💬 Reviews:</div>${reviewsHtml}` : ''}
+</div>
+<div style="padding:0 8px 8px;display:flex;justify-content:flex-end;gap:6px">${d.phone ? `<a href="tel:${esc(d.phone)}" class="w95-btn" style="font-weight:bold">📞 ${ind ? 'Call Me' : 'Call Us'}</a>` : ''}<span class="w95-btn">OK</span><span class="w95-btn">Cancel</span></div>
+</div>
+<div style="position:fixed;bottom:0;left:0;right:0;height:28px;background:#c0c0c0;border-top:2px outset #dfdfdf;display:flex;align-items:center;padding:2px 4px;z-index:50"><div style="border:2px outset #dfdfdf;background:#c0c0c0;padding:2px 8px;display:flex;align-items:center;gap:4px;font-weight:bold;font-size:11px;height:22px">🪟 Start</div><div style="flex:1;padding:0 8px"><div style="border:2px outset #dfdfdf;padding:2px 8px;font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📋 ${esc(d.business_name)}</div></div><div style="border:1px inset #808080;padding:2px 8px;font-size:11px">${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}</div></div>
+<div style="text-align:center;padding-bottom:40px;color:#006666;font-size:9px">Powered by AutoLocal.ai</div>
+${stickyContactBar(d)}
+</div>`
+}
+
+function pokemonTemplate(d: SiteData): string {
+  const ind = isIndividual(d)
+  const heroImg = getHeroImg(d)
+  const gallery = getGallery(d)
+  const accent = d.brand_color_accent || '#6890f0'
+  const hp = d.google_rating ? Math.round(d.google_rating * 20) : 80
+  const attacksHtml = d.services.slice(0, 4).map((s, i) => `<div style="padding:8px 0;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:8px"><div style="display:flex;gap:1px">${Array.from({length:Math.min(i+1,3)}).map(() => `<span style="width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:white;background:${accent};border:1px solid rgba(0,0,0,.2)">W</span>`).join('')}</div><div style="flex:1"><div style="font-weight:bold;font-size:14px">${esc(s.name)}</div>${s.description ? `<div style="font-size:10px;color:#666;font-style:italic">${esc(s.description)}</div>` : ''}</div><div style="font-size:20px;font-weight:bold;color:#333">${esc(s.price || String((i+1)*30))}</div></div>`).join('')
+  const reviewsHtml = d.reviews.map(r => `<div style="background:rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.1)"><div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#fff;font-weight:bold;font-size:12px">${esc(r.author)}</span><span style="color:#ffd700;font-size:11px">${'★'.repeat(r.rating)}</span></div><div style="color:#ccc;font-size:11px;margin-top:4px;font-style:italic">"${esc(r.text)}"</div></div>`).join('')
+  const hoursHtml = DAYS_ORDER.map(day => d.hours[day] ? `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);color:#ccc;font-size:12px"><span>${DAY_LABELS[day]?.substring(0,3)}</span><span>${esc(d.hours[day])}</span></div>` : '').join('')
+  const galleryHtml = gallery.map(img => `<div style="border-radius:8px;overflow:hidden;border:2px solid #ffd700;aspect-ratio:3/4"><img src="${esc(img)}" alt="" style="width:100%;height:100%;object-fit:cover"></div>`).join('')
+
+  return `
+<div style="min-height:100vh;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 16px">
+<style>@keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.poke-holo{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,0,0,.08) 0%,rgba(255,165,0,.08) 15%,rgba(255,255,0,.08) 30%,rgba(0,128,0,.08) 45%,rgba(0,0,255,.08) 60%,rgba(75,0,130,.08) 75%,rgba(238,130,238,.08) 100%);background-size:400% 400%;animation:holo 4s ease infinite;pointer-events:none;border-radius:16px;z-index:2}</style>
+<div style="max-width:420px;width:100%;border-radius:16px;padding:12px;position:relative;overflow:hidden;background:linear-gradient(145deg,#f5f5dc 0%,#eef3ff 30%,#fffde8 100%);border:6px solid ${accent};box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5)">
+<div class="poke-holo"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 4px 8px;position:relative;z-index:1"><div><div style="font-size:9px;color:#888">Stage 1 — Evolves from ${esc(d.city || 'local')} startup</div><div style="font-size:20px;font-weight:bold;color:#333">${esc(d.business_name)}</div></div><div style="text-align:right"><span style="font-size:12px;color:#888">HP </span><span style="font-size:24px;font-weight:bold;color:#c00">${hp}</span></div></div>
+<div style="border:3px solid ${accent};border-radius:8px;overflow:hidden;margin:0 4px;position:relative;z-index:1"><img src="${esc(heroImg)}" alt="" style="width:100%;height:220px;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;display:block">${d.logo_url ? `<div style="position:absolute;bottom:8px;right:8px;width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,.3)"><img src="${esc(d.logo_url)}" alt="" style="width:100%;height:100%;object-fit:cover"></div>` : ''}</div>
+<div style="display:flex;justify-content:space-between;padding:6px 8px;font-size:10px;color:#666;position:relative;z-index:1"><span>${esc(d.city || 'Local')}${d.state ? ', '+esc(d.state) : ''}</span><span>No. 001 · ${ind ? 'Solo' : 'Business'}</span></div>
+<div style="padding:4px 8px;position:relative;z-index:1">${attacksHtml || `<div style="padding:8px 0;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:${accent};display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:bold">W</span><div style="flex:1"><div style="font-weight:bold;font-size:14px">Tackle</div><div style="font-size:10px;color:#666;font-style:italic">A basic but effective approach</div></div><div style="font-size:20px;font-weight:bold">40</div></div>`}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid #ccc;padding:8px;font-size:10px;position:relative;z-index:1"><div style="text-align:center"><div style="color:#888;font-size:9px">weakness</div><div>🔥 ×2</div></div><div style="text-align:center"><div style="color:#888;font-size:9px">resistance</div><div>🛡️ -30</div></div><div style="text-align:center"><div style="color:#888;font-size:9px">retreat cost</div><div>⚪</div></div></div>
+<div style="padding:8px;font-size:10px;font-style:italic;color:#555;border-top:1px solid #ccc;line-height:1.5;position:relative;z-index:1">${esc(d.description || d.business_name + ' is known throughout ' + (d.city || 'the region') + ' for providing exceptional services.')}</div>
+<div style="display:flex;justify-content:space-between;padding:4px 8px 2px;font-size:8px;color:#999;position:relative;z-index:1"><span>Illus. AutoLocal.ai</span><span>©${new Date().getFullYear()} ${esc(d.business_name)}</span><span>001/001 ★</span></div>
+</div>
+<a href="${d.phone ? `tel:${esc(d.phone)}` : '#'}" style="display:inline-block;margin-top:24px;padding:14px 40px;background:${accent};color:#fff;border-radius:50px;font-weight:bold;font-size:16px;text-decoration:none;box-shadow:0 4px 20px ${accent}66">${d.phone ? (ind ? '📱 Call Me' : '📱 Call Us') : 'Get Started'}</a>
+${d.reviews.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">⚡ Trainer Reviews</div>${reviewsHtml}</div>` : ''}
+${gallery.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🃏 Card Collection</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${galleryHtml}</div></div>` : ''}
+${Object.keys(d.hours).length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px;background:rgba(255,255,255,.05);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,.1)"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🕐 Gym Hours</div>${hoursHtml}</div>` : ''}
+<div style="max-width:420px;width:100%;margin-top:16px;text-align:center;padding:16px;color:#888;font-size:11px">${d.address ? `<div>📍 ${esc(d.address)}${d.city?', '+esc(d.city):''}${d.state?', '+esc(d.state):''}</div>` : ''}${d.phone ? `<div style="margin-top:4px">📞 ${esc(d.phone)}</div>` : ''}<div style="margin-top:12px;color:#555;font-size:9px">Powered by AutoLocal.ai</div></div>
+${stickyContactBar(d)}
+</div>`
+}
+
+function receiptTemplate(d: SiteData): string {
+  const ind = isIndividual(d)
+  const gallery = getGallery(d)
+  const email = getEmail(d)
+  const now = new Date()
+  const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}/${now.getFullYear()}`
+  const txn = d.google_review_count ? String(d.google_review_count * 73).padStart(6, '0') : '001337'
+  const div1 = '════════════════════════════════════════'
+  const div2 = '────────────────────────────────────────'
+  const servicesHtml = d.services.map(s => `<div style="display:flex;justify-content:space-between;align-items:baseline"><span>${esc(s.name.toUpperCase())}</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;min-width:20px;align-self:flex-end;margin-bottom:3px"></span><span>${esc(s.price || '---')}</span></div>${s.description ? `<div style="font-size:9px;color:#888;padding-left:8px">&nbsp;&nbsp;${esc(s.description)}</div>` : ''}`).join('')
+  const hoursHtml = DAYS_ORDER.map(day => d.hours[day] ? `<div style="display:flex;justify-content:space-between;align-items:baseline"><span>${day.toUpperCase()}</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;min-width:20px;align-self:flex-end;margin-bottom:3px"></span><span>${esc(d.hours[day])}</span></div>` : '').join('')
+  const reviewsHtml = d.reviews.map((r, i) => `<div style="margin-bottom:8px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="font-weight:bold">#${i+1} — ${esc(r.author)}</span><span>${'★'.repeat(r.rating)}</span></div><div style="color:#555;font-style:italic">"${esc(r.text)}"</div></div>`).join('')
+  const barcodeHtml = Array.from({length:40}).map(() => `<span style="display:inline-block;height:40px;background:#1a1a1a;width:${Math.random()>0.5?'2':'1'}px"></span>`).join('')
+  const galleryHtml = gallery.slice(0,6).map(img => `<img src="${esc(img)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;filter:contrast(1.05)">`).join('')
+
+  return `
+<div style="min-height:100vh;background:#e8e4de;font-family:'Courier New',Courier,monospace;display:flex;justify-content:center;padding:32px 16px">
+<style>.r-div{color:#888;overflow:hidden;white-space:nowrap;text-align:center;letter-spacing:1px}.r-thin{color:#aaa;overflow:hidden;white-space:nowrap;text-align:center}.r-ctr{text-align:center}.receipt{max-width:420px;width:100%;background:#fafaf7;padding:32px 24px;box-shadow:0 2px 20px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.05);position:relative;color:#1a1a1a;font-size:12px;line-height:1.6}.receipt::after{content:'';position:absolute;bottom:-12px;left:0;right:0;height:12px;background:linear-gradient(135deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(225deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(315deg,#fafaf7 33.33%,transparent 33.33%),linear-gradient(45deg,#fafaf7 33.33%,transparent 33.33%);background-size:24px 12px}</style>
+<div class="receipt">
+${d.logo_url ? `<div class="r-ctr" style="margin-bottom:12px"><img src="${esc(d.logo_url)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:4px;filter:grayscale(30%)"></div>` : ''}
+<div class="r-ctr" style="font-weight:bold;font-size:22px;letter-spacing:3px;margin-bottom:4px">${esc(d.business_name.toUpperCase())}</div>
+${d.tagline ? `<div class="r-ctr" style="font-size:10px;color:#666;margin-bottom:4px">${esc(d.tagline)}</div>` : ''}
+<div class="r-ctr" style="font-size:10px;color:#888;margin-bottom:8px">${d.address ? `<div>${esc(d.address)}</div>` : ''}${d.city ? `<div>${esc(d.city)}${d.state ? ', '+esc(d.state) : ''}</div>` : ''}${d.phone ? `<div>TEL: ${esc(d.phone)}</div>` : ''}${email ? `<div>${esc(email)}</div>` : ''}</div>
+<div class="r-div">${div1}</div>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:#666;padding:4px 0"><span>DATE: ${dateStr}</span><span>TXN #: ${txn}</span></div>
+<div class="r-thin">${div2}</div>
+${d.hero_image_url ? `<div style="margin:8px 0"><img src="${esc(d.hero_image_url)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;filter:contrast(1.1);border:1px solid #ddd"></div>` : ''}
+${d.services.length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">SERVICES</div>${servicesHtml}</div><div class="r-thin">${div2}</div><div style="margin:4px 0 8px"><div style="display:flex;justify-content:space-between"><span>ITEMS</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;align-self:flex-end;margin-bottom:3px"></span><span>${d.services.length}</span></div><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:14px;margin-top:4px"><span>SATISFACTION</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;align-self:flex-end;margin-bottom:3px"></span><span>GUARANTEED</span></div></div>` : ''}
+<div class="r-div">${div1}</div>
+${d.description ? `<div style="border:1px dashed #ccc;padding:8px;margin:8px 0;font-size:11px"><div style="font-weight:bold;font-size:10px;margin-bottom:4px">*** MEMO ***</div>${esc(d.description)}</div>` : ''}
+${Object.keys(d.hours).length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">HOURS OF OPERATION</div>${hoursHtml}</div><div class="r-thin">${div2}</div>` : ''}
+${d.reviews.length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">CUSTOMER REVIEWS</div>${reviewsHtml}</div>` : ''}
+${d.google_rating ? `<div class="r-thin">${div2}</div><div class="r-ctr" style="font-weight:bold;margin:8px 0">RATING: ${'★'.repeat(Math.round(d.google_rating))}${'☆'.repeat(5-Math.round(d.google_rating))} (${d.google_rating})${d.google_review_count >= 20 ? `<div style="font-size:10px;color:#888">${d.google_review_count} REVIEWS ON GOOGLE</div>` : ''}</div>` : ''}
+<div class="r-div">${div1}</div>
+${gallery.length > 0 ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0">${galleryHtml}</div>` : ''}
+<div style="display:flex;justify-content:center;gap:1px;margin:16px 0 8px">${barcodeHtml}</div>
+<div class="r-ctr" style="font-weight:bold;font-size:14px;letter-spacing:2px;margin:8px 0">THANK YOU!</div>
+${d.phone ? `<div class="r-ctr" style="margin:8px 0"><a href="tel:${esc(d.phone)}" style="display:inline-block;border:2px solid #1a1a1a;padding:8px 24px;font-weight:bold;font-size:14px;color:#1a1a1a;text-decoration:none;font-family:inherit;letter-spacing:1px">${ind ? 'CALL ME' : 'CALL US'}: ${esc(d.phone)}</a></div>` : ''}
+<div class="r-ctr" style="font-size:9px;color:#aaa;margin-top:16px">Powered by AutoLocal.ai</div>
+</div>
+${stickyContactBar(d)}
+</div>`
+}
+
 const TEMPLATE_MAP: Record<string, (d: SiteData) => string> = {
   modern: bdeTemplate,
   bold: boldTemplate,
@@ -991,6 +1186,11 @@ const TEMPLATE_MAP: Record<string, (d: SiteData) => string> = {
   clutch: clutchTemplate,
   artika: artikaTemplate,
   bde: bdeTemplate,
+  myspace: myspaceTemplate,
+  aim: aimTemplate,
+  win95: win95Template,
+  pokemon: pokemonTemplate,
+  receipt: receiptTemplate,
 }
 
 export function generateStaticHtml(data: any, template: string): string {

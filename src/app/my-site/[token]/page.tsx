@@ -57,6 +57,11 @@ const TEMPLATES = [
   { id: 'professional', name: 'Professional', emoji: '💼' },
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
+  { id: 'myspace', name: 'MySpace', emoji: '🎵' },
+  { id: 'aim', name: 'AIM', emoji: '💬' },
+  { id: 'win95', name: 'Win95', emoji: '🖥️' },
+  { id: 'pokemon', name: 'Pokémon', emoji: '⚡' },
+  { id: 'receipt', name: 'Receipt', emoji: '🧾' },
 ]
 
 const COLOR_PALETTES = [
