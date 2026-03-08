@@ -130,16 +130,12 @@ export default function HomePage() {
         return
       }
       await new Promise(r => setTimeout(r, 1500))
-      // Auto-sign in if we got a token, then redirect
+      // Route through auto-login page if we got a token
       if (data.autoLoginToken) {
-        const { createClient } = await import('@supabase/supabase-js')
-        const sb = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
-        await sb.auth.verifyOtp({ token_hash: data.autoLoginToken, type: 'magiclink' }).catch(() => {})
+        router.push(`/auth/auto-login?token=${encodeURIComponent(data.autoLoginToken)}&next=${encodeURIComponent(data.previewUrl)}`)
+      } else {
+        router.push(data.previewUrl)
       }
-      router.push(data.previewUrl)
     } catch {
       setError('Connection error. Please try again.')
       setLoading(false)
