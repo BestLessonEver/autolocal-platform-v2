@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import dns from 'dns'
 import { validateInternalAuth } from '@/lib/internal-auth'
 
+// Force IPv4 DNS resolution — Railway can't reach Gmail SMTP over IPv6
+dns.setDefaultResultOrder('ipv4first')
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SMTP_USER || 'brian@autolocal.ai',
     pass: process.env.SMTP_PASS, // Google App Password
