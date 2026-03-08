@@ -74,7 +74,7 @@ function resolveTemplate(data: PreviewData): TemplateName {
   return categoryToTemplate(data.category)
 }
 
-export default function PreviewWrapper({ data }: { data: PreviewData }) {
+export default function PreviewWrapper({ data, accessToken }: { data: PreviewData; accessToken?: string }) {
   const isPurchased = !!data.website_current
   const [bannerVisible, setBannerVisible] = useState(false)
   const [activeTemplate, setActiveTemplate] = useState<TemplateName>(() => resolveTemplate(data))
@@ -161,7 +161,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
             <div className="flex items-center gap-3 shrink-0">
               {isPurchased ? (
                 <a
-                  href="/dashboard"
+                  href={accessToken ? `/my-site/${accessToken}` : '/dashboard'}
                   className="px-4 py-1.5 bg-white text-emerald-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
                   Go to Dashboard →

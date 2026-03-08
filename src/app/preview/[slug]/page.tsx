@@ -50,7 +50,8 @@ export default async function PreviewPage({ params, searchParams }: Props & { se
   // If hosting is active (deployed), the preview is public
   if (data.hosting_status === 'active') {
     void supabase.rpc('increment_preview_views', { preview_slug: params.slug })
-    return <PreviewWrapper data={data} />
+    const activeToken = data.id ? `${data.id.substring(0, 8)}-${params.slug}` : undefined
+    return <PreviewWrapper data={data} accessToken={activeToken} />
   }
 
   // For non-active sites, require authentication — owner, admin, or valid token
@@ -110,5 +111,6 @@ export default async function PreviewPage({ params, searchParams }: Props & { se
   }
 
   void supabase.rpc('increment_preview_views', { preview_slug: params.slug })
-  return <PreviewWrapper data={data} />
+  const previewAccessToken = (token as string) || (data.id ? `${data.id.substring(0, 8)}-${params.slug}` : undefined)
+  return <PreviewWrapper data={data} accessToken={previewAccessToken} />
 }
