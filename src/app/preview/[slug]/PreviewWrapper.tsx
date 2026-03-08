@@ -155,31 +155,10 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
 
   return (
     <>
-      {/* Compact mode CSS — shrinks hero when loaded in dashboard iframe */}
+      {/* Compact mode — just hide fixed overlays in iframe */}
       {isCompact && (
         <style>{`
-          .compact-preview section:first-of-type,
-          .compact-preview > div > section:first-of-type,
-          .compact-preview > div > div > section:first-of-type {
-            min-height: 250px !important;
-            max-height: 250px !important;
-            height: 250px !important;
-            overflow: hidden !important;
-          }
-          .compact-preview section:first-of-type img,
-          .compact-preview > div > section:first-of-type img {
-            max-height: 250px !important;
-          }
-          .compact-preview .min-h-screen { min-height: auto !important; }
-          .compact-preview .min-h-\\[80vh\\] { min-height: 250px !important; }
-          .compact-preview .min-h-\\[70vh\\] { min-height: 250px !important; }
-          .compact-preview .min-h-\\[100vh\\] { min-height: auto !important; }
-          .compact-preview .h-\\[80vh\\] { height: 250px !important; }
-          .compact-preview .h-\\[70vh\\] { height: 250px !important; }
-          .compact-preview .h-screen { height: auto !important; }
-          .compact-preview .min-h-\\[500px\\] { min-height: 250px !important; }
-          .compact-preview .min-h-\\[550px\\] { min-height: 250px !important; }
-          .compact-preview .min-h-\\[600px\\] { min-height: 250px !important; }
+          .fixed { display: none !important; }
         `}</style>
       )}
       {/* Preview Banner — slides in after 3 seconds (hidden in iframe) */}
@@ -388,11 +367,9 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
       )}
 
       {/* Template content — no forced top padding, let the site breathe */}
-      <div className={isCompact ? 'compact-preview' : ''}>
-        <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
-          <Template data={filteredData} />
-        </TemplateErrorBoundary>
-      </div>
+      <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
+        <Template data={filteredData} />
+      </TemplateErrorBoundary>
 
       {/* Powered by AutoLocal — above sticky call bar on mobile */}
       <div className="fixed bottom-20 sm:bottom-4 right-4 z-50">
