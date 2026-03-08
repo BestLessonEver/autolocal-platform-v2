@@ -866,15 +866,17 @@ export default function ClientDashboard() {
                   Full size ↗
                 </a>
               </div>
-              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '680px' }}>
-                <iframe
-                  ref={iframeRef}
-                  key={previewKey}
-                  src={`/preview/${data.slug}?token=${token}&t=${previewKey}`}
-                  className="w-[1280px] h-[2400px] origin-top-left"
-                  style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }}
-                  title="Live Preview"
-                />
+              <div className="rounded-xl border border-white/10 overflow-hidden overflow-y-auto bg-white" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+                <div style={{ width: '420px', height: '787px', position: 'relative' }}>
+                  <iframe
+                    ref={iframeRef}
+                    key={previewKey}
+                    src={`/preview/${data.slug}?token=${token}&t=${previewKey}`}
+                    className="w-[1280px] h-[2400px] origin-top-left"
+                    style={{ transform: 'scale(0.328)', transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 }}
+                    title="Live Preview"
+                  />
+                </div>
               </div>
             </div>
           </div>
