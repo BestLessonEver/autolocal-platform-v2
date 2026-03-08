@@ -220,8 +220,8 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    // Photos
-    const photoUrls = (place.photos || []).slice(0, 4).map((p: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    // Photos — grab all available (Google returns up to 10)
+    const photoUrls = (place.photos || []).slice(0, 10).map((p: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       const pname = p.name || ''
       return pname ? `https://places.googleapis.com/v1/${pname}/media?maxWidthPx=800&key=${GOOGLE_PLACES_KEY}` : ''
     }).filter(Boolean)
@@ -262,7 +262,7 @@ export async function POST(req: NextRequest) {
       brand_color_secondary: secondary,
       brand_color_accent: accent,
       hero_image_url: photoUrls[0] || '',
-      gallery_images: photoUrls.slice(0, 3),
+      gallery_images: photoUrls,
       services: [],
       hours: Object.keys(hours).length > 0 ? hours : null,
       address: address.includes(',') ? address.split(',')[0] : address,
