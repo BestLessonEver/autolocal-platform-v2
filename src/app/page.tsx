@@ -130,12 +130,18 @@ export default function HomePage() {
         return
       }
       await new Promise(r => setTimeout(r, 1500))
-      // Route through auto-login page if we got a token
+      // Auto-login in background (for future dashboard access), then go straight to preview
       if (data.autoLoginToken) {
-        router.push(`/auth/auto-login?token=${encodeURIComponent(data.autoLoginToken)}&next=${encodeURIComponent(data.previewUrl)}`)
-      } else {
-        router.push(data.previewUrl)
+        const { createClient } = await import('@supabase/supabase-js')
+        const sb = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+        // Fire and forget — don't block navigation
+        sb.auth.verifyOtp({ token_hash: data.autoLoginToken, type: 'magiclink' }).catch(() => {})
       }
+      // Preview URL already has ?token= for instant access (no auth needed)
+      router.push(data.previewUrl)
     } catch {
       setError('Connection error. Please try again.')
       setLoading(false)

@@ -423,10 +423,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Build preview access token: {id-prefix-8}-{slug}
+    let previewToken = ''
+    try {
+      const { data: row } = await supabase
+        .from('website_previews')
+        .select('id')
+        .eq('slug', fullSlug)
+        .single()
+      if (row?.id) {
+        previewToken = `${row.id.substring(0, 8)}-${fullSlug}`
+      }
+    } catch {}
+
     log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
     return NextResponse.json({
       success: true,
-      previewUrl: `/preview/${fullSlug}`,
+      previewUrl: previewToken
+        ? `/preview/${fullSlug}?token=${encodeURIComponent(previewToken)}`
+        : `/preview/${fullSlug}`,
       autoLoginToken,
       slug: fullSlug,
       businessName: name,
