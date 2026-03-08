@@ -118,7 +118,7 @@ export default function LoginPage() {
         <p className="text-center text-sm text-gray-600 mt-6">
           Don&apos;t have a website yet?{' '}
           <Link href="/" className="text-indigo-400 hover:text-indigo-300 transition">
-            Get one for $99 →
+            Get one free →
           </Link>
         </p>
       </div>

@@ -873,7 +873,7 @@ export default function ClientDashboard() {
           <p className="text-gray-400">{error || 'No website linked to your account.'}</p>
           <p className="text-gray-500 text-sm mt-2">Signed in as <span className="text-indigo-400">{userEmail}</span></p>
           <div className="flex gap-3 justify-center mt-6">
-            <a href="/" className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">Get a Website — $99</a>
+            <a href="/" className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">Get a Website — Free</a>
             <button onClick={handleLogout} className="px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white transition">Sign Out</button>
           </div>
         </div>

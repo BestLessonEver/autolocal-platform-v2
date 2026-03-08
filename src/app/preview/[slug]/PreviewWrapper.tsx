@@ -188,7 +188,7 @@ export default function PreviewWrapper({ data }: { data: PreviewData }) {
                   }}
                   className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
-                  Get Started — $99 + $9/mo
+                  Go Live — $9/mo (first month free)
                 </button>
               )}
               <button
