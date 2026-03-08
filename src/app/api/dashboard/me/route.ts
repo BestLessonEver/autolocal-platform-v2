@@ -58,6 +58,7 @@ export async function GET() {
     view_count: site.view_count || 0,
     created_at: site.created_at,
     plan,
+    hosting_status: site.hosting_status || 'preview',
     changes_this_month: used,
     free_changes_remaining: freeRemaining,
     unlimited_changes: unlimited,

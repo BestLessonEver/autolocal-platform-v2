@@ -81,6 +81,7 @@ export async function GET(
     view_count: data.view_count,
     created_at: data.created_at,
     plan,
+    hosting_status: (data as any).hosting_status || 'preview',
     changes_this_month: changesThisMonth,
     free_changes_remaining: freeChangesRemaining,
     unlimited_changes: plan === 'living',
