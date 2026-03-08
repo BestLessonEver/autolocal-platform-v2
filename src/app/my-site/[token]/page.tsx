@@ -870,7 +870,7 @@ export default function ClientDashboard() {
                 <iframe
                   ref={iframeRef}
                   key={previewKey}
-                  src={`/preview/${data.slug}?t=${previewKey}`}
+                  src={`/preview/${data.slug}?token=${token}&t=${previewKey}`}
                   className="w-[1280px] h-[2400px] origin-top-left"
                   style={{ transform: 'scale(0.328)', transformOrigin: 'top left' }}
                   title="Live Preview"
@@ -905,7 +905,7 @@ export default function ClientDashboard() {
             <div className="flex-1 overflow-auto p-4">
               <iframe
                 key={previewKey}
-                src={`/preview/${data.slug}?t=${previewKey}`}
+                src={`/preview/${data.slug}?token=${token}&t=${previewKey}`}
                 className="w-full h-full rounded-xl border border-white/10"
                 style={{ minHeight: '600px' }}
                 title="Mobile Preview"
