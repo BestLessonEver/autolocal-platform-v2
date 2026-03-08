@@ -365,14 +365,21 @@ function BrandControls({ data, onUpdate, onDeploy }: { data: SiteData; onUpdate:
 
   const hasChanges = primary !== data.brand_color_primary || secondary !== data.brand_color_secondary || accent !== data.brand_color_accent
 
+  const [logoError, setLogoError] = useState('')
+  const [logoUploading, setLogoUploading] = useState(false)
+
   const handleLogoUpload = async (file: File) => {
+    setLogoError('')
+    setLogoUploading(true)
     const formData = new FormData()
     formData.append('logo', file)
     try {
       const res = await fetch('/api/dashboard/me/brand', { method: 'POST', body: formData })
       const result = await res.json()
       if (res.ok && result.logo_url) { onUpdate({ logo_url: result.logo_url }); onDeploy() }
-    } catch { /* silent */ }
+      else { setLogoError(result.error || 'Upload failed'); console.error('Logo upload error:', result) }
+    } catch (err) { setLogoError('Connection error'); console.error('Logo upload error:', err) }
+    setLogoUploading(false)
   }
 
   const handleSave = async () => {
@@ -426,10 +433,11 @@ function BrandControls({ data, onUpdate, onDeploy }: { data: SiteData; onUpdate:
           <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
             {data.logo_url ? <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain" /> : <span className="text-xl text-gray-600">📷</span>}
           </div>
-          <label className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer">
-            {data.logo_url ? 'Change' : 'Upload Logo'}
+          <label className={`px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white hover:border-white/20 transition cursor-pointer ${logoUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+            {logoUploading ? 'Uploading...' : data.logo_url ? 'Change' : 'Upload Logo'}
             <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f) }} className="hidden" />
           </label>
+          {logoError && <span className="text-xs text-red-400">{logoError}</span>}
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowPicker(!showPicker)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:border-white/20 transition" title="Edit colors">
