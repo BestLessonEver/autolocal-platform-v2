@@ -112,7 +112,7 @@ function ThankYouContent() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="/login"
+            href="/dashboard"
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:shadow-lg hover:shadow-indigo-500/20 transition"
           >
             Go to My Dashboard →

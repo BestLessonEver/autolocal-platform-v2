@@ -395,10 +395,39 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Generate auto-login token so thank-you page can sign user in
+    let autoLoginToken = ''
+    if (email) {
+      try {
+        // Ensure user exists first
+        const { data: existingUsers } = await supabase.auth.admin.listUsers()
+        const existingUser = existingUsers?.users?.find((u: any) => u.email === email)
+        if (!existingUser) {
+          await supabase.auth.admin.createUser({
+            email,
+            email_confirm: true,
+          })
+        }
+
+        const { data: linkData } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email,
+          options: { redirectTo: 'https://autolocal.ai/auth/callback?next=/dashboard' },
+        })
+        // Extract token_hash from the action_link
+        const actionLink = linkData?.properties?.action_link || ''
+        const tokenMatch = actionLink.match(/token_hash=([^&]+)/)
+        if (tokenMatch) autoLoginToken = tokenMatch[1]
+      } catch (err) {
+        log('[generate-preview] Auto-login token generation failed:', err)
+      }
+    }
+
     log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
     return NextResponse.json({
       success: true,
       previewUrl: `/preview/${fullSlug}`,
+      autoLoginToken,
       slug: fullSlug,
       businessName: name,
       category,
