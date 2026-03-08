@@ -158,19 +158,28 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
       {/* Compact mode CSS — shrinks hero when loaded in dashboard iframe */}
       {isCompact && (
         <style>{`
-          [class*="min-h-screen"], [class*="h-screen"], [class*="min-h-[100vh]"], [class*="h-[100vh]"] {
-            min-height: auto !important;
-            height: auto !important;
-          }
-          section:first-of-type, [class*="hero"], header + div, main > div:first-child {
-            max-height: 300px !important;
+          .compact-preview section:first-of-type,
+          .compact-preview > div > section:first-of-type,
+          .compact-preview > div > div > section:first-of-type {
+            min-height: 250px !important;
+            max-height: 250px !important;
+            height: 250px !important;
             overflow: hidden !important;
           }
-          img[class*="object-cover"][class*="h-full"],
-          img[class*="object-cover"][class*="h-screen"],
-          img[class*="object-cover"][class*="min-h-"] {
-            max-height: 300px !important;
+          .compact-preview section:first-of-type img,
+          .compact-preview > div > section:first-of-type img {
+            max-height: 250px !important;
           }
+          .compact-preview .min-h-screen { min-height: auto !important; }
+          .compact-preview .min-h-\\[80vh\\] { min-height: 250px !important; }
+          .compact-preview .min-h-\\[70vh\\] { min-height: 250px !important; }
+          .compact-preview .min-h-\\[100vh\\] { min-height: auto !important; }
+          .compact-preview .h-\\[80vh\\] { height: 250px !important; }
+          .compact-preview .h-\\[70vh\\] { height: 250px !important; }
+          .compact-preview .h-screen { height: auto !important; }
+          .compact-preview .min-h-\\[500px\\] { min-height: 250px !important; }
+          .compact-preview .min-h-\\[550px\\] { min-height: 250px !important; }
+          .compact-preview .min-h-\\[600px\\] { min-height: 250px !important; }
         `}</style>
       )}
       {/* Preview Banner — slides in after 3 seconds (hidden in iframe) */}
@@ -379,9 +388,11 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
       )}
 
       {/* Template content — no forced top padding, let the site breathe */}
-      <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
-        <Template data={filteredData} />
-      </TemplateErrorBoundary>
+      <div className={isCompact ? 'compact-preview' : ''}>
+        <TemplateErrorBoundary key={activeTemplate} fallback={<div>Error loading template</div>}>
+          <Template data={filteredData} />
+        </TemplateErrorBoundary>
+      </div>
 
       {/* Powered by AutoLocal — above sticky call bar on mobile */}
       <div className="fixed bottom-20 sm:bottom-4 right-4 z-50">
