@@ -84,6 +84,19 @@ const COLOR_PALETTES = [
 ]
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const DAY_KEY_MAP: Record<string, string> = { Monday: 'mon', Tuesday: 'tue', Wednesday: 'wed', Thursday: 'thu', Friday: 'fri', Saturday: 'sat', Sunday: 'sun' }
+
+// Normalize hours — DB may store keys as "mon" or "Monday"
+function normalizeHoursToFull(h: Record<string, string> | null): Record<string, string> {
+  if (!h) return {}
+  const reverseMap: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
+  const result: Record<string, string> = {}
+  for (const [k, v] of Object.entries(h)) {
+    const fullKey = reverseMap[k.toLowerCase()] || (k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
+    result[fullKey] = v
+  }
+  return result
+}
 
 const TIME_OPTIONS = [
   '6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM',
@@ -697,7 +710,9 @@ export default function ClientDashboard() {
         const res = await fetch('/api/dashboard/me')
         if (res.status === 401) { router.push('/login'); return }
         if (!res.ok) { const err = await res.json(); setError(err.error || 'No website found.'); setLoading(false); return }
-        setData(await res.json())
+        const d = await res.json()
+        if (d.hours) d.hours = normalizeHoursToFull(d.hours)
+        setData(d)
       } catch { setError('Failed to load dashboard.') }
       setLoading(false)
     }
@@ -804,25 +819,34 @@ export default function ClientDashboard() {
   const removeService = (idx: number) => { if (!data) return; const services = (data.services || []).filter((_, i) => i !== idx); setData(p => p ? { ...p, services } : p); saveNow({ services }) }
 
   // Hours
+  // Convert full-day-name hours to short keys for DB storage
+  const hoursToDb = (h: Record<string, string>) => {
+    const result: Record<string, string> = {}
+    for (const [k, v] of Object.entries(h)) {
+      result[DAY_KEY_MAP[k] || k.toLowerCase().slice(0, 3)] = v
+    }
+    return result
+  }
+
   const updateHours = (day: string, open: string, close: string) => {
     if (!data) return
     const val = open && close ? `${open} - ${close}` : 'Closed'
     const hours = { ...(data.hours || {}), [day]: val }
-    setData(p => p ? { ...p, hours } : p); save({ hours })
+    setData(p => p ? { ...p, hours } : p); save({ hours: hoursToDb(hours) })
   }
   const toggleDayClosed = (day: string) => {
     if (!data) return
     const current = data.hours?.[day] || ''
     const isClosed = current.toLowerCase() === 'closed' || !current
     const hours = { ...(data.hours || {}), [day]: isClosed ? '9:00 AM - 5:00 PM' : 'Closed' }
-    setData(p => p ? { ...p, hours } : p); saveNow({ hours })
+    setData(p => p ? { ...p, hours } : p); saveNow({ hours: hoursToDb(hours) })
   }
   const copyToWeekdays = () => {
     if (!data) return
     const mon = data.hours?.['Monday'] || '9:00 AM - 5:00 PM'
     const hours = { ...(data.hours || {}) }
     for (const d of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) hours[d] = mon
-    setData(p => p ? { ...p, hours } : p); saveNow({ hours })
+    setData(p => p ? { ...p, hours } : p); saveNow({ hours: hoursToDb(hours) })
   }
 
   // Change request
