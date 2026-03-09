@@ -59,7 +59,7 @@ const searched: Record<number, (p: TemplateParams) => DripTemplate> = {
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'} 👋</h1>
       <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We noticed you were looking for a website for your business. We'd love to help!</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">For just <strong style="color:${BRAND.text};">$99</strong>, you get a custom, professional website — built in minutes, not weeks. Plus $9/mo hosting with zero hassle.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Get a free custom website — built in minutes, not weeks. Go live with hosting for $0 today (first month free), then just $9/mo.</p>
       ${button('Search for Your Business →', 'https://autolocal.ai?utm_source=drip&utm_campaign=searched_1')}
       <p style="color:${BRAND.muted};font-size:13px;text-align:center;">No commitment — see a free preview before you pay.</p>
     `, p.email),
@@ -88,7 +88,7 @@ const searched: Record<number, (p: TemplateParams) => DripTemplate> = {
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'},</h1>
       <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">It's been a week since you checked out AutoLocal. A lot of businesses like yours have launched their sites since then.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We're still here when you're ready. $99 for a custom website. $9/mo hosting. No contracts.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We're still here when you're ready. Free website, $9/mo hosting (first month free). No contracts.</p>
       ${button('Build Your Site →', 'https://autolocal.ai?utm_source=drip&utm_campaign=searched_4')}
     `, p.email),
   }),
@@ -109,54 +109,56 @@ const searched: Record<number, (p: TemplateParams) => DripTemplate> = {
 // ============================================================
 const previewed: Record<number, (p: TemplateParams) => DripTemplate> = {
   1: (p) => ({
-    subject: `Your website preview for ${p.businessName || 'your business'} is ready`,
+    subject: `Your free website for ${p.businessName || 'your business'} is ready to customize`,
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'} 👋</h1>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Your free preview for <strong style="color:${BRAND.text};">${p.businessName || 'your business'}</strong> is live and looking great!</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Ready to make it official? It's just $99 to launch + $9/mo hosting. Cancel anytime.</p>
-      ${button('View Your Preview →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_1`)}
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Your free website for <strong style="color:${BRAND.text};">${p.businessName || 'your business'}</strong> is live and looking great!</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Log in to your dashboard to change templates, edit text, swap photos, and pick your brand colors — all free.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">When you're ready to go live, activate hosting — <strong style="color:${BRAND.primaryLight};">your first month is free</strong>, then just $9/mo.</p>
+      ${button('Go to My Dashboard →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_1`)}
     `, p.email),
   }),
   2: (p) => ({
-    subject: `${p.businessName || 'Your business'} looks amazing — don't let it go to waste`,
+    subject: `${p.businessName || 'Your business'} looks amazing — ready to go live?`,
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'},</h1>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We built a custom website preview for <strong style="color:${BRAND.text};">${p.businessName || 'your business'}</strong> and it's still waiting for you.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Compare that to what you'd pay elsewhere:</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Your custom website for <strong style="color:${BRAND.text};">${p.businessName || 'your business'}</strong> is still waiting for you.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Compare what you'd pay elsewhere:</p>
       <ul style="color:${BRAND.muted};line-height:1.8;padding-left:20px;">
         <li>Wix: $16-33/mo ($192-396/yr)</li>
         <li>Squarespace: $16-33/mo ($192-396/yr)</li>
-        <li><strong style="color:${BRAND.primaryLight};">AutoLocal: $99 + $9/mo ($207/yr)</strong></li>
+        <li><strong style="color:${BRAND.primaryLight};">AutoLocal: FREE to build + $9/mo hosting (1st month free)</strong></li>
       </ul>
-      ${button('Launch Your Site →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_2`)}
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Your site is already built with your real Google reviews, photos, and hours. Just activate hosting to go live.</p>
+      ${button('Activate Hosting — $0 Today →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_2`)}
     `, p.email),
   }),
   3: (p) => ({
     subject: `Real talk: your business needs a website`,
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hey ${p.contactName || 'there'},</h1>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We get it — committing to a website feels like a big step. But here's the thing: yours is already built.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">All you need to do is hit "Get Started" and it's live. No setup. No tech skills. No waiting weeks for a designer.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">We get it — committing to a website feels like a big step. But here's the thing: yours is already built. And it's <strong style="color:${BRAND.text};">completely free</strong> to customize.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">When you're ready to go live, it's $0 today and just $9/mo after your free trial. No contracts. Cancel anytime.</p>
       ${button('See Your Site Again →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_3`)}
       <p style="color:${BRAND.muted};font-size:13px;text-align:center;">Reply to this email anytime — we're real people who want to help.</p>
     `, p.email),
   }),
   4: (p) => ({
-    subject: `Your preview for ${p.businessName || 'your business'} is still live`,
+    subject: `Your free site for ${p.businessName || 'your business'} is still live`,
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'},</h1>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Just wanted you to know — we haven't taken down your website preview. It's still there, looking great.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">When you're ready, it takes about 60 seconds to go live.</p>
-      ${button('View Preview →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_4`)}
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Just wanted you to know — your website is still there, looking great. We haven't taken it down.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">When you're ready to go live, it takes about 60 seconds. First month is on us.</p>
+      ${button('View My Site →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_4`)}
     `, p.email),
   }),
   5: (p) => ({
-    subject: `Last chance to claim your site, ${p.contactName || 'friend'}`,
+    subject: `Last nudge about your website, ${p.contactName || 'friend'}`,
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'},</h1>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">This is our last email about your website preview. We'll keep it up for a while longer, but we wanted to give you one more nudge.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">$99 + $9/mo. No contracts. Cancel anytime. Your site is already built — just say go.</p>
-      ${button('Launch It →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_5`)}
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">This is our last email about your website. It's still live and free to edit — and your first month of hosting is free when you're ready.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">$0 today. $9/mo after. No contracts. Your site is already built — just say go.</p>
+      ${button('Go Live →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=previewed_5`)}
     `, p.email),
   }),
 }
@@ -204,7 +206,7 @@ const abandoned_checkout: Record<number, (p: TemplateParams) => DripTemplate> = 
     html: wrap(`
       <h1 style="color:${BRAND.text};font-size:22px;margin:0 0 16px;">Hi ${p.contactName || 'there'},</h1>
       <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">It's been a week. Your custom site preview is still live and ready to launch whenever you are.</p>
-      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">$99 one-time + $9/mo. No contracts. Cancel hosting anytime.</p>
+      <p style="color:${BRAND.muted};line-height:1.6;margin:0 0 16px;">Free to build. $9/mo hosting (first month free). No contracts. Cancel anytime.</p>
       ${button('Launch Your Site →', `https://autolocal.ai/preview/${p.slug || ''}?utm_source=drip&utm_campaign=checkout_4`)}
     `, p.email),
   }),

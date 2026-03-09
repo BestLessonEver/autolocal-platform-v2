@@ -397,6 +397,19 @@ export async function POST(req: NextRequest) {
       sendPreviewEmail(email, contactName || name, name, fullSlug).catch(err =>
         console.error('[generate-preview] Email send failed:', err)
       )
+
+      // Enqueue drip campaign — nurture until they activate hosting
+      fetch('https://autolocal.ai/api/drip/enqueue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': internalAuthHeader() },
+        body: JSON.stringify({
+          email,
+          stage: 'previewed',
+          slug: fullSlug,
+          businessName: name,
+          contactName: contactName || undefined,
+        }),
+      }).catch(err => console.error('[generate-preview] Drip enqueue failed:', err))
     }
 
     // Generate auto-login token so thank-you page can sign user in
