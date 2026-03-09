@@ -169,20 +169,24 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const hasGoogleData = existing !== null && existing !== undefined
   await sendWelcomeEmail(email, contactName, businessName, hasGoogleData)
 
-  // Auto-deploy to Vercel — site goes LIVE only after hosting is activated
+  // Auto-deploy — site goes LIVE only after hosting is activated
   if (slug) {
-    fetch(`https://autolocal.ai/api/deploy`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': internalAuthHeader(),
-      },
-      body: JSON.stringify({ slug }),
-    }).then(r => r.json()).then(r => {
-      if (process.env.DEBUG) console.log(`🚀 Auto-deploy for ${slug}: ${r?.success ? 'ok' : 'failed'}`)
-    }).catch(err => {
-      console.error(`Deploy error for ${slug}:`, err)
-    })
+    try {
+      fetch(`https://autolocal.ai/api/deploy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': internalAuthHeader(),
+        },
+        body: JSON.stringify({ slug }),
+      }).then(r => r.json()).then(r => {
+        if (process.env.DEBUG) console.log(`🚀 Auto-deploy for ${slug}: ${r?.success ? 'ok' : 'failed'}`)
+      }).catch(err => {
+        console.error(`Deploy error for ${slug}:`, err)
+      })
+    } catch (err) {
+      console.error('Deploy auth error (INTERNAL_API_KEY missing?):', err)
+    }
   }
 
   // Cancel any active drip campaigns for this email (they converted!)
