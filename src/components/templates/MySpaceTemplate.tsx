@@ -77,7 +77,7 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
                 <img
                   src={profilePhoto || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&h=240&fit=crop'}
                   alt=""
-                  style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '200px', objectFit: 'cover', objectPosition: `center ${data.hero_crop ?? 50}%` }}
                 />
               </div>
               <div style={{ fontSize: '10px', paddingTop: '4px' }}>
@@ -206,7 +206,7 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {blurbPhotos.slice(0, 3).map((img, i) => (
                       <div key={i} style={{ maxWidth: i === 0 ? '100%' : i === 1 ? '60%' : '75%', alignSelf: i === 1 ? 'flex-start' : i === 2 ? 'center' : 'stretch' }}>
-                        <img src={img} alt="" style={{ width: '100%', objectFit: 'cover', border: '1px solid #ccc' }} />
+                        <img src={img} alt="" style={{ width: '100%', objectFit: 'cover', border: '1px solid #ccc', ...(i === 0 && img === data.hero_image_url ? { objectPosition: `center ${data.hero_crop ?? 50}%` } : {}) }} />
                       </div>
                     ))}
                     {blurbPhotos.length > 3 && (
