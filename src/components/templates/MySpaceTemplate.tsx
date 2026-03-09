@@ -7,7 +7,9 @@ import { type TemplateProps, getCtaButtonText } from './types'
 export default function MySpaceTemplate({ data }: TemplateProps) {
   const services = data.services ?? []
   const reviews = data.reviews ?? []
-  const allImages = [data.hero_image_url, ...(data.gallery_images ?? [])].filter(Boolean) as string[]
+  const gallery = (data.gallery_images ?? []).filter(img => img !== data.hero_image_url)
+  const profilePhoto = gallery[0] || data.hero_image_url  // 2nd photo = profile pic
+  const blurbPhotos = [data.hero_image_url, ...gallery.slice(1)].filter(Boolean) as string[]  // hero + rest (skip profile pic)
   const hours = data.hours ?? {}
   const ind = data.site_mode === 'individual'
 
@@ -73,9 +75,9 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
             <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
               <div style={{ width: '180px', flexShrink: 0 }}>
                 <img
-                  src={data.hero_image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&h=240&fit=crop'}
+                  src={profilePhoto || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&h=240&fit=crop'}
                   alt=""
-                  style={{ width: '100%', height: '200px', objectFit: 'cover', objectPosition: `center ${data.hero_crop ?? 50}%` }}
+                  style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                 />
               </div>
               <div style={{ fontSize: '10px', paddingTop: '4px' }}>
@@ -200,17 +202,16 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
                 </div>
 
                 {/* Photos scattered in the blurb — large, varied sizes like real MySpace */}
-                {allImages.length > 0 && (
+                {blurbPhotos.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {allImages.slice(0, 3).map((img, i) => (
+                    {blurbPhotos.slice(0, 3).map((img, i) => (
                       <div key={i} style={{ maxWidth: i === 0 ? '100%' : i === 1 ? '60%' : '75%', alignSelf: i === 1 ? 'flex-start' : i === 2 ? 'center' : 'stretch' }}>
                         <img src={img} alt="" style={{ width: '100%', objectFit: 'cover', border: '1px solid #ccc' }} />
                       </div>
                     ))}
-                    {/* More photos in a grid */}
-                    {allImages.length > 3 && (
+                    {blurbPhotos.length > 3 && (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                        {allImages.slice(3, 9).map((img, i) => (
+                        {blurbPhotos.slice(3, 9).map((img, i) => (
                           <img key={i} src={img} alt="" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', border: '1px solid #ccc' }} />
                         ))}
                       </div>
