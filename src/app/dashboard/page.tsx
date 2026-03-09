@@ -709,6 +709,16 @@ export default function ClientDashboard() {
       if (!user) { router.push('/login'); return }
       setUserEmail(user.email || '')
       try {
+        // Check if user has multiple sites
+        const sitesRes = await fetch('/api/dashboard/my-sites')
+        if (sitesRes.ok) {
+          const sites = await sitesRes.json()
+          if (Array.isArray(sites) && sites.length > 1) {
+            // Multiple sites — redirect to site picker
+            router.push('/dashboard/sites')
+            return
+          }
+        }
         const res = await fetch('/api/dashboard/me')
         if (res.status === 401) { router.push('/login'); return }
         if (!res.ok) { const err = await res.json(); setError(err.error || 'No website found.'); setLoading(false); return }

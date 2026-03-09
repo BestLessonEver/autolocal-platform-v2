@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface Client {
   id: string
@@ -60,6 +60,7 @@ export default function AdminClientsPage() {
   const [tab, setTab] = useState<'previews' | 'clients'>('previews')
   const [search, setSearch] = useState('')
   const [deploying, setDeploying] = useState<string | null>(null)
+  const [expandedEmail, setExpandedEmail] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
@@ -303,76 +304,103 @@ export default function AdminClientsPage() {
             </div>
           </div>
         ) : (
-          /* Leads Table — sites with email addresses */
+          /* Leads Table — grouped by email */
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Business</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Email</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Sites</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Phone</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Location</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Hosting</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Created</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Revenue</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Since</th>
                     <th className="text-right px-4 py-3 text-gray-500 font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {previews.filter(p => p.email && p.email.toLowerCase().includes(search.toLowerCase()) || p.business_name.toLowerCase().includes(search.toLowerCase())).filter(p => p.email).length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="text-center py-12 text-gray-500">
-                        No leads with email addresses yet.
-                      </td>
-                    </tr>
-                  ) : previews.filter(p => p.email).filter(p =>
-                    p.business_name.toLowerCase().includes(search.toLowerCase()) ||
-                    (p.email || '').toLowerCase().includes(search.toLowerCase())
-                  ).map(p => (
-                    <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-white">{p.business_name}</p>
-                        <p className="text-xs text-gray-500">{p.template}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <a href={`mailto:${p.email}`} className="text-indigo-400 hover:text-indigo-300 text-xs">{p.email}</a>
-                      </td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{p.phone || '—'}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{p.city}{p.state ? `, ${p.state}` : ''}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          p.hosting_status === 'active' ? 'bg-green-500/20 text-green-400' :
-                          p.hosting_status === 'pending_cancel' ? 'bg-orange-500/20 text-orange-400' :
-                          p.hosting_status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
-                          p.hosting_status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          {p.hosting_status || 'preview'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <a
-                            href={`/my-site/${p.id.slice(0, 8)}-${p.slug}`}
-                            target="_blank"
-                            className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
-                          >
-                            Dashboard
-                          </a>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(p.email || '')
-                              alert('Email copied!')
-                            }}
-                            className="px-2.5 py-1 rounded-md bg-indigo-600/20 border border-indigo-500/30 text-xs text-indigo-400 hover:bg-indigo-600/30 transition"
-                          >
-                            Copy Email
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {(() => {
+                    const grouped = new Map<string, Preview[]>()
+                    previews.filter(p => p.email).forEach(p => {
+                      const key = p.email!.toLowerCase()
+                      if (!grouped.has(key)) grouped.set(key, [])
+                      grouped.get(key)!.push(p)
+                    })
+                    const entries = Array.from(grouped.entries()).filter(([email, sites]) =>
+                      email.includes(search.toLowerCase()) ||
+                      sites.some(s => s.business_name.toLowerCase().includes(search.toLowerCase()))
+                    )
+                    if (entries.length === 0) return (
+                      <tr><td colSpan={7} className="text-center py-12 text-gray-500">No leads yet.</td></tr>
+                    )
+                    return entries.map(([email, sites]) => {
+                      const primary = sites[0]
+                      const extra = sites.length - 1
+                      const activeCount = sites.filter(s => s.hosting_status === 'active' || s.hosting_status === 'pending_cancel').length
+                      const isExpanded = expandedEmail === email
+                      return (
+                        <React.Fragment key={email}>
+                          <tr className="border-b border-white/5 hover:bg-white/[0.02] transition cursor-pointer" onClick={() => setExpandedEmail(isExpanded ? null : email)}>
+                            <td className="px-4 py-3">
+                              <a href={`mailto:${email}`} className="text-indigo-400 hover:text-indigo-300 text-sm" onClick={e => e.stopPropagation()}>{email}</a>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="font-semibold text-white text-xs">{primary.business_name}</span>
+                              {extra > 0 && (
+                                <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600/30 text-indigo-400">+{extra} more</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-gray-400 text-xs">{primary.phone || '—'}</td>
+                            <td className="px-4 py-3 text-gray-400 text-xs">{primary.city}{primary.state ? `, ${primary.state}` : ''}</td>
+                            <td className="px-4 py-3">
+                              {activeCount > 0 ? (
+                                <span className="text-green-400 text-xs font-semibold">${activeCount * 9}/mo</span>
+                              ) : (
+                                <span className="text-gray-600 text-xs">$0</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-gray-500 text-xs">{new Date(primary.created_at).toLocaleDateString()}</td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(email); alert('Email copied!') }} className="px-2.5 py-1 rounded-md bg-indigo-600/20 border border-indigo-500/30 text-xs text-indigo-400 hover:bg-indigo-600/30 transition">
+                                  Copy Email
+                                </button>
+                                {sites.length > 1 && (
+                                  <span className="text-gray-500 text-xs">{isExpanded ? '▲' : '▼'}</span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                          {isExpanded && sites.map(s => (
+                            <tr key={s.id} className="border-b border-white/5 bg-white/[0.01]">
+                              <td className="px-4 py-2 pl-8 text-gray-600 text-xs">↳</td>
+                              <td className="px-4 py-2">
+                                <span className="text-white text-xs">{s.business_name}</span>
+                                <span className="text-gray-600 text-xs ml-2">({s.template})</span>
+                              </td>
+                              <td className="px-4 py-2 text-gray-500 text-xs">{s.category}</td>
+                              <td className="px-4 py-2 text-gray-500 text-xs">{s.city}{s.state ? `, ${s.state}` : ''}</td>
+                              <td className="px-4 py-2">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                  s.hosting_status === 'active' ? 'bg-green-500/20 text-green-400' :
+                                  s.hosting_status === 'pending_cancel' ? 'bg-orange-500/20 text-orange-400' :
+                                  s.hosting_status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                                  'bg-yellow-500/20 text-yellow-400'
+                                }`}>{s.hosting_status || 'preview'}</span>
+                              </td>
+                              <td className="px-4 py-2 text-gray-500 text-xs">{new Date(s.created_at).toLocaleDateString()}</td>
+                              <td className="px-4 py-2 text-right">
+                                <a href={`/my-site/${s.id.slice(0, 8)}-${s.slug}`} target="_blank" className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-gray-300 hover:text-white transition">
+                                  Dashboard
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      )
+                    })
+                  })()}
                 </tbody>
               </table>
             </div>
