@@ -118,14 +118,14 @@ export default function ClutchTemplate({ data }: TemplateProps) {
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
-          <div className="absolute inset-0 bg-[#0f172a]/80" />
+          {/* overlay removed */}
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24 sm:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24 sm:py-32" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5)' }}>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] tracking-tight mb-6">
             {data.business_name}
           </h1>
           {data.tagline && (
-            <p className="text-xl sm:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">{data.tagline}</p>
+            <p className="text-xl sm:text-2xl text-white mb-10 max-w-2xl mx-auto leading-relaxed">{data.tagline}</p>
           )}
           <a
             href={data.cta_url || '#contact'}
