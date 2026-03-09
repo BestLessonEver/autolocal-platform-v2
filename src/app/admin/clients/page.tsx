@@ -33,11 +33,7 @@ interface Preview {
   template: string
   created_at: string
   view_count: number
-  subdomain: string | null
   hosting_status: string | null
-  contact_name: string | null
-  headline: string | null
-  tagline: string | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -222,16 +218,12 @@ export default function AdminClientsPage() {
                     <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
                       <td className="px-4 py-3">
                         <p className="font-semibold text-white">{p.business_name}</p>
-                        <p className="text-xs text-gray-500">{p.contact_name || p.email || p.slug}</p>
+                        <p className="text-xs text-gray-500">{p.email || p.slug}</p>
                       </td>
                       <td className="px-4 py-3">
-                        {p.subdomain ? (
-                          <a href={`https://${p.subdomain}.autolocal.ai`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
-                            {p.subdomain}.autolocal.ai
-                          </a>
-                        ) : (
-                          <span className="text-gray-600 text-xs">—</span>
-                        )}
+                        <a href={`/preview/${p.slug}`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
+                          {p.slug}
+                        </a>
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-xs">
                         {p.city}{p.state ? `, ${p.state}` : ''}
