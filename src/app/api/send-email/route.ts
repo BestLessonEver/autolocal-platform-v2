@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.SMTP_USER || 'brian@autolocal.ai',
+    user: process.env.SMTP_USER || 'bestlessoninfo@gmail.com',
     pass: process.env.SMTP_PASS, // Google App Password
   },
 })
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     }
 
     await transporter.sendMail({
-      from: `"AutoLocal.ai" <brian@autolocal.ai>`,
+      from: `"AutoLocal.ai" <${process.env.SMTP_USER || 'bestlessoninfo@gmail.com'}>`,
       to,
       subject,
       html,
