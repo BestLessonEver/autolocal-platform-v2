@@ -526,7 +526,7 @@ function PhotoGrid({
   googleSource?: boolean
 }) {
   const pointerSensor = useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
-  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 500, tolerance: 8 } })
   const sensors = useSensors(pointerSensor, touchSensor)
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -664,6 +664,7 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState('')
   const [previewKey, setPreviewKey] = useState(0)
   const [mobilePreview, setMobilePreview] = useState(false)
+  const [showHeroPicker, setShowHeroPicker] = useState(false)
   const [mobileMenu, setMobileMenu] = useState(false)
   const [cropPhoto, setCropPhoto] = useState<{ url: string; index: number } | null>(null)
   const [actionSheet, setActionSheet] = useState<{ url: string; index: number } | null>(null)
@@ -1043,11 +1044,42 @@ export default function ClientDashboard() {
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-600"><span className="text-4xl">📷</span></div>
                 )}
-                <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 active:opacity-100 transition cursor-pointer">
-                  <span className="px-4 py-2 rounded-lg bg-white/20 text-white text-sm font-bold">📤 Change Hero Image</span>
-                  <input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f, 'hero') }} className="hidden" />
-                </label>
+                <button
+                  onClick={() => setShowHeroPicker(prev => !prev)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 active:opacity-100 transition cursor-pointer"
+                >
+                  <span className="px-4 py-2 rounded-lg bg-white/20 text-white text-sm font-bold">🔄 Change Hero Image</span>
+                </button>
               </div>
+              {showHeroPicker && (
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-400">Choose Hero Image</span>
+                    <button onClick={() => setShowHeroPicker(false)} className="text-gray-500 hover:text-white text-sm">✕</button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(data.gallery_images || []).map((url, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          updateFieldNow('hero_image_url', url)
+                          setShowHeroPicker(false)
+                        }}
+                        className={`relative rounded-lg overflow-hidden aspect-square border-2 transition ${
+                          data.hero_image_url === url ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-transparent hover:border-white/20'
+                        }`}
+                      >
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        {data.hero_image_url === url && (
+                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
+                            <span className="text-white text-lg">✓</span>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {data.hero_image_url && (
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Image Position</label>

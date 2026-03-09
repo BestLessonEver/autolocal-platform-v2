@@ -228,6 +228,7 @@ export default function ClientDashboard() {
   const [error, setError] = useState('')
   const [previewKey, setPreviewKey] = useState(0)
   const [mobilePreview, setMobilePreview] = useState(false)
+  const [showHeroPicker, setShowHeroPicker] = useState(false)
 
   // Change request
   const [changeMessage, setChangeMessage] = useState('')
@@ -595,21 +596,46 @@ export default function ClientDashboard() {
                     <span className="text-4xl">📷</span>
                   </div>
                 )}
-                <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                <button
+                  onClick={() => setShowHeroPicker(prev => !prev)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                >
                   <span className="px-4 py-2 rounded-lg bg-white/20 text-white text-sm font-bold">
-                    📤 Change Hero Image
+                    🔄 Change Hero Image
                   </span>
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={e => {
-                      const f = e.target.files?.[0]
-                      if (f) handlePhotoUpload(f, 'hero')
-                    }}
-                    className="hidden"
-                  />
-                </label>
+                </button>
               </div>
+
+              {/* Hero Photo Picker */}
+              {showHeroPicker && (
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-400">Choose Hero Image</span>
+                    <button onClick={() => setShowHeroPicker(false)} className="text-gray-500 hover:text-white text-sm">✕</button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(data.gallery_images || []).map((url, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          updateFieldNow('hero_image_url', url)
+                          setShowHeroPicker(false)
+                        }}
+                        className={`relative rounded-lg overflow-hidden aspect-square border-2 transition ${
+                          data.hero_image_url === url ? 'border-indigo-500 ring-2 ring-indigo-500/30' : 'border-transparent hover:border-white/20'
+                        }`}
+                      >
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        {data.hero_image_url === url && (
+                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
+                            <span className="text-white text-lg">✓</span>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Headline */}
               <div>
