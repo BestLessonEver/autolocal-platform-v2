@@ -1,268 +1,294 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
 
 export default function MySpaceTemplate({ data }: TemplateProps) {
-  const [reviewIdx, setReviewIdx] = useState(0)
   const services = data.services ?? []
   const reviews = data.reviews ?? []
-  const galleryImages = (data.gallery_images ?? []).filter(img => img !== data.hero_image_url)
+  const allImages = [data.hero_image_url, ...(data.gallery_images ?? [])].filter(Boolean) as string[]
   const hours = data.hours ?? {}
   const ind = data.site_mode === 'individual'
-  const accent = data.brand_color_accent || '#3b5998'
 
   const daysOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
   const dayLabels: Record<string, string> = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' }
-
-  // Classic MySpace blue palette
-  const blue = '#003471'
-  const blueDark = '#00254d'
-  const blueLight = '#5b8fb9'
-  const blueLink = '#003471'
-  const orangeHeader = '#f08c00'
+  const visitors = data.google_review_count ? data.google_review_count * 47 : 1337
+  const email = data.contact_email || data.email
 
   return (
-    <div className="min-h-screen" style={{ background: '#c4cde0', fontFamily: 'Verdana, Arial, sans-serif', fontSize: '11px', color: '#000' }}>
+    <div className="min-h-screen" style={{ background: '#b2c9d6', fontFamily: 'Verdana, Arial, sans-serif', fontSize: '11px', color: '#000' }}>
       <style dangerouslySetInnerHTML={{ __html: `
-        .ms-link { color: ${blueLink}; text-decoration: underline; cursor: pointer; }
-        .ms-link:hover { color: #0066cc; }
+        .ms-link { color: #36c; text-decoration: underline; cursor: pointer; font-size: 11px; }
+        .ms-link:hover { color: #14a; }
         .ms-section { background: #fff; border: 1px solid #b5c7de; margin-bottom: 8px; }
-        .ms-section-header { background: ${blue}; color: #fff; padding: 5px 8px; font-weight: bold; font-size: 11px; border-bottom: 1px solid ${blueDark}; }
-        .ms-section-header-orange { background: #f6a400; color: #fff; padding: 5px 8px; font-weight: bold; font-size: 11px; border-bottom: 1px solid ${orangeHeader}; }
-        .ms-online { color: #00b300; font-size: 10px; }
-        .ms-comment { background: #f5f5f5; border: 1px solid #ddd; padding: 8px; margin-bottom: 6px; }
+        .ms-sh { background: #5a8ab5; color: #fff; padding: 4px 8px; font-weight: bold; font-size: 11px; }
+        .ms-sh-orange { background: #f4a300; color: #fff; padding: 4px 8px; font-weight: bold; font-size: 11px; }
+        .ms-interests td { padding: 3px 8px; border-bottom: 1px solid #eee; font-size: 11px; vertical-align: top; }
+        .ms-interests td:first-child { font-weight: bold; color: #5a8ab5; width: 90px; }
+        .ms-contact-table td { padding: 3px 6px; font-size: 11px; }
+        .ms-contact-table a { color: #36c; text-decoration: none; }
       `}} />
 
-      {/* Top Nav Bar — classic blue */}
-      <div style={{ background: `linear-gradient(180deg, ${blue} 0%, ${blueDark} 100%)`, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #002244' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '16px', letterSpacing: '-0.5px' }}>yourspace.</span>
+      {/* ═══ Top Header Bar ═══ */}
+      <div style={{ background: '#003366', padding: '8px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+          <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '20px', fontFamily: 'Georgia, serif', letterSpacing: '-0.5px' }}>mAIspace</span>
+          <span style={{ color: '#9cc', fontSize: '10px' }}>a space for businesses</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <input type="text" placeholder="Search" style={{ padding: '2px 6px', fontSize: '10px', border: '1px solid #999', borderRadius: '2px', width: '140px' }} readOnly />
-          <span style={{ background: '#999', color: '#fff', padding: '2px 8px', fontSize: '10px', borderRadius: '2px', cursor: 'pointer' }}>Search</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#cde', fontSize: '10px' }}>Search Users:</span>
+          <input type="text" style={{ padding: '2px 4px', fontSize: '10px', border: '1px solid #666', width: '140px' }} readOnly />
+          <span style={{ background: '#789', color: '#fff', padding: '2px 8px', fontSize: '10px', border: '1px outset #aaa', cursor: 'pointer' }}>Search</span>
+          <span style={{ color: '#9cc', fontSize: '10px', marginLeft: '12px' }}>Help</span>
+          <span style={{ color: '#9cc', fontSize: '10px' }}>|</span>
+          <span style={{ color: '#9cc', fontSize: '10px' }}>SignOut</span>
         </div>
       </div>
 
-      {/* Secondary Nav */}
-      <div style={{ background: blue, padding: '3px 16px', display: 'flex', gap: '16px', fontSize: '10px', borderBottom: '1px solid #002244' }}>
-        {['Home', 'Mail (2) ▾', 'Profile ▾', 'Friends ▾', 'Music', 'Video', 'More ▾'].map(item => (
-          <span key={item} style={{ color: '#fff', cursor: 'pointer' }}>{item}</span>
+      {/* ═══ Nav Links Bar ═══ */}
+      <div style={{ background: '#6699bb', padding: '3px 20px', display: 'flex', gap: '4px', fontSize: '10px', borderBottom: '1px solid #4a7a9a' }}>
+        <span style={{ color: '#fff' }}>🏠</span>
+        {['Home', 'Browse', 'Search', 'Messages', 'Blog', 'Bulletins', 'Forum', 'Music Charts', 'Favorites', 'Invite', 'Groups', 'About'].map(item => (
+          <span key={item} style={{ color: '#fff', cursor: 'pointer', borderRight: '1px solid #88aabb', paddingRight: '6px' }}>{item}</span>
         ))}
-        <span style={{ marginLeft: 'auto', color: '#aaccee', cursor: 'pointer', fontSize: '10px' }}>My Account</span>
-        <span style={{ color: '#aaccee', cursor: 'pointer', fontSize: '10px' }}>Sign Out</span>
       </div>
 
-      {/* Profile Header */}
-      <div style={{ background: '#fff', padding: '8px 16px', maxWidth: '960px', margin: '0 auto', borderBottom: '1px solid #ccc' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <div>
-            <h1 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0', color: '#000' }}>Hello, {ind ? data.business_name.split(' ')[0] : data.business_name}!</h1>
-            <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-              My URL: <span style={{ fontWeight: 'bold' }}>yourspace.com/{data.slug || data.business_name?.toLowerCase().replace(/\s+/g, '')}</span> [<span className="ms-link">Edit Profile</span>]
-            </div>
-          </div>
-          <div style={{ fontSize: '10px', color: '#666' }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </div>
+      {/* ═══ Main Content Area ═══ */}
+      <div style={{ maxWidth: '960px', margin: '8px auto', background: '#fff', padding: '0' }}>
+        {/* Profile Name + Edit */}
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0 }}>{data.business_name}</h1>
+          <div style={{ border: '1px solid #ccc', padding: '8px 24px', fontSize: '11px', color: '#666' }}>Edit Your Profile</div>
         </div>
-      </div>
 
-      {/* Two Column Layout */}
-      <div style={{ display: 'flex', maxWidth: '960px', margin: '0 auto', gap: '0', background: '#fff' }}>
-        {/* Left Column */}
-        <div style={{ width: '240px', flexShrink: 0, padding: '8px', borderRight: '1px solid #ddd' }}>
-          {/* Profile Photo */}
-          <div style={{ marginBottom: '8px' }}>
-            <img
-              src={data.hero_image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=300&fit=crop'}
-              alt=""
-              style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', objectPosition: `center ${data.hero_crop ?? 50}%`, border: '1px solid #999' }}
-            />
-            <div style={{ textAlign: 'center', marginTop: '6px' }}>
-              <div style={{ color: '#000', fontWeight: 'bold', fontSize: '12px' }}>&quot;{data.tagline || data.business_name}&quot;</div>
-              {data.logo_url && (
-                <img src={data.logo_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', margin: '6px auto', display: 'block', objectFit: 'cover' }} />
-              )}
-              <div style={{ color: '#666', fontSize: '10px', marginTop: '4px' }}>
-                {ind ? 'Profile' : 'Business'} · {data.city || 'Somewhere'}, {data.state || 'US'}
+        {/* Two Column Layout */}
+        <div style={{ display: 'flex' }}>
+          {/* ═══ Left Column ═══ */}
+          <div style={{ width: '340px', flexShrink: 0, padding: '8px 12px', borderRight: '1px solid #eee' }}>
+            {/* edit photo link */}
+            <div style={{ fontSize: '10px', color: '#888', marginBottom: '2px' }}>[edit photo]</div>
+
+            {/* Profile Photo + Online Status */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ width: '180px', flexShrink: 0 }}>
+                <img
+                  src={data.hero_image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=200&h=240&fit=crop'}
+                  alt=""
+                  style={{ width: '100%', height: '200px', objectFit: 'cover', objectPosition: `center ${data.hero_crop ?? 50}%` }}
+                />
+              </div>
+              <div style={{ fontSize: '10px', paddingTop: '4px' }}>
+                <div style={{ marginBottom: '4px', color: '#888' }}>[edit]</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: '#0a0', fontSize: '8px' }}>●</span>
+                  <span style={{ fontWeight: 'bold', color: '#0a0' }}>ONLINE!</span>
+                </div>
+                {data.google_rating && (
+                  <div style={{ marginTop: '6px', color: '#666' }}>
+                    ⭐ {data.google_rating}/5 ({data.google_review_count || 0} reviews)
+                  </div>
+                )}
+                {data.logo_url && (
+                  <img src={data.logo_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover', marginTop: '8px' }} />
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Profile Views & Last Login */}
-          <div style={{ fontSize: '10px', color: '#333', padding: '4px 0', borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', marginBottom: '8px' }}>
-            <div><strong>Profile Views:</strong> {data.google_review_count ? data.google_review_count * 47 : 1337}</div>
-            <div><strong>Last Login:</strong> Today</div>
-          </div>
+            {/* Mood */}
+            <div style={{ fontSize: '11px', marginBottom: '4px' }}>
+              <strong>Mood:</strong> {data.google_rating && data.google_rating >= 4 ? 'Thriving! 🔥' : 'Open for business ✨'} [edit]
+            </div>
 
-          {/* Links */}
-          <div style={{ fontSize: '10px', marginBottom: '8px', lineHeight: '1.8' }}>
-            <div><span className="ms-link">Photos:</span> Edit | Upload</div>
-            <div><span className="ms-link">Videos:</span> Edit | Upload</div>
-            <div className="ms-link">Manage Blog</div>
-            <div className="ms-link">Manage Reviews</div>
-          </div>
+            {/* View my links */}
+            <div style={{ fontSize: '11px', marginBottom: '8px' }}>
+              <strong>View my:</strong> <span className="ms-link">Blog</span> | <span className="ms-link">Bulletins</span> | <span className="ms-link">Forum Topics</span>
+            </div>
 
-          {/* Contact Table */}
-          <div className="ms-section">
-            <div className="ms-section-header">Contacting {ind ? 'Me' : 'Us'}</div>
-            <div style={{ padding: '6px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            {/* Contacting Section */}
+            <div className="ms-section">
+              <div className="ms-sh">Contacting {data.business_name}</div>
+              <table className="ms-contact-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <tbody>
-                  {data.phone && (
+                  <tr>
+                    <td>🟢 <a href={data.cta_url || '#'}>Add to Friends</a></td>
+                    <td>⭐ <a href="#">Add to Favorites</a></td>
+                  </tr>
+                  {(email || data.phone) && (
                     <tr>
-                      <td style={{ padding: '4px 0', borderBottom: '1px solid #eee' }}>
-                        <a href={`tel:${data.phone}`} className="ms-link" style={{ fontSize: '11px' }}>📞 {ind ? 'Call Me' : 'Call Us'}</a>
-                      </td>
-                    </tr>
-                  )}
-                  {(data.contact_email || data.email) && (
-                    <tr>
-                      <td style={{ padding: '4px 0', borderBottom: '1px solid #eee' }}>
-                        <a href={`mailto:${data.contact_email || data.email}`} className="ms-link" style={{ fontSize: '11px' }}>✉️ Send Message</a>
-                      </td>
+                      {email && <td>💌 <a href={`mailto:${email}`}>Send Message</a></td>}
+                      {data.phone && <td>📞 <a href={`tel:${data.phone}`}>{data.phone}</a></td>}
                     </tr>
                   )}
                   <tr>
-                    <td style={{ padding: '4px 0' }}>
-                      <a href={data.cta_url || '#'} className="ms-link" style={{ fontSize: '11px', color: blue, fontWeight: 'bold' }}>⭐ Add to Friends</a>
-                    </td>
+                    <td>💬 Instant Message</td>
+                    <td>🚫 Block User</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-          </div>
 
-          {/* Alerts box */}
-          <div className="ms-section">
-            <div className="ms-section-header-orange">Alerts</div>
-            <div style={{ padding: '6px', fontSize: '10px' }}>
-              {data.google_rating && <div>⭐ Rated {data.google_rating}/5 on Google{data.google_review_count ? ` (${data.google_review_count} reviews)` : ''}</div>}
-              <div className="ms-online" style={{ marginTop: '4px' }}>● Online Now!</div>
+            {/* URL Section */}
+            <div style={{ border: '1px solid #ccc', padding: '6px 8px', marginBottom: '8px', fontSize: '11px' }}>
+              <div><strong>mAIspace URL:</strong></div>
+              <div style={{ color: '#36c', wordBreak: 'break-all' }}>maispace.com/{data.slug || 'profile'}</div>
+              <div style={{ color: '#888', fontSize: '10px' }}>[edit]</div>
             </div>
-          </div>
 
-          {/* URL Info */}
-          {data.website_current && (
-            <div style={{ padding: '4px 0', color: '#666', fontSize: '9px', wordBreak: 'break-all' }}>
-              🔗 {data.website_current}
-            </div>
-          )}
-        </div>
+            {/* Interests — Services as table */}
+            {services.length > 0 && (
+              <div className="ms-section">
+                <div className="ms-sh-orange">{data.business_name}&apos;s Interests</div>
+                <table className="ms-interests" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {services.map((s, i) => (
+                      <tr key={i}>
+                        <td>{s.name}</td>
+                        <td>{s.description || s.price || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div style={{ padding: '4px 8px', fontSize: '10px', color: '#888' }}>[edit]</div>
+              </div>
+            )}
 
-        {/* Right Column */}
-        <div style={{ flex: 1, padding: '8px', minWidth: 0, background: '#fff' }}>
-          {/* About Me */}
-          {data.description && (
+            {/* Links section */}
             <div className="ms-section">
-              <div className="ms-section-header">About {ind ? 'Me' : 'Us'}</div>
-              <div style={{ padding: '8px', color: '#333', lineHeight: '1.6' }}>
-                {data.description}
+              <div className="ms-sh-orange">{data.business_name}&apos;s Links</div>
+              <div style={{ padding: '6px 8px', fontSize: '11px' }}>
+                {data.website_current && <div>🌐 <span className="ms-link">{data.website_current}</span></div>}
+                {data.address && <div style={{ marginTop: '4px' }}>📍 {data.address}{data.city ? `, ${data.city}` : ''}{data.state ? `, ${data.state}` : ''}</div>}
+                <div style={{ marginTop: '4px', color: '#888', fontSize: '10px' }}>[edit]</div>
               </div>
             </div>
-          )}
 
-          {/* Who I'd Like to Meet */}
-          <div className="ms-section">
-            <div className="ms-section-header">{ind ? "Who I'd Like to Meet" : 'Our Ideal Customers'}</div>
-            <div style={{ padding: '8px', color: '#333', lineHeight: '1.6' }}>
-              Anyone looking for the best {data.category || 'services'} in {data.city || 'town'}!
-              {data.address && <div style={{ marginTop: '4px', color: '#666' }}>📍 {data.address}{data.city ? `, ${data.city}` : ''}{data.state ? `, ${data.state}` : ''}</div>}
-            </div>
-          </div>
-
-          {/* Interests (Services) */}
-          {services.length > 0 && (
-            <div className="ms-section">
-              <div className="ms-section-header">{ind ? 'My Services' : 'Our Services'}</div>
-              <div style={{ padding: '8px' }}>
-                {services.map((s, i) => (
-                  <div key={i} style={{ marginBottom: '6px' }}>
-                    <span style={{ color: blue, fontWeight: 'bold' }}>{s.name}</span>
-                    {s.price && <span style={{ color: '#666', marginLeft: '8px' }}>{s.price}</span>}
-                    {s.description && <div style={{ color: '#666', fontSize: '10px', marginTop: '2px' }}>{s.description}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Top 8 Friends (Gallery) */}
-          {galleryImages.length > 0 && (
-            <div className="ms-section">
-              <div className="ms-section-header">{data.business_name}&apos;s Top {Math.min(galleryImages.length, 8)} Friends</div>
-              <div style={{ padding: '8px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                {galleryImages.slice(0, 8).map((img, i) => (
-                  <div key={i} style={{ textAlign: 'center' }}>
-                    <img src={img} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', border: '1px solid #ccc' }} />
-                    <div className="ms-link" style={{ fontSize: '9px', marginTop: '2px' }}>Friend #{i + 1}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Hours */}
-          {Object.keys(hours).length > 0 && (
-            <div className="ms-section">
-              <div className="ms-section-header">Hours</div>
-              <div style={{ padding: '8px' }}>
-                {daysOrder.map(day => hours[day] ? (
-                  <div key={day} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', borderBottom: '1px solid #eee' }}>
-                    <span style={{ color: '#666' }}>{dayLabels[day]}</span>
-                    <span style={{ color: '#333' }}>{hours[day]}</span>
-                  </div>
-                ) : null)}
-              </div>
-            </div>
-          )}
-
-          {/* Comments (Reviews) */}
-          {reviews.length > 0 && (
-            <div className="ms-section">
-              <div className="ms-section-header">
-                {data.business_name}&apos;s Comments ({reviews.length})
-              </div>
-              <div style={{ padding: '8px' }}>
-                {reviews.map((r, i) => (
-                  <div key={i} className="ms-comment">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <span className="ms-link" style={{ fontWeight: 'bold' }}>{r.author}</span>
-                      <span style={{ color: '#999', fontSize: '9px' }}>{r.date || 'Posted recently'}</span>
+            {/* Hours */}
+            {Object.keys(hours).length > 0 && (
+              <div className="ms-section">
+                <div className="ms-sh">Hours</div>
+                <div style={{ padding: '6px 8px' }}>
+                  {daysOrder.map(day => hours[day] ? (
+                    <div key={day} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', borderBottom: '1px solid #f0f0f0', fontSize: '11px' }}>
+                      <span style={{ fontWeight: 'bold', color: '#5a8ab5' }}>{dayLabels[day]}</span>
+                      <span>{hours[day]}</span>
                     </div>
-                    <div style={{ color: '#333' }}>&quot;{r.text}&quot;</div>
-                    <div style={{ color: '#f90', fontSize: '9px', marginTop: '4px' }}>{'⭐'.repeat(r.rating)}</div>
+                  ) : null)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ═══ Right Column — Blurbs + Photos ═══ */}
+          <div style={{ flex: 1, padding: '8px 12px', minWidth: 0 }}>
+            {/* Blog Entries header */}
+            <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>
+              {data.business_name}&apos;s Latest Blog Entries [<span className="ms-link">View Blog</span>]
+            </div>
+            <div style={{ fontSize: '10px', color: '#888', marginBottom: '12px', fontStyle: 'italic' }}>
+              There are no Blog Entries yet.
+            </div>
+
+            {/* Blurbs Section — About + Photos */}
+            <div className="ms-section">
+              <div className="ms-sh-orange">{data.business_name}&apos;s Blurbs</div>
+              <div style={{ padding: '8px' }}>
+                {/* About me */}
+                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>About me:</div>
+                <div style={{ fontSize: '11px', color: '#333', lineHeight: '1.6', marginBottom: '12px' }}>
+                  {data.description || `Welcome to ${data.business_name}! The best ${data.category || 'business'} in ${data.city || 'town'}.`}
+                </div>
+
+                {/* Photos scattered in the blurb — large, varied sizes like real MySpace */}
+                {allImages.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {allImages.slice(0, 3).map((img, i) => (
+                      <div key={i} style={{ maxWidth: i === 0 ? '100%' : i === 1 ? '60%' : '75%', alignSelf: i === 1 ? 'flex-start' : i === 2 ? 'center' : 'stretch' }}>
+                        <img src={img} alt="" style={{ width: '100%', objectFit: 'cover', border: '1px solid #ccc' }} />
+                      </div>
+                    ))}
+                    {/* More photos in a grid */}
+                    {allImages.length > 3 && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                        {allImages.slice(3, 9).map((img, i) => (
+                          <img key={i} src={img} alt="" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', border: '1px solid #ccc' }} />
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ))}
+                )}
+
+                {/* Who I'd like to meet */}
+                <div style={{ marginTop: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>
+                    {ind ? "Who I'd like to meet:" : 'Who we\'d like to meet:'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#333', lineHeight: '1.6' }}>
+                    Anyone looking for the best {data.category || 'services'} in {data.city || 'town'}! Come visit us — you won&apos;t be disappointed. ✨
+                  </div>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Google Rating */}
-          {data.google_rating && (
-            <div style={{ textAlign: 'center', padding: '8px', color: '#666', fontSize: '10px' }}>
-              ★ {data.google_rating} stars{data.google_review_count >= 20 ? ` · ${data.google_review_count} reviews on Google` : ' on Google'}
+            {/* Friends (Top 8) — small thumbnails */}
+            <div className="ms-section">
+              <div className="ms-sh">{data.business_name}&apos;s Friend Space (<span className="ms-link">{reviews.length || visitors} friends</span>)</div>
+              <div style={{ padding: '8px' }}>
+                {reviews.length > 0 ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                    {reviews.slice(0, 8).map((r, i) => (
+                      <div key={i} style={{ textAlign: 'center' }}>
+                        <div style={{ width: '100%', aspectRatio: '1', background: `hsl(${(i * 47) % 360}, 40%, 80%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', borderRadius: '2px' }}>
+                          {r.author?.charAt(0) || '?'}
+                        </div>
+                        <div className="ms-link" style={{ fontSize: '9px', marginTop: '2px' }}>{r.author?.split(' ')[0] || `Friend ${i+1}`}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '10px', color: '#888' }}>Add friends to fill up your space!</div>
+                )}
+              </div>
             </div>
-          )}
+
+            {/* Comments (Reviews) */}
+            {reviews.length > 0 && (
+              <div className="ms-section">
+                <div className="ms-sh">{data.business_name}&apos;s Comments</div>
+                <div style={{ padding: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#888', marginBottom: '8px' }}>
+                    Displaying <strong>{reviews.length}</strong> of {reviews.length} comments
+                  </div>
+                  {reviews.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '8px', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                      <div style={{ width: '50px', flexShrink: 0, textAlign: 'center' }}>
+                        <div style={{ width: '50px', height: '50px', background: `hsl(${(i * 73) % 360}, 40%, 80%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                          {r.author?.charAt(0) || '?'}
+                        </div>
+                        <div className="ms-link" style={{ fontSize: '9px', marginTop: '2px' }}>{r.author?.split(' ')[0]}</div>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>
+                          {r.date || 'Posted recently'} — {'⭐'.repeat(r.rating)}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#333', lineHeight: '1.5' }}>
+                          &quot;{r.text}&quot;
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ background: blue, textAlign: 'center', padding: '12px', borderTop: '2px solid #002244' }}>
-        <div style={{ color: '#aaccee', fontSize: '9px', marginBottom: '4px' }}>
-          ☆ Thank you for visiting! ☆
-        </div>
-        <div style={{ display: 'inline-block', background: '#fff', border: '1px solid #999', padding: '2px 8px', fontSize: '10px', color: '#333' }}>
-          Visitors: {data.google_review_count ? data.google_review_count * 47 : 1337}
-        </div>
-        <div style={{ color: '#5b8fb9', fontSize: '8px', marginTop: '8px' }}>
-          Powered by AutoLocal.ai
-        </div>
+      {/* ═══ Footer ═══ */}
+      <div style={{ textAlign: 'center', padding: '12px', fontSize: '9px', color: '#667' }}>
+        <div>©2025 mAIspace. All Rights Reserved.</div>
+        <div style={{ marginTop: '4px' }}>Powered by <a href="https://autolocal.ai" style={{ color: '#36c' }}>AutoLocal.ai</a></div>
       </div>
-
     </div>
   )
 }
