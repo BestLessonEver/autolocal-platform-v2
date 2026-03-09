@@ -911,7 +911,7 @@ export default function ClientDashboard() {
                   Full size ↗
                 </a>
               </div>
-              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '580px' }}>
+              <div className="rounded-xl border border-white/10 overflow-hidden bg-white" style={{ height: '263px' }}>
                 <iframe
                   ref={iframeRef}
                   key={previewKey}
