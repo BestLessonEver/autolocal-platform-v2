@@ -249,16 +249,17 @@ export async function POST(req: Request) {
       const updatedSub = event.data.object as Stripe.Subscription
       const updEmail = updatedSub.metadata?.email
       if (updEmail && updatedSub.cancel_at_period_end) {
+        const cancelDate = updatedSub.cancel_at ? new Date(updatedSub.cancel_at * 1000).toISOString() : null
         await supabase
           .from('website_previews')
-          .update({ hosting_status: 'pending_cancel' })
+          .update({ hosting_status: 'pending_cancel', cancel_date: cancelDate })
           .eq('email', updEmail)
         if (process.env.DEBUG) console.log(`⏳ Pending cancel: ${updEmail}`)
       } else if (updEmail && !updatedSub.cancel_at_period_end && updatedSub.status === 'active') {
         // User re-activated (un-cancelled)
         await supabase
           .from('website_previews')
-          .update({ hosting_status: 'active' })
+          .update({ hosting_status: 'active', cancel_date: null })
           .eq('email', updEmail)
         if (process.env.DEBUG) console.log(`✅ Re-activated: ${updEmail}`)
       }

@@ -34,6 +34,7 @@ interface Preview {
   created_at: string
   view_count: number
   hosting_status: string | null
+  cancel_date: string | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -196,13 +197,14 @@ export default function AdminClientsPage() {
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Views</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Hosting</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Created</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Cancel Date</th>
                     <th className="text-right px-4 py-3 text-gray-500 font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPreviews.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="text-center py-12 text-gray-500">
+                      <td colSpan={9} className="text-center py-12 text-gray-500">
                         No previews yet. Generate one from the homepage or pipeline script.
                       </td>
                     </tr>
@@ -244,6 +246,13 @@ export default function AdminClientsPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">
                         {new Date(p.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        {p.cancel_date ? (
+                          <span className="text-orange-400">{new Date(p.cancel_date).toLocaleDateString()}</span>
+                        ) : (
+                          <span className="text-gray-600">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
