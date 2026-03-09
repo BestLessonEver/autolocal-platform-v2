@@ -165,9 +165,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Send welcome email
+  // Send welcome email (fire-and-forget — don't block webhook response)
   const hasGoogleData = existing !== null && existing !== undefined
-  await sendWelcomeEmail(email, contactName, businessName, hasGoogleData)
+  sendWelcomeEmail(email, contactName, businessName, hasGoogleData).catch(err =>
+    console.error('Webhook welcome email failed (non-fatal):', err)
+  )
 
   // Auto-deploy — site goes LIVE only after hosting is activated
   if (slug) {
@@ -220,7 +222,11 @@ export async function POST(req: Request) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
-      await handleCheckoutComplete(session)
+      try {
+        await handleCheckoutComplete(session)
+      } catch (err) {
+        console.error('handleCheckoutComplete error:', err)
+      }
       break
     }
 
