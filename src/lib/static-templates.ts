@@ -269,15 +269,6 @@ function boldTemplate(d: SiteData): string {
     </div>
   </section>
 
-  <!-- CTA Banner -->
-  <section class="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h2 class="text-4xl sm:text-6xl font-black tracking-tight mb-6">Ready to Get Started?</h2>
-      <p class="text-xl text-gray-400 mb-10 max-w-xl mx-auto">Contact us today and experience the difference.</p>
-      <a href="${esc(d.cta_url || '#contact')}" class="inline-flex px-12 py-5 rounded-lg text-white font-bold text-lg shadow-2xl transition-all transform hover:scale-105" style="background:${p}">${esc(ctaText)}</a>
-    </div>
-  </section>
-
   <!-- Footer -->
   <footer class="bg-black text-gray-500 py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -447,7 +438,8 @@ function elegantTemplate(d: SiteData): string {
 // ═══════════════════════════════════════════════════════
 // PROFESSIONAL TEMPLATE
 // ═══════════════════════════════════════════════════════
-function professionalTemplate(d: SiteData): string {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _professionalTemplate(d: SiteData): string {
   const p = d.brand_color_primary
   const a = d.brand_color_accent
   const heroImg = getHeroImg(d)
@@ -1099,7 +1091,8 @@ ${stickyContactBar(d)}
 </div>`
 }
 
-function pokemonTemplate(d: SiteData): string {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _pokemonTemplate(d: SiteData): string {
   const ind = isIndividual(d)
   const heroImg = getHeroImg(d)
   const gallery = getGallery(d)
@@ -1180,14 +1173,14 @@ const TEMPLATE_MAP: Record<string, (d: SiteData) => string> = {
   modern: bdeTemplate,
   bold: boldTemplate,
   elegant: elegantTemplate,
-  professional: professionalTemplate,
+  // professional: professionalTemplate, // removed
   clutch: clutchTemplate,
   artika: artikaTemplate,
   bde: bdeTemplate,
   myspace: myspaceTemplate,
   aim: aimTemplate,
   win95: win95Template,
-  pokemon: pokemonTemplate,
+  // pokemon: pokemonTemplate, // removed
   receipt: receiptTemplate,
 }
 

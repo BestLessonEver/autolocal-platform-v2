@@ -122,7 +122,7 @@ export default function BoldTemplate({ data }: TemplateProps) {
               <p className="text-sm font-bold tracking-[0.3em] uppercase mb-4" style={{ color: accent }}>What We Do</p>
               <h2 className="text-4xl sm:text-5xl font-black tracking-tight">{data.site_mode === 'individual' ? 'My Services' : 'Our Services'}</h2>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${data.services.length <= 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
               {data.services.map((s, i) => (
                 <div key={i} className="group bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300 hover:border-white/20">
                   <div
@@ -268,21 +268,6 @@ export default function BoldTemplate({ data }: TemplateProps) {
               </div>
             )}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Banner — Bold, dark */}
-      <section className="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl sm:text-6xl font-black tracking-tight mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-gray-400 mb-10 max-w-xl mx-auto">Contact us today and experience the difference.</p>
-          <a
-            href={ctaHref}
-            className="inline-flex px-12 py-5 rounded-lg text-white font-bold text-lg shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105"
-            style={{ backgroundColor: primary }}
-          >
-            {ctaText}
-          </a>
         </div>
       </section>
 

@@ -5,14 +5,14 @@ import { useState, useEffect, Component, type ErrorInfo, type ReactNode } from '
 import { type PreviewData, type TemplateName, categoryToTemplate } from '@/components/templates/types'
 import BoldTemplate from '@/components/templates/BoldTemplate'
 import ElegantTemplate from '@/components/templates/ElegantTemplate'
-import ProfessionalTemplate from '@/components/templates/ProfessionalTemplate'
+// Professional template removed
 import ClutchTemplate from '@/components/templates/ClutchTemplate'
 import ArtikaTemplate from '@/components/templates/ArtikaTemplate'
 import BDETemplate from '@/components/templates/BDETemplate'
 import MySpaceTemplate from '@/components/templates/MySpaceTemplate'
 import AIMTemplate from '@/components/templates/AIMTemplate'
 import Win95Template from '@/components/templates/Win95Template'
-import PokemonTemplate from '@/components/templates/PokemonTemplate'
+// Pokemon template removed
 import ReceiptTemplate from '@/components/templates/ReceiptTemplate'
 
 class TemplateErrorBoundary extends Component<
@@ -47,7 +47,7 @@ class TemplateErrorBoundary extends Component<
 const TEMPLATE_MAP: Record<string, React.ComponentType<{ data: PreviewData }>> = {
   bold: BoldTemplate,
   elegant: ElegantTemplate,
-  professional: ProfessionalTemplate,
+
   clutch: ClutchTemplate,
   artika: ArtikaTemplate,
   bde: BDETemplate,
@@ -55,14 +55,14 @@ const TEMPLATE_MAP: Record<string, React.ComponentType<{ data: PreviewData }>> =
   myspace: MySpaceTemplate,
   aim: AIMTemplate,
   win95: Win95Template,
-  pokemon: PokemonTemplate,
+
   receipt: ReceiptTemplate,
 }
 
 const TEMPLATE_OPTIONS: { key: TemplateName; label: string; icon: string }[] = [
   { key: 'bold', label: 'Bold', icon: '⚡' },
   { key: 'elegant', label: 'Elegant', icon: '✨' },
-  { key: 'professional', label: 'Pro', icon: '🏢' },
+
   { key: 'bde', label: 'Dark', icon: '🖤' },
 ]
 

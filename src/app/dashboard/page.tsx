@@ -60,13 +60,13 @@ interface ServiceItem {
 const TEMPLATES = [
   { id: 'modern', name: 'Modern', emoji: '✨' },
   { id: 'bold', name: 'Bold', emoji: '⚡' },
-  { id: 'professional', name: 'Professional', emoji: '💼' },
+
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
   { id: 'myspace', name: 'YourSpace', emoji: '🎵' },
   { id: 'aim', name: 'AIM', emoji: '💬' },
   { id: 'win95', name: 'Win95', emoji: '🖥️' },
-  { id: 'pokemon', name: 'Pokémon', emoji: '⚡' },
+
   { id: 'receipt', name: 'Receipt', emoji: '🧾' },
 ]
 
@@ -1005,17 +1005,11 @@ export default function ClientDashboard() {
             {/* Template Carousel */}
             <section id="sec-template" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-gray-400 mb-3">Design Template</h3>
-              <div className="flex gap-3 overflow-x-auto pb-2" ref={el => {
-                if (el && !el.dataset.scrolled) {
-                  el.dataset.scrolled = '1'
-                  const active = el.querySelector('[data-active-template]') as HTMLElement
-                  if (active) active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
-                }
-              }}>
+              <div className="grid grid-cols-4 gap-3 pb-2">
                 {TEMPLATES.map(t => (
                   <button key={t.id} onClick={() => updateFieldNow('template', t.id)}
                     {...(data.template === t.id ? { 'data-active-template': true } : {})}
-                    className={`shrink-0 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition min-w-[80px] sm:min-w-[90px] ${
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition ${
                       data.template === t.id ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10' : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
                     }`}>
                     <span className="text-2xl">{t.emoji}</span>
