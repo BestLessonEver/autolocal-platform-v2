@@ -33,6 +33,11 @@ interface Preview {
   template: string
   created_at: string
   view_count: number
+  subdomain: string | null
+  hosting_status: string | null
+  contact_name: string | null
+  headline: string | null
+  tagline: string | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -150,8 +155,8 @@ export default function AdminClientsPage() {
             <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Total Views</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-3xl font-black text-white">{clients.filter(c => c.status === 'active').length}</p>
-            <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Active</p>
+            <p className="text-3xl font-black text-white">{previews.filter(p => p.hosting_status === 'active').length}</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Hosting Active</p>
           </div>
         </div>
 
@@ -197,10 +202,11 @@ export default function AdminClientsPage() {
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Business</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Domain</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Location</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Rating</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Views</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Status</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Hosting</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-semibold">Created</th>
                     <th className="text-right px-4 py-3 text-gray-500 font-semibold">Actions</th>
                   </tr>
@@ -208,7 +214,7 @@ export default function AdminClientsPage() {
                 <tbody>
                   {filteredPreviews.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-12 text-gray-500">
+                      <td colSpan={8} className="text-center py-12 text-gray-500">
                         No previews yet. Generate one from the homepage or pipeline script.
                       </td>
                     </tr>
@@ -216,9 +222,18 @@ export default function AdminClientsPage() {
                     <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
                       <td className="px-4 py-3">
                         <p className="font-semibold text-white">{p.business_name}</p>
-                        <p className="text-xs text-gray-500">{p.slug}</p>
+                        <p className="text-xs text-gray-500">{p.contact_name || p.email || p.slug}</p>
                       </td>
-                      <td className="px-4 py-3 text-gray-400">
+                      <td className="px-4 py-3">
+                        {p.subdomain ? (
+                          <a href={`https://${p.subdomain}.autolocal.ai`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
+                            {p.subdomain}.autolocal.ai
+                          </a>
+                        ) : (
+                          <span className="text-gray-600 text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">
                         {p.city}{p.state ? `, ${p.state}` : ''}
                       </td>
                       <td className="px-4 py-3">
@@ -233,8 +248,12 @@ export default function AdminClientsPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-400">{p.view_count || 0}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[p.status] || STATUS_COLORS.draft}`}>
-                          {p.status}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          p.hosting_status === 'active' ? 'bg-green-500/20 text-green-400' :
+                          p.hosting_status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {p.hosting_status || 'free'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">
@@ -242,6 +261,13 @@ export default function AdminClientsPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={`/my-site/${p.id.slice(0, 8)}-${p.slug}`}
+                            target="_blank"
+                            className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
+                          >
+                            Dashboard
+                          </a>
                           <a
                             href={`/preview/${p.slug}`}
                             target="_blank"
