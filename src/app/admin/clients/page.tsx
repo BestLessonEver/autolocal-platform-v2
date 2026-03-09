@@ -168,6 +168,14 @@ export default function AdminClientsPage() {
             >
               All Sites ({previews.length})
             </button>
+            <button
+              onClick={() => setTab('clients')}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
+                tab === 'clients' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Leads ({previews.filter(p => p.email).length})
+            </button>
           </div>
           <input
             type="text"
@@ -294,7 +302,82 @@ export default function AdminClientsPage() {
               </table>
             </div>
           </div>
-        ) : null}
+        ) : (
+          /* Leads Table — sites with email addresses */
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Business</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Email</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Phone</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Location</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Hosting</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Created</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {previews.filter(p => p.email && p.email.toLowerCase().includes(search.toLowerCase()) || p.business_name.toLowerCase().includes(search.toLowerCase())).filter(p => p.email).length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center py-12 text-gray-500">
+                        No leads with email addresses yet.
+                      </td>
+                    </tr>
+                  ) : previews.filter(p => p.email).filter(p =>
+                    p.business_name.toLowerCase().includes(search.toLowerCase()) ||
+                    (p.email || '').toLowerCase().includes(search.toLowerCase())
+                  ).map(p => (
+                    <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-white">{p.business_name}</p>
+                        <p className="text-xs text-gray-500">{p.template}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <a href={`mailto:${p.email}`} className="text-indigo-400 hover:text-indigo-300 text-xs">{p.email}</a>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">{p.phone || '—'}</td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">{p.city}{p.state ? `, ${p.state}` : ''}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          p.hosting_status === 'active' ? 'bg-green-500/20 text-green-400' :
+                          p.hosting_status === 'pending_cancel' ? 'bg-orange-500/20 text-orange-400' :
+                          p.hosting_status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                          p.hosting_status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {p.hosting_status || 'preview'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={`/my-site/${p.id.slice(0, 8)}-${p.slug}`}
+                            target="_blank"
+                            className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
+                          >
+                            Dashboard
+                          </a>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(p.email || '')
+                              alert('Email copied!')
+                            }}
+                            className="px-2.5 py-1 rounded-md bg-indigo-600/20 border border-indigo-500/30 text-xs text-indigo-400 hover:bg-indigo-600/30 transition"
+                          >
+                            Copy Email
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
