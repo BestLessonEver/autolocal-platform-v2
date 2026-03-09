@@ -61,6 +61,36 @@ export default function AdminClientsPage() {
   const [search, setSearch] = useState('')
   const [deploying, setDeploying] = useState<string | null>(null)
   const [expandedEmail, setExpandedEmail] = useState<string | null>(null)
+  const [editingEmail, setEditingEmail] = useState<string | null>(null)
+  const [editEmailValue, setEditEmailValue] = useState('')
+
+  async function updateEmail(id: string) {
+    const res = await fetch('/api/admin/previews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, email: editEmailValue.trim() || null }),
+    })
+    if (res.ok) {
+      setEditingEmail(null)
+      loadData()
+    } else {
+      alert('Failed to update email')
+    }
+  }
+
+  async function deleteSite(id: string, name: string) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    const res = await fetch('/api/admin/previews', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (res.ok) {
+      loadData()
+    } else {
+      alert('Failed to delete')
+    }
+  }
 
   useEffect(() => {
     loadData()
@@ -221,7 +251,24 @@ export default function AdminClientsPage() {
                     <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
                       <td className="px-4 py-3">
                         <p className="font-semibold text-white">{p.business_name}</p>
-                        <p className="text-xs text-gray-500">{p.email || p.slug}</p>
+                        {editingEmail === p.id ? (
+                          <div className="flex items-center gap-1 mt-1">
+                            <input
+                              type="email"
+                              value={editEmailValue}
+                              onChange={e => setEditEmailValue(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') updateEmail(p.id); if (e.key === 'Escape') setEditingEmail(null) }}
+                              className="px-2 py-0.5 rounded bg-white/10 border border-white/20 text-xs text-white w-48 outline-none focus:border-indigo-500"
+                              autoFocus
+                            />
+                            <button onClick={() => updateEmail(p.id)} className="text-green-400 text-xs hover:text-green-300">✓</button>
+                            <button onClick={() => setEditingEmail(null)} className="text-gray-500 text-xs hover:text-gray-300">✕</button>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-500 cursor-pointer hover:text-indigo-400 transition" onClick={() => { setEditingEmail(p.id); setEditEmailValue(p.email || '') }}>
+                            {p.email || <span className="italic text-gray-600">no email — click to add</span>}
+                          </p>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <a href={`/preview/${p.slug}`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
@@ -295,6 +342,12 @@ export default function AdminClientsPage() {
                           >
                             Send Offer
                           </a>
+                          <button
+                            onClick={() => deleteSite(p.id, p.business_name)}
+                            className="px-2.5 py-1 rounded-md bg-red-600/10 border border-red-500/20 text-xs text-red-400 hover:bg-red-600/20 transition"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>

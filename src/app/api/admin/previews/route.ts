@@ -41,3 +41,59 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json(data || [])
 }
+
+export async function PATCH(req: NextRequest) {
+  if (!(await isAuthorized(req))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id, email } = await req.json()
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+  const { error } = await supabase
+    .from('website_previews')
+    .update({ email })
+    .eq('id', id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
+
+export async function DELETE(req: NextRequest) {
+  if (!(await isAuthorized(req))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id } = await req.json()
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+  // Delete associated storage files
+  const { data: preview } = await supabase
+    .from('website_previews')
+    .select('slug')
+    .eq('id', id)
+    .single()
+
+  if (preview?.slug) {
+    // Clean up logo and photos from storage
+    const { data: files } = await supabase.storage.from('logos').list(preview.slug)
+    if (files?.length) {
+      await supabase.storage.from('logos').remove(files.map(f => `${preview.slug}/${f.name}`))
+    }
+  }
+
+  // Delete drip entries
+  await supabase.from('drip_queue').delete().eq('preview_id', id)
+
+  // Delete change requests
+  await supabase.from('change_requests').delete().eq('preview_id', id)
+
+  // Delete the preview
+  const { error } = await supabase
+    .from('website_previews')
+    .delete()
+    .eq('id', id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
