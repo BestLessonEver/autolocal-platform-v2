@@ -143,8 +143,8 @@ export default function AdminClientsPage() {
             <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Previews</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-3xl font-black text-white">{clients.length}</p>
-            <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Clients</p>
+            <p className="text-3xl font-black text-white">{previews.filter(p => p.email).length}</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Leads (w/ email)</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4">
             <p className="text-3xl font-black text-white">{previews.reduce((sum, p) => sum + (p.view_count || 0), 0)}</p>
@@ -165,15 +165,7 @@ export default function AdminClientsPage() {
                 tab === 'previews' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'
               }`}
             >
-              Previews ({previews.length})
-            </button>
-            <button
-              onClick={() => setTab('clients')}
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
-                tab === 'clients' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Clients ({clients.length})
+              All Sites ({previews.length})
             </button>
           </div>
           <input
@@ -291,78 +283,7 @@ export default function AdminClientsPage() {
               </table>
             </div>
           </div>
-        ) : (
-          /* Clients Table */
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Business</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Contact</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Package</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Status</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-semibold">Joined</th>
-                    <th className="text-right px-4 py-3 text-gray-500 font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredClients.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="text-center py-12 text-gray-500">
-                        No clients yet. They&apos;ll show up here once they sign up through the offer page.
-                      </td>
-                    </tr>
-                  ) : filteredClients.map(c => (
-                    <tr key={c.id} className="border-b border-white/5 hover:bg-white/[0.02] transition">
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-white">{c.business_name}</p>
-                        {c.phone && <p className="text-xs text-gray-500">{c.phone}</p>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-gray-300">{c.owner_name || c.business_name}</p>
-                        <p className="text-xs text-gray-500">{c.email}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-gray-300 text-xs font-medium">
-                          {(c.package && PACKAGE_LABELS[c.package]) || c.package || '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[c.status] || STATUS_COLORS.draft}`}>
-                          {c.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">
-                        {new Date(c.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {(() => {
-                          // Find matching preview by business name or email
-                          const match = previews.find(p =>
-                            p.business_name.toLowerCase() === c.business_name.toLowerCase() ||
-                            (p.email && c.email && p.email === c.email)
-                          )
-                          const dashUrl = match
-                            ? `/my-site/${match.id.substring(0, 8)}-${match.slug}`
-                            : `/client/${c.id}`
-                          return (
-                            <a
-                              href={dashUrl}
-                              className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300 hover:border-white/20 hover:text-white transition"
-                            >
-                              Dashboard
-                            </a>
-                          )
-                        })()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
