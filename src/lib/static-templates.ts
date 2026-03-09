@@ -97,6 +97,7 @@ function hoursHtml(d: SiteData, labelClass: string, valueClass: string, rowClass
   return entries.length > 0 ? entries.join('') : ''
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function stickyContactBar(d: SiteData): string {
   const hasPhone = !!d.phone
   const bookingUrl = d.cta_url && !d.cta_url.startsWith('tel:') ? d.cta_url : null
@@ -278,7 +279,7 @@ function boldTemplate(d: SiteData): string {
       <p class="text-xs mt-10 text-gray-700">© ${year} ${esc(d.business_name)}. All rights reserved. · Powered by AutoLocal.ai</p>
     </div>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -431,7 +432,7 @@ function elegantTemplate(d: SiteData): string {
       <p class="text-white/30 text-xs mt-10" style="font-family:sans-serif">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
     </div>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -583,7 +584,7 @@ function _professionalTemplate(d: SiteData): string {
       <p class="text-white/30 text-xs mt-10">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
     </div>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -732,7 +733,7 @@ function clutchTemplate(d: SiteData): string {
       <p class="text-xs mt-8 text-gray-600">© ${year} ${esc(d.business_name)} · Powered by <span class="text-[#f97316]">AutoLocal.ai</span></p>
     </div>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -847,7 +848,7 @@ function artikaTemplate(d: SiteData): string {
     <p class="font-extralight text-xl mb-2" style="color:#2a2a2a">${esc(d.business_name)}</p>
     <p class="text-sm tracking-widest uppercase mt-8" style="color:#b0ada6">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -968,7 +969,7 @@ ${d.logo_url ? `<div class="absolute top-0 left-0 z-20 p-6"><img src="${esc(d.lo
     <p class="text-white font-black text-lg">${esc(d.business_name)}</p>
     <p class="text-gray-600 text-xs mt-3">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
   </footer>
-  ${stickyContactBar(d)}
+  
 </div>`
 }
 
@@ -1008,7 +1009,7 @@ ${Object.keys(d.hours).length > 0 ? `<div class="ms-section"><div class="ms-sh">
 ${d.reviews.length > 0 ? `<div class="ms-section"><div class="ms-sh">${esc(d.business_name)}'s Comments (${d.reviews.length})</div><div style="padding:8px">${reviewsHtml}</div></div>` : ''}
 </div></div>
 <div style="background:#003471;text-align:center;padding:12px;border-top:2px solid #002244"><div style="display:inline-block;background:#fff;border:1px solid #999;padding:2px 8px;font-size:10px;color:#333">Visitors: ${visitors}</div><div style="color:#5b8fb9;font-size:8px;margin-top:8px">Powered by AutoLocal.ai</div></div>
-${stickyContactBar(d)}
+
 </div>`
 }
 
@@ -1049,7 +1050,7 @@ ${d.reviews.length > 0 ? `<div style="border-top:1px solid #eee;margin-top:8px;p
 <div style="padding:4px;background:#ece9d8;border-top:1px solid #bbb"><textarea style="width:100%;border:2px inset #888;padding:4px;font-family:Tahoma,Arial,sans-serif;font-size:12px;background:white;resize:none" rows="2" placeholder="Send a message..." readonly></textarea><div style="display:flex;justify-content:flex-end;gap:4px;margin-top:4px"><a href="${d.phone ? `tel:${esc(d.phone)}` : '#'}" style="padding:3px 16px;background:#ece9d8;border:2px outset #dfdfdf;font-size:11px;font-weight:bold;text-decoration:none;color:#000">${d.phone ? (ind ? 'Call Me' : 'Call Us') : 'Send'}</a></div></div>
 <div style="background:#ece9d8;padding:2px 6px;border-top:1px solid #bbb;font-size:9px;color:#888;text-align:center">Powered by AutoLocal.ai</div>
 </div></div>
-${stickyContactBar(d)}
+
 </div>`
 }
 
@@ -1087,7 +1088,7 @@ ${d.reviews.length > 0 ? `<div style="font-weight:bold;margin:12px 0 8px">💬 R
 </div>
 <div style="position:fixed;bottom:0;left:0;right:0;height:28px;background:#c0c0c0;border-top:2px outset #dfdfdf;display:flex;align-items:center;padding:2px 4px;z-index:50"><div style="border:2px outset #dfdfdf;background:#c0c0c0;padding:2px 8px;display:flex;align-items:center;gap:4px;font-weight:bold;font-size:11px;height:22px">🪟 Start</div><div style="flex:1;padding:0 8px"><div style="border:2px outset #dfdfdf;padding:2px 8px;font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📋 ${esc(d.business_name)}</div></div><div style="border:1px inset #808080;padding:2px 8px;font-size:11px">${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}</div></div>
 <div style="text-align:center;padding-bottom:40px;color:#006666;font-size:9px">Powered by AutoLocal.ai</div>
-${stickyContactBar(d)}
+
 </div>`
 }
 
@@ -1121,7 +1122,7 @@ ${d.reviews.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px
 ${gallery.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🃏 Card Collection</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${galleryHtml}</div></div>` : ''}
 ${Object.keys(d.hours).length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px;background:rgba(255,255,255,.05);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,.1)"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🕐 Gym Hours</div>${hoursHtml}</div>` : ''}
 <div style="max-width:420px;width:100%;margin-top:16px;text-align:center;padding:16px;color:#888;font-size:11px">${d.address ? `<div>📍 ${esc(d.address)}${d.city?', '+esc(d.city):''}${d.state?', '+esc(d.state):''}</div>` : ''}${d.phone ? `<div style="margin-top:4px">📞 ${esc(d.phone)}</div>` : ''}<div style="margin-top:12px;color:#555;font-size:9px">Powered by AutoLocal.ai</div></div>
-${stickyContactBar(d)}
+
 </div>`
 }
 
@@ -1165,7 +1166,7 @@ ${gallery.length > 0 ? `<div style="display:grid;grid-template-columns:repeat(3,
 ${d.phone ? `<div class="r-ctr" style="margin:8px 0"><a href="tel:${esc(d.phone)}" style="display:inline-block;border:2px solid #1a1a1a;padding:8px 24px;font-weight:bold;font-size:14px;color:#1a1a1a;text-decoration:none;font-family:inherit;letter-spacing:1px">${ind ? 'CALL ME' : 'CALL US'}: ${esc(d.phone)}</a></div>` : ''}
 <div class="r-ctr" style="font-size:9px;color:#aaa;margin-top:16px">Powered by AutoLocal.ai</div>
 </div>
-${stickyContactBar(d)}
+
 </div>`
 }
 

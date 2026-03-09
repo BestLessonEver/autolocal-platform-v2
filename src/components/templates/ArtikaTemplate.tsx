@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
 
 const HERO_IMAGES: Record<string, string> = {
   salon: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1400&h=900&fit=crop',
@@ -267,7 +266,6 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
         </p>
       </footer>
 
-      <StickyContactBar data={data} />
     </div>
   )
 }

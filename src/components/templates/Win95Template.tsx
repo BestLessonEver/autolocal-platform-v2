@@ -3,7 +3,6 @@
 
 import { useState } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
 
 export default function Win95Template({ data }: TemplateProps) {
   const [startOpen, setStartOpen] = useState(false)
@@ -268,7 +267,6 @@ export default function Win95Template({ data }: TemplateProps) {
         Powered by AutoLocal.ai
       </div>
 
-      <StickyContactBar data={data} />
     </div>
   )
 }

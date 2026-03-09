@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
 
 export default function MySpaceTemplate({ data }: TemplateProps) {
   const [reviewIdx, setReviewIdx] = useState(0)
@@ -264,7 +263,6 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
         </div>
       </div>
 
-      <StickyContactBar data={data} />
     </div>
   )
 }

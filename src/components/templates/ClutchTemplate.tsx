@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
 
 /* ── CSS-only fade-in on scroll ── */
 const fadeInStyle = `
@@ -333,7 +332,6 @@ export default function ClutchTemplate({ data }: TemplateProps) {
         </div>
       </footer>
 
-      <StickyContactBar data={data} />
     </div>
   )
 }

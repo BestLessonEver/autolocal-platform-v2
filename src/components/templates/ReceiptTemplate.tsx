@@ -2,7 +2,6 @@
 'use client'
 
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
 
 function dots(label: string, value: string, width = 40): string {
   const used = label.length + value.length
@@ -251,7 +250,6 @@ export default function ReceiptTemplate({ data }: TemplateProps) {
         </div>
       </div>
 
-      <StickyContactBar data={data} />
     </div>
   )
 }
