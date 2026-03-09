@@ -257,21 +257,23 @@ export async function POST(req: Request) {
     case 'customer.subscription.updated': {
       // Handle cancel_at_period_end — user cancelled but billing cycle still active
       const updatedSub = event.data.object as Stripe.Subscription
-      const updEmail = updatedSub.metadata?.email
-      if (updEmail && updatedSub.cancel_at_period_end) {
+      const updCustomerId = typeof updatedSub.customer === 'string' ? updatedSub.customer : updatedSub.customer?.id
+      if (!updCustomerId) break
+
+      if (updatedSub.cancel_at_period_end) {
         const cancelDate = updatedSub.cancel_at ? new Date(updatedSub.cancel_at * 1000).toISOString() : null
         await supabase
           .from('website_previews')
           .update({ hosting_status: 'pending_cancel', cancel_date: cancelDate })
-          .eq('email', updEmail)
-        if (process.env.DEBUG) console.log(`⏳ Pending cancel: ${updEmail}`)
-      } else if (updEmail && !updatedSub.cancel_at_period_end && updatedSub.status === 'active') {
+          .eq('stripe_customer_id', updCustomerId)
+        if (process.env.DEBUG) console.log(`⏳ Pending cancel: ${updCustomerId}`)
+      } else if (!updatedSub.cancel_at_period_end && updatedSub.status === 'active') {
         // User re-activated (un-cancelled)
         await supabase
           .from('website_previews')
           .update({ hosting_status: 'active', cancel_date: null })
-          .eq('email', updEmail)
-        if (process.env.DEBUG) console.log(`✅ Re-activated: ${updEmail}`)
+          .eq('stripe_customer_id', updCustomerId)
+        if (process.env.DEBUG) console.log(`✅ Re-activated: ${updCustomerId}`)
       }
       break
     }
@@ -279,12 +281,14 @@ export async function POST(req: Request) {
     case 'customer.subscription.deleted': {
       // Handle subscription end — mark hosting as cancelled
       const subscription = event.data.object as Stripe.Subscription
-      const subEmail = subscription.metadata?.email
-      if (subEmail) {
+      const delCustomerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id
+      if (!delCustomerId) break
+
+      {
         const { data: preview } = await supabase
           .from('website_previews')
-          .select('business_name, slug')
-          .eq('email', subEmail)
+          .select('business_name, slug, email')
+          .eq('stripe_customer_id', delCustomerId)
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
@@ -292,11 +296,13 @@ export async function POST(req: Request) {
         await supabase
           .from('website_previews')
           .update({ hosting_status: 'cancelled' })
-          .eq('email', subEmail)
+          .eq('stripe_customer_id', delCustomerId)
 
         // Send cancellation confirmation email
         const bizName = preview?.business_name || 'your business'
         const slug = preview?.slug || ''
+        const subEmail = preview?.email
+        if (!subEmail) break
         try {
           await fetch('https://autolocal.ai/api/send-email', {
             method: 'POST',
@@ -343,7 +349,7 @@ export async function POST(req: Request) {
           console.error('Cancellation email failed:', emailErr)
         }
 
-        if (process.env.DEBUG) console.log(`⚠️ Hosting cancelled: ${subEmail}`)
+        if (process.env.DEBUG) console.log(`⚠️ Hosting cancelled: ${delCustomerId}`)
       }
       break
     }
