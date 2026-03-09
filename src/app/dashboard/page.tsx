@@ -1039,7 +1039,7 @@ export default function ClientDashboard() {
             {/* Hero */}
             <section id="sec-hero" className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 space-y-4">
               <h3 className="text-sm font-semibold text-gray-400">Hero Image</h3>
-              <div className="relative group rounded-xl overflow-hidden bg-white/5" style={{ aspectRatio: '4/3', maxHeight: '300px' }}>
+              <div className="relative group rounded-xl overflow-hidden bg-white/5" style={{ aspectRatio: '16/9', maxHeight: '360px' }}>
                 {data.hero_image_url ? (
                   <img src={data.hero_image_url} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop || 50}%` }} />
                 ) : (

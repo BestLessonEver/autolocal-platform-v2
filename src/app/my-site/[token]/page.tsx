@@ -604,7 +604,7 @@ export default function ClientDashboard() {
               <h3 className="text-sm font-semibold text-gray-400">Hero</h3>
 
               {/* Hero Image */}
-              <div className="relative group rounded-xl overflow-hidden h-48 bg-white/5">
+              <div className="relative group rounded-xl overflow-hidden bg-white/5" style={{ aspectRatio: '16/9', maxHeight: '360px' }}>
                 {data.hero_image_url ? (
                   <img
                     src={data.hero_image_url}
