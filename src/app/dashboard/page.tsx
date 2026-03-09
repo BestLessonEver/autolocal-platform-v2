@@ -503,7 +503,7 @@ function SortablePhoto({
 
   return (
     <div ref={setNodeRef} style={sortStyle} {...attributes} {...listeners}
-      className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group touch-none select-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
+      className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group select-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
       onClick={e => {
         if (!isDragging) { e.preventDefault(); onActionSheet() }
       }}>
@@ -525,8 +525,9 @@ function PhotoGrid({
   onUpload: (f: File) => void
   googleSource?: boolean
 }) {
-  const pointerSensor = useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
-  const sensors = useSensors(pointerSensor)
+  const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 10 } })
+  const sensors = useSensors(pointerSensor, touchSensor)
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
