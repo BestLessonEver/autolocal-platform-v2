@@ -65,10 +65,10 @@ export default function ArtikaTemplate({ data }: TemplateProps) {
         {/* Background: hero image with cream overlay */}
         <div className="absolute inset-0">
           <img src={heroImg} alt="" className="w-full h-full object-cover" style={{ objectPosition: `center ${data.hero_crop ?? 50}%` }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(250,249,246,0.92) 0%, rgba(250,249,246,0.7) 50%, rgba(250,249,246,0.3) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(250,249,246,0.6) 0%, rgba(250,249,246,0.35) 50%, rgba(250,249,246,0.1) 100%)' }} />
         </div>
 
-        <div className="relative z-10 px-6 max-w-3xl mx-auto artika-fade-up">
+        <div className="relative z-10 px-6 max-w-3xl mx-auto artika-fade-up" style={{ textShadow: '0 1px 8px rgba(250,249,246,0.8)' }}>
           {data.logo_url && (
             <img src={data.logo_url} alt="" className="h-16 w-16 mx-auto mb-8 rounded-full object-cover" />
           )}
