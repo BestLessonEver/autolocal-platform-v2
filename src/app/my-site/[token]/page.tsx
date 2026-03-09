@@ -78,6 +78,27 @@ const COLOR_PALETTES = [
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
+const DAY_KEY_MAP: Record<string, string> = { Monday: 'mon', Tuesday: 'tue', Wednesday: 'wed', Thursday: 'thu', Friday: 'fri', Saturday: 'sat', Sunday: 'sun' }
+
+function normalizeHoursToFull(h: Record<string, string> | null): Record<string, string> {
+  if (!h) return {}
+  const reverseMap: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' }
+  const result: Record<string, string> = {}
+  for (const [k, v] of Object.entries(h)) {
+    const fullKey = reverseMap[k.toLowerCase()] || (k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
+    result[fullKey] = v
+  }
+  return result
+}
+
+function hoursToDb(h: Record<string, string>): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const [k, v] of Object.entries(h)) {
+    result[DAY_KEY_MAP[k] || k.toLowerCase().slice(0, 3)] = v
+  }
+  return result
+}
+
 // ─── Hooks ──────────────────────────────────────────────────────────────────────
 
 function useAutosave(token: string, onSaved: () => void) {
@@ -249,7 +270,7 @@ export default function ClientDashboard() {
         if (!res.ok) throw new Error('Not found')
         return res.json()
       })
-      .then(setData)
+      .then(d => { if (d.hours) d.hours = normalizeHoursToFull(d.hours); setData(d) })
       .catch(() => setError('Invalid or expired dashboard link.'))
       .finally(() => setLoading(false))
   }, [token])
@@ -404,7 +425,7 @@ export default function ClientDashboard() {
   const updateHour = (day: string, value: string) => {
     const hours = { ...(data.hours || {}), [day]: value }
     setData(prev => prev ? { ...prev, hours } : prev)
-    save({ hours })
+    save({ hours: hoursToDb(hours) })
   }
 
   const toggleDayClosed = (day: string) => {
@@ -421,7 +442,7 @@ export default function ClientDashboard() {
       hours[day] = mondayHours
     }
     setData(prev => prev ? { ...prev, hours } : prev)
-    saveNow({ hours })
+    saveNow({ hours: hoursToDb(hours) })
   }
 
   // ─── Change Request ───────────────────────
