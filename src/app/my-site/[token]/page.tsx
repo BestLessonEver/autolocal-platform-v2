@@ -57,7 +57,7 @@ const TEMPLATES = [
   { id: 'bold', name: 'Bold', emoji: '⚡' },
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
-  { id: 'myspace', name: 'YourSpace', emoji: '🎵' },
+  { id: 'myspace', name: 'mAIspace', emoji: '🎵' },
   { id: 'aim', name: 'AIM', emoji: '💬' },
   { id: 'win95', name: 'Win95', emoji: '🖥️' },
   { id: 'receipt', name: 'Receipt', emoji: '🧾' },
@@ -655,6 +655,21 @@ export default function ClientDashboard() {
                       </button>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Hero Crop Slider */}
+              {data.hero_image_url && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1.5">Image Position</label>
+                  <input type="range" min="0" max="100" value={data.hero_crop ?? 50}
+                    onChange={e => {
+                      const v = parseInt(e.target.value)
+                      setData(p => p ? { ...p, hero_crop: v } : p)
+                      save({ hero_crop: v })
+                    }}
+                    className="w-full accent-indigo-600"
+                  />
                 </div>
               )}
 

@@ -60,8 +60,12 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
           <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Preview your custom website</span></td></tr>
             <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Edit text, photos, colors, and template from your dashboard</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Love it? Go live for $0 today (first month free)</span></td></tr>
+            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Love it? Go live — your first month is FREE</span></td></tr>
           </table>
+          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:16px 24px;margin:0 0 20px;text-align:center;">
+            <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 4px;">🎉 Free Month Promo</p>
+            <p style="color:#e0e7ff;font-size:13px;margin:0;">Activate hosting from your dashboard — $0 today, just $9/mo after your free trial.</p>
+          </div>
           <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Go to My Dashboard →</a>
           <p style="color:#52525b;font-size:13px;margin:24px 0 0;">
             Or preview your site directly: <a href="https://autolocal.ai/preview/${slug}" style="color:#6366f1;">autolocal.ai/preview/${slug}</a>

@@ -63,7 +63,7 @@ const TEMPLATES = [
 
   { id: 'clutch', name: 'Clutch', emoji: '🔥' },
   { id: 'artika', name: 'Artika', emoji: '🎨' },
-  { id: 'myspace', name: 'YourSpace', emoji: '🎵' },
+  { id: 'myspace', name: 'mAIspace', emoji: '🎵' },
   { id: 'aim', name: 'AIM', emoji: '💬' },
   { id: 'win95', name: 'Win95', emoji: '🖥️' },
 
@@ -504,9 +504,10 @@ function SortablePhoto({
   return (
     <div ref={setNodeRef} style={sortStyle} {...attributes} {...listeners}
       className={`relative rounded-lg overflow-hidden bg-white/5 cursor-grab active:cursor-grabbing group select-none ${isDragging ? 'shadow-2xl shadow-indigo-500/20 scale-105 ring-2 ring-indigo-500/50' : ''}`}
-      onClick={e => {
-        if (!isDragging) { e.preventDefault(); onActionSheet() }
-      }}>
+      onClickCapture={e => {
+        if (isDragging) { e.stopPropagation(); return }
+      }}
+      onClick={() => { if (!isDragging) onActionSheet() }}>
       <img src={url} alt="" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} style={{ WebkitTouchCallout: 'none' }} />
       {isHero && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white pointer-events-none">Hero</span>}
     </div>
