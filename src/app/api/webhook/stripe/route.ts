@@ -244,8 +244,29 @@ export async function POST(req: Request) {
       break
     }
 
+    case 'customer.subscription.updated': {
+      // Handle cancel_at_period_end — user cancelled but billing cycle still active
+      const updatedSub = event.data.object as Stripe.Subscription
+      const updEmail = updatedSub.metadata?.email
+      if (updEmail && updatedSub.cancel_at_period_end) {
+        await supabase
+          .from('website_previews')
+          .update({ hosting_status: 'pending_cancel' })
+          .eq('email', updEmail)
+        if (process.env.DEBUG) console.log(`⏳ Pending cancel: ${updEmail}`)
+      } else if (updEmail && !updatedSub.cancel_at_period_end && updatedSub.status === 'active') {
+        // User re-activated (un-cancelled)
+        await supabase
+          .from('website_previews')
+          .update({ hosting_status: 'active' })
+          .eq('email', updEmail)
+        if (process.env.DEBUG) console.log(`✅ Re-activated: ${updEmail}`)
+      }
+      break
+    }
+
     case 'customer.subscription.deleted': {
-      // Handle subscription cancellation — mark hosting as expired
+      // Handle subscription end — mark hosting as cancelled
       const subscription = event.data.object as Stripe.Subscription
       const subEmail = subscription.metadata?.email
       if (subEmail) {
@@ -259,7 +280,7 @@ export async function POST(req: Request) {
 
         await supabase
           .from('website_previews')
-          .update({ hosting_status: 'expired' })
+          .update({ hosting_status: 'cancelled' })
           .eq('email', subEmail)
 
         // Send cancellation confirmation email
