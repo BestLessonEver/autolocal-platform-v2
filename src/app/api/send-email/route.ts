@@ -1,8 +1,20 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
+import dns from 'dns'
 import { validateInternalAuth } from '@/lib/internal-auth'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Force IPv4 DNS resolution — Railway can't reach Gmail SMTP over IPv6
+dns.setDefaultResultOrder('ipv4first')
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER || 'brian@autolocal.ai',
+    pass: process.env.SMTP_PASS,
+  },
+})
 
 export async function POST(req: Request) {
   const auth = validateInternalAuth(req)
@@ -17,20 +29,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing to, subject, or html' }, { status: 400 })
     }
 
-    const { data, error } = await resend.emails.send({
-      from: 'AutoLocal.ai <brian@autolocal.ai>',
+    const info = await transporter.sendMail({
+      from: `"AutoLocal.ai" <brian@autolocal.ai>`,
       to,
       subject,
       html,
     })
 
-    if (error) {
-      console.error('[send-email] Resend error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    console.log('[send-email] Sent to', to, '— id:', data?.id)
-    return NextResponse.json({ success: true, id: data?.id })
+    console.log('[send-email] Sent to', to, '— messageId:', info.messageId)
+    return NextResponse.json({ success: true, messageId: info.messageId })
   } catch (err) {
     console.error('[send-email] Error:', err)
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
