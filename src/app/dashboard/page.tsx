@@ -526,8 +526,7 @@ function PhotoGrid({
   googleSource?: boolean
 }) {
   const pointerSensor = useSensor(PointerSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
-  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 500, tolerance: 8 } })
-  const sensors = useSensors(pointerSensor, touchSensor)
+  const sensors = useSensors(pointerSensor)
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
