@@ -118,6 +118,7 @@ export async function PATCH(
     template: 'template',
     site_mode: 'site_mode',
     hero_crop: 'hero_crop',
+    hero_image_url: 'hero_image_url',
   }
 
   for (const [bodyKey, dbKey] of Object.entries(allowedFields)) {
