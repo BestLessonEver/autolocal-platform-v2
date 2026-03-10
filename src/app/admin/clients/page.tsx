@@ -419,6 +419,9 @@ export default function AdminClientsPage() {
                                 <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(email); alert('Email copied!') }} className="px-2.5 py-1 rounded-md bg-indigo-600/20 border border-indigo-500/30 text-xs text-indigo-400 hover:bg-indigo-600/30 transition">
                                   Copy Email
                                 </button>
+                                <button onClick={async e => { e.stopPropagation(); if (!confirm(`Delete ALL ${sites.length} site(s) for ${email}?`)) return; for (const s of sites) { await fetch('/api/admin/previews', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: s.id }) }) }; loadData() }} className="px-2.5 py-1 rounded-md bg-red-600/10 border border-red-500/20 text-xs text-red-400 hover:bg-red-600/20 transition">
+                                  Delete
+                                </button>
                                 {sites.length > 1 && (
                                   <span className="text-gray-500 text-xs">{isExpanded ? '▲' : '▼'}</span>
                                 )}
@@ -444,9 +447,14 @@ export default function AdminClientsPage() {
                               </td>
                               <td className="px-4 py-2 text-gray-500 text-xs">{new Date(s.created_at).toLocaleDateString()}</td>
                               <td className="px-4 py-2 text-right">
-                                <a href={`/my-site/${s.id.slice(0, 8)}-${s.slug}`} target="_blank" className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-gray-300 hover:text-white transition">
-                                  Dashboard
-                                </a>
+                                <div className="flex items-center justify-end gap-2">
+                                  <a href={`/my-site/${s.id.slice(0, 8)}-${s.slug}`} target="_blank" className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-gray-300 hover:text-white transition">
+                                    Dashboard
+                                  </a>
+                                  <button onClick={() => deleteSite(s.id, s.business_name)} className="px-2 py-0.5 rounded-md bg-red-600/10 border border-red-500/20 text-[10px] text-red-400 hover:bg-red-600/20 transition">
+                                    Delete
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))}
