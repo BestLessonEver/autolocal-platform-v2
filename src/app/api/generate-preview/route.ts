@@ -60,10 +60,12 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
           </div>
 
           <!-- Promo box -->
-          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:20px 24px;margin:0 0 28px;text-align:center;">
-            <p style="color:#ffffff;font-size:15px;font-weight:800;margin:0 0 6px;">🎉 Free Month of Hosting</p>
-            <p style="color:#ffffff;font-size:14px;margin:0;">Activate from your dashboard — <strong>$0 today</strong>, just $9/mo after your free trial. Cancel anytime.</p>
-          </div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td align="center" bgcolor="#6366f1" style="background:#6366f1;border-radius:12px;padding:20px 24px;">
+              <span style="color:#ffffff !important;font-size:15px;font-weight:800;display:block;margin:0 0 6px;">🎉 Free Month of Hosting</span>
+              <span style="color:#ffffff !important;font-size:14px;display:block;">Activate from your dashboard — <b style="color:#ffffff !important;">$0 today</b>, just $9/mo after your free trial. Cancel anytime.</span>
+            </td></tr>
+          </table>
 
           <!-- How to make your site great -->
           <h2 style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 12px;">🛠️ How to Make Your Site Stand Out</h2>
