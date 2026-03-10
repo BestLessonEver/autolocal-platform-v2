@@ -1,25 +1,42 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const searchParams = useSearchParams()
+  const prefillEmail = searchParams.get('email') || ''
+  const redirect = searchParams.get('redirect') || ''
+  const [email, setEmail] = useState(prefillEmail)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+
+  // Auto-submit if email is prefilled from URL
+  useEffect(() => {
+    if (prefillEmail && !sent) {
+      setEmail(prefillEmail)
+      // Small delay so UI renders first
+      const timer = setTimeout(() => {
+        document.getElementById('login-form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [prefillEmail]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
+    const redirectPath = redirect || '/dashboard'
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
       },
     })
 
@@ -77,7 +94,7 @@ export default function LoginPage() {
                 Enter the email associated with your website and we&apos;ll send you a magic link.
               </p>
 
-              <form onSubmit={handleMagicLink} className="space-y-4">
+              <form id="login-form" onSubmit={handleMagicLink} className="space-y-4">
                 <div>
                   <input
                     type="email"

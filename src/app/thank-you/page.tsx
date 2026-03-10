@@ -10,6 +10,7 @@ function ThankYouContent() {
   const product = params.get('product') || 'website'
   const slug = params.get('slug') || ''
   const businessName = params.get('business') || 'your business'
+  const email = params.get('email') || ''
   const [confetti, setConfetti] = useState(true)
 
   useEffect(() => {
@@ -95,10 +96,10 @@ function ThankYouContent() {
         </div>
 
         <a
-          href="/dashboard"
+          href={email ? `/login?email=${encodeURIComponent(email)}&redirect=/dashboard` : '/dashboard'}
           className="inline-block px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold hover:shadow-lg hover:shadow-indigo-500/20 transition hover:scale-[1.02] active:scale-[0.98]"
         >
-          Go to My Dashboard →
+          Customize Your Site →
         </a>
 
         <p className="text-gray-600 text-sm mt-10">

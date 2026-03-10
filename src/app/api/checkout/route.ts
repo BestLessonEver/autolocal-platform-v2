@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         line_items: [
           { price: PRICES.hosting, quantity: 1 },
         ],
-        success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=hosting&business=${encodeURIComponent(businessName || '')}&slug=${encodeURIComponent(slug || '')}`,
+        success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=hosting&business=${encodeURIComponent(businessName || '')}&slug=${encodeURIComponent(slug || '')}&email=${encodeURIComponent(email || '')}`,
         cancel_url: slug
           ? `https://autolocal.ai/my-site/${encodeURIComponent(slug)}`
           : `https://autolocal.ai`,
