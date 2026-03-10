@@ -490,6 +490,26 @@ export async function POST(req: NextRequest) {
     }
 
     log('[generate-preview] Success! Preview URL:', `/preview/${fullSlug}`)
+
+    // 🔔 Admin alert — new signup notification
+    sendEmail(
+      'brian@autolocal.ai',
+      `🆕 New signup: ${name}`,
+      `<div style="font-family:sans-serif;font-size:14px;color:#333;max-width:500px">
+        <h2 style="margin:0 0 12px">New AutoLocal Signup</h2>
+        <table style="border-collapse:collapse;width:100%">
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#666">Business</td><td style="padding:4px 8px">${name}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#666">Email</td><td style="padding:4px 8px">${email || 'none'}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#666">Template</td><td style="padding:4px 8px">${template}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#666">Category</td><td style="padding:4px 8px">${category || '—'}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;color:#666">Rating</td><td style="padding:4px 8px">${rating ? `${rating} ⭐ (${reviewCount} reviews)` : '—'}</td></tr>
+        </table>
+        <div style="margin-top:16px">
+          <a href="https://autolocal.ai/preview/${fullSlug}" style="display:inline-block;padding:8px 20px;background:#6366f1;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold">View Preview →</a>
+          <a href="https://autolocal.ai/admin/clients" style="display:inline-block;padding:8px 20px;background:#333;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin-left:8px">Admin →</a>
+        </div>
+      </div>`,
+    ).catch(() => {})
     return NextResponse.json({
       success: true,
       previewUrl: previewToken
