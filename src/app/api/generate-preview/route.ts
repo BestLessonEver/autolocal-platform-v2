@@ -51,32 +51,60 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
         </td></tr>
         <tr><td style="background-color:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;">
           <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 16px;">Hi ${firstName}, your website is ready! 🎉</h1>
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 8px;">
-            We just built a custom website for <strong style="color:#ffffff;">${businessName}</strong> using your real Google reviews, photos, and business info.
+          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 16px;">
+            We just built a custom website for <strong style="color:#ffffff;">${businessName}</strong> using your real business info. It's live and ready to customize right now.
           </p>
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
-            Here's what you can do next:
-          </p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Preview your custom website</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Edit text, photos, colors, and template from your dashboard</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Love it? Go live — your first month is FREE</span></td></tr>
-          </table>
-          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:16px 24px;margin:0 0 20px;text-align:center;">
-            <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 4px;">🎉 Free Month Promo</p>
-            <p style="color:#e0e7ff;font-size:13px;margin:0;">Activate hosting from your dashboard — $0 today, just $9/mo after your free trial.</p>
+
+          <!-- CTA -->
+          <div style="text-align:center;margin:0 0 28px;">
+            <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Open My Dashboard →</a>
           </div>
-          <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Go to My Dashboard →</a>
-          <p style="color:#52525b;font-size:13px;margin:24px 0 0;">
-            Or preview your site directly: <a href="https://autolocal.ai/preview/${slug}" style="color:#6366f1;">autolocal.ai/preview/${slug}</a>
+
+          <!-- Promo box -->
+          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:16px 24px;margin:0 0 28px;text-align:center;">
+            <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 4px;">🎉 Free Month of Hosting</p>
+            <p style="color:#e0e7ff;font-size:13px;margin:0;">Activate from your dashboard — $0 today, just $9/mo after your free trial. Cancel anytime.</p>
+          </div>
+
+          <!-- How to make your site great -->
+          <h2 style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 12px;">🛠️ How to Make Your Site Stand Out</h2>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;width:100%;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <span style="color:#6366f1;font-weight:700;font-size:14px;">📸 Upload professional photos</span>
+              <p style="color:#71717a;font-size:13px;line-height:1.5;margin:4px 0 0;">This is the #1 thing that makes a site look great. Phone photos work, but pro photos make you look like a premium business. Show your space, your team, your work.</p>
+            </td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <span style="color:#6366f1;font-weight:700;font-size:14px;">✏️ Customize your text</span>
+              <p style="color:#71717a;font-size:13px;line-height:1.5;margin:4px 0 0;">Click any text on your dashboard to edit it. Update your headline, description, and services to match your voice.</p>
+            </td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <span style="color:#6366f1;font-weight:700;font-size:14px;">🎨 Try different templates</span>
+              <p style="color:#71717a;font-size:13px;line-height:1.5;margin:4px 0 0;">Your dashboard has 8 templates — modern, bold, artsy, even retro. Switch anytime and see a live preview instantly.</p>
+            </td></tr>
+            <tr><td style="padding:8px 0;">
+              <span style="color:#6366f1;font-weight:700;font-size:14px;">🕐 Add your hours & contact info</span>
+              <p style="color:#71717a;font-size:13px;line-height:1.5;margin:4px 0 0;">Make sure customers can find you. Add your business hours, phone number, and email so they can reach out.</p>
+            </td></tr>
+          </table>
+
+          <!-- How to log in -->
+          <h2 style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 8px;">🔑 How to Log In</h2>
+          <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 6px;">
+            <strong style="color:#d4d4d8;">Option 1:</strong> Click the button above — it signs you in automatically.
           </p>
-          <p style="color:#52525b;font-size:13px;margin:12px 0 0;">
-            You can sign in anytime at <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> using this email.
+          <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 6px;">
+            <strong style="color:#d4d4d8;">Option 2:</strong> Go to <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> and enter this email. We'll send you a sign-in link (no password needed).
+          </p>
+          <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 20px;">
+            <strong style="color:#d4d4d8;">Your preview:</strong> <a href="https://autolocal.ai/preview/${slug}" style="color:#6366f1;">autolocal.ai/preview/${slug}</a>
+          </p>
+
+          <p style="color:#52525b;font-size:13px;margin:0;">
+            Questions? Just reply to this email — a real person reads every one.
           </p>
         </td></tr>
         <tr><td align="center" style="padding-top:24px;">
-          <p style="color:#3f3f46;font-size:12px;margin:0;">Questions? Reply to this email or reach us at brian@autolocal.ai</p>
-          <p style="color:#27272a;font-size:11px;margin:12px 0 0;">AutoLocal.ai · Custom websites for local businesses</p>
+          <p style="color:#3f3f46;font-size:12px;margin:0;">Brian @ AutoLocal.ai · Custom websites for local businesses</p>
         </td></tr>
       </table>
     </td></tr>
