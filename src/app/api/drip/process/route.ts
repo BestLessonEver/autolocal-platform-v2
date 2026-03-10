@@ -8,17 +8,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function POST(req: Request) {
+async function processQueue() {
   try {
-    const auth = req.headers.get('authorization')
-    const expectedKey = process.env.INTERNAL_API_KEY
-    if (!expectedKey) {
-      return NextResponse.json({ error: 'Internal API not configured' }, { status: 503 })
-    }
-    if (auth !== `Bearer ${expectedKey}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     // Get all due emails
     const now = new Date().toISOString()
     const { data: due, error: fetchErr } = await supabase
@@ -151,4 +142,27 @@ export async function POST(req: Request) {
     console.error('Drip process error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
+}
+
+// GET — cron-friendly endpoint (use ?key=INTERNAL_API_KEY)
+export async function GET(req: Request) {
+  const url = new URL(req.url)
+  const key = url.searchParams.get('key')
+  const expectedKey = process.env.INTERNAL_API_KEY
+  if (!expectedKey || key !== expectedKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return processQueue()
+}
+
+export async function POST(req: Request) {
+  const auth = req.headers.get('authorization')
+  const expectedKey = process.env.INTERNAL_API_KEY
+  if (!expectedKey) {
+    return NextResponse.json({ error: 'Internal API not configured' }, { status: 503 })
+  }
+  if (auth !== `Bearer ${expectedKey}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return processQueue()
 }

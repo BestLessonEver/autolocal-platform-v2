@@ -905,7 +905,7 @@ export default function ClientDashboard() {
                 <span>
                   {data.hosting_status === 'active' ? '🟢 Hosting Active — $9/mo' : '👁️ Free Preview Mode'}
                 </span>
-                <a href="/api/billing-portal" className="text-indigo-400 hover:underline">Manage Billing</a>
+                <a href={`/api/billing-portal?email=${encodeURIComponent(data.email || '')}`} className="text-indigo-400 hover:underline">Manage Billing</a>
                 <span className="text-gray-700">·</span>
                 <a href="mailto:support@autolocal.ai?subject=Feedback" className="hover:text-gray-300 transition">💡 Feedback</a>
                 <a href="mailto:support@autolocal.ai?subject=Bug Report" className="hover:text-gray-300 transition">🐛 Bug</a>
