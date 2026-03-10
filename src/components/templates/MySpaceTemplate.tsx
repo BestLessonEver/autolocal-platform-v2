@@ -288,7 +288,6 @@ export default function MySpaceTemplate({ data }: TemplateProps) {
       {/* ═══ Footer ═══ */}
       <div style={{ textAlign: 'center', padding: '12px', fontSize: '9px', color: '#667' }}>
         <div>©2025 mAIspace. All Rights Reserved.</div>
-        <div style={{ marginTop: '4px' }}>Powered by <a href="https://autolocal.ai" style={{ color: '#36c' }}>AutoLocal.ai</a></div>
       </div>
     </div>
   )

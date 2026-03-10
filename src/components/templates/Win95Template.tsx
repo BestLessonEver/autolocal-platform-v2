@@ -47,8 +47,8 @@ export default function Win95Template({ data }: TemplateProps) {
         .w95-checkbox { width: 13px; height: 13px; border: 2px inset #808080; background: white; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px; font-size: 10px; }
       `}} />
 
-      {/* Desktop Icons */}
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '24px', position: 'absolute', top: 0, left: 8 }}>
+      {/* Desktop Icons — hidden on mobile */}
+      <div className="hidden sm:flex" style={{ padding: '16px', flexDirection: 'column', gap: '24px', position: 'absolute', top: 0, left: 8 }}>
         {[
           { icon: '💻', label: 'My Computer' },
           { icon: '📁', label: 'My Documents' },
@@ -264,7 +264,6 @@ export default function Win95Template({ data }: TemplateProps) {
 
       {/* Footer */}
       <div style={{ textAlign: 'center', paddingBottom: '40px', color: '#006666', fontSize: '9px' }}>
-        Powered by AutoLocal.ai
       </div>
 
     </div>

@@ -178,7 +178,7 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
                   href={accessToken ? `/my-site/${accessToken}` : '/dashboard'}
                   className="px-4 py-1.5 bg-white text-emerald-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
-                  Go to Dashboard →
+                  Customize Your Site →
                 </a>
               ) : (
                 <button

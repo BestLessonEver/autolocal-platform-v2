@@ -276,7 +276,7 @@ function boldTemplate(d: SiteData): string {
       <p class="text-white font-black text-2xl mb-3">${esc(d.business_name)}</p>
       ${d.address ? `<p class="text-sm">${esc(d.address)}${d.city ? `, ${esc(d.city)}` : ''}${d.state ? `, ${esc(d.state)}` : ''}</p>` : ''}
       ${d.phone ? `<p class="text-sm mt-1">${esc(d.phone)}</p>` : ''}
-      <p class="text-xs mt-10 text-gray-700">© ${year} ${esc(d.business_name)}. All rights reserved. · Powered by AutoLocal.ai</p>
+      <p class="text-xs mt-10 text-gray-700">© ${year} ${esc(d.business_name)}. All rights reserved.</p>
     </div>
   </footer>
   
@@ -429,7 +429,7 @@ function elegantTemplate(d: SiteData): string {
       <p class="text-3xl font-bold mb-3">${esc(d.business_name)}</p>
       ${d.address ? `<p class="text-white/60 text-sm">${esc(d.address)}${d.city ? `, ${esc(d.city)}` : ''}${d.state ? `, ${esc(d.state)}` : ''}</p>` : ''}
       ${d.phone ? `<p class="text-white/60 text-sm mt-1">${esc(d.phone)}</p>` : ''}
-      <p class="text-white/30 text-xs mt-10" style="font-family:sans-serif">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
+      <p class="text-white/30 text-xs mt-10" style="font-family:sans-serif">© ${year} ${esc(d.business_name)}</p>
     </div>
   </footer>
   
@@ -581,7 +581,7 @@ function _professionalTemplate(d: SiteData): string {
       <p class="font-bold text-xl mb-2">${esc(d.business_name)}</p>
       ${d.address ? `<p class="text-white/70 text-sm">${esc(d.address)}</p>` : ''}
       ${d.phone ? `<p class="text-white/70 text-sm mt-1">${esc(d.phone)}</p>` : ''}
-      <p class="text-white/30 text-xs mt-10">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
+      <p class="text-white/30 text-xs mt-10">© ${year} ${esc(d.business_name)}</p>
     </div>
   </footer>
   
@@ -846,7 +846,7 @@ function artikaTemplate(d: SiteData): string {
   <footer class="py-16 px-6 text-center">
     <div class="w-8 h-px mx-auto mb-8" style="background:#d4d0c8"></div>
     <p class="font-extralight text-xl mb-2" style="color:#2a2a2a">${esc(d.business_name)}</p>
-    <p class="text-sm tracking-widest uppercase mt-8" style="color:#b0ada6">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
+    <p class="text-sm tracking-widest uppercase mt-8" style="color:#b0ada6">© ${year} ${esc(d.business_name)}</p>
   </footer>
   
 </div>`
@@ -967,7 +967,7 @@ ${d.logo_url ? `<div class="absolute top-0 left-0 z-20 p-6"><img src="${esc(d.lo
   <!-- Footer -->
   <footer class="py-12 border-t border-white/5 text-center">
     <p class="text-white font-black text-lg">${esc(d.business_name)}</p>
-    <p class="text-gray-600 text-xs mt-3">© ${year} ${esc(d.business_name)} · Powered by AutoLocal.ai</p>
+    <p class="text-gray-600 text-xs mt-3">© ${year} ${esc(d.business_name)}</p>
   </footer>
   
 </div>`
@@ -1008,7 +1008,7 @@ ${gallery.length > 0 ? `<div class="ms-section"><div class="ms-sh">${esc(d.busin
 ${Object.keys(d.hours).length > 0 ? `<div class="ms-section"><div class="ms-sh">Hours</div><div style="padding:8px">${daysHtml}</div></div>` : ''}
 ${d.reviews.length > 0 ? `<div class="ms-section"><div class="ms-sh">${esc(d.business_name)}'s Comments (${d.reviews.length})</div><div style="padding:8px">${reviewsHtml}</div></div>` : ''}
 </div></div>
-<div style="background:#003471;text-align:center;padding:12px;border-top:2px solid #002244"><div style="display:inline-block;background:#fff;border:1px solid #999;padding:2px 8px;font-size:10px;color:#333">Visitors: ${visitors}</div><div style="color:#5b8fb9;font-size:8px;margin-top:8px">Powered by AutoLocal.ai</div></div>
+<div style="background:#003471;text-align:center;padding:12px;border-top:2px solid #002244"><div style="display:inline-block;background:#fff;border:1px solid #999;padding:2px 8px;font-size:10px;color:#333">Visitors: ${visitors}</div><div style="color:#5b8fb9;font-size:8px;margin-top:8px"></div></div>
 
 </div>`
 }
@@ -1048,7 +1048,7 @@ ${d.services.length > 0 ? `<div style="padding:4px 8px"><span style="font-weight
 ${d.reviews.length > 0 ? `<div style="border-top:1px solid #eee;margin-top:8px;padding-top:8px;padding-left:8px;color:#888;font-size:10px">— What people are saying —</div>${chatMsgs}` : ''}
 </div>
 <div style="padding:4px;background:#ece9d8;border-top:1px solid #bbb"><textarea style="width:100%;border:2px inset #888;padding:4px;font-family:Tahoma,Arial,sans-serif;font-size:12px;background:white;resize:none" rows="2" placeholder="Send a message..." readonly></textarea><div style="display:flex;justify-content:flex-end;gap:4px;margin-top:4px"><a href="${d.phone ? `tel:${esc(d.phone)}` : '#'}" style="padding:3px 16px;background:#ece9d8;border:2px outset #dfdfdf;font-size:11px;font-weight:bold;text-decoration:none;color:#000">${d.phone ? (ind ? 'Call Me' : 'Call Us') : 'Send'}</a></div></div>
-<div style="background:#ece9d8;padding:2px 6px;border-top:1px solid #bbb;font-size:9px;color:#888;text-align:center">Powered by AutoLocal.ai</div>
+<div style="background:#ece9d8;padding:2px 6px;border-top:1px solid #bbb;font-size:9px;color:#888;text-align:center"></div>
 </div></div>
 
 </div>`
@@ -1066,7 +1066,7 @@ function win95Template(d: SiteData): string {
   return `
 <div style="min-height:100vh;background:#008080;font-family:'MS Sans Serif',Tahoma,Arial,sans-serif;font-size:11px;color:#000;cursor:default;padding-bottom:36px">
 <style>.w95-w{background:#c0c0c0;border:2px outset #dfdfdf;box-shadow:2px 2px 0 #000}.w95-tb{background:#000080;color:white;padding:2px 4px;display:flex;align-items:center;justify-content:space-between;font-weight:bold;font-size:11px}.w95-b{width:16px;height:14px;background:#c0c0c0;border:1px outset #dfdfdf;display:inline-flex;align-items:center;justify-content:center;font-size:8px}.w95-btn{padding:3px 16px;border:2px outset #dfdfdf;background:#c0c0c0;font-family:inherit;font-size:11px;cursor:pointer;text-decoration:none;color:#000;display:inline-block}</style>
-<div style="padding:16px;display:flex;flex-direction:column;gap:24px;position:absolute;top:0;left:8px">
+<div class="hidden sm:flex" style="padding:16px;flex-direction:column;gap:24px;position:absolute;top:0;left:8px">
 <div style="text-align:center;width:64px"><div style="font-size:32px">💻</div><div style="color:white;font-size:11px;text-shadow:1px 1px 0 #000">My Computer</div></div>
 <div style="text-align:center;width:64px"><div style="font-size:32px">📁</div><div style="color:white;font-size:11px;text-shadow:1px 1px 0 #000">My Documents</div></div>
 </div>
@@ -1087,7 +1087,7 @@ ${d.reviews.length > 0 ? `<div style="font-weight:bold;margin:12px 0 8px">💬 R
 <div style="padding:0 8px 8px;display:flex;justify-content:flex-end;gap:6px">${d.phone ? `<a href="tel:${esc(d.phone)}" class="w95-btn" style="font-weight:bold">📞 ${ind ? 'Call Me' : 'Call Us'}</a>` : ''}<span class="w95-btn">OK</span><span class="w95-btn">Cancel</span></div>
 </div>
 <div style="position:fixed;bottom:0;left:0;right:0;height:28px;background:#c0c0c0;border-top:2px outset #dfdfdf;display:flex;align-items:center;padding:2px 4px;z-index:50"><div style="border:2px outset #dfdfdf;background:#c0c0c0;padding:2px 8px;display:flex;align-items:center;gap:4px;font-weight:bold;font-size:11px;height:22px">🪟 Start</div><div style="flex:1;padding:0 8px"><div style="border:2px outset #dfdfdf;padding:2px 8px;font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📋 ${esc(d.business_name)}</div></div><div style="border:1px inset #808080;padding:2px 8px;font-size:11px">${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}</div></div>
-<div style="text-align:center;padding-bottom:40px;color:#006666;font-size:9px">Powered by AutoLocal.ai</div>
+<div style="text-align:center;padding-bottom:40px;color:#006666;font-size:9px"></div>
 
 </div>`
 }
@@ -1121,7 +1121,7 @@ function _pokemonTemplate(d: SiteData): string {
 ${d.reviews.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">⚡ Trainer Reviews</div>${reviewsHtml}</div>` : ''}
 ${gallery.length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🃏 Card Collection</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${galleryHtml}</div></div>` : ''}
 ${Object.keys(d.hours).length > 0 ? `<div style="max-width:420px;width:100%;margin-top:24px;background:rgba(255,255,255,.05);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,.1)"><div style="color:#fff;font-size:14px;font-weight:bold;margin-bottom:8px;text-align:center">🕐 Gym Hours</div>${hoursHtml}</div>` : ''}
-<div style="max-width:420px;width:100%;margin-top:16px;text-align:center;padding:16px;color:#888;font-size:11px">${d.address ? `<div>📍 ${esc(d.address)}${d.city?', '+esc(d.city):''}${d.state?', '+esc(d.state):''}</div>` : ''}${d.phone ? `<div style="margin-top:4px">📞 ${esc(d.phone)}</div>` : ''}<div style="margin-top:12px;color:#555;font-size:9px">Powered by AutoLocal.ai</div></div>
+<div style="max-width:420px;width:100%;margin-top:16px;text-align:center;padding:16px;color:#888;font-size:11px">${d.address ? `<div>📍 ${esc(d.address)}${d.city?', '+esc(d.city):''}${d.state?', '+esc(d.state):''}</div>` : ''}${d.phone ? `<div style="margin-top:4px">📞 ${esc(d.phone)}</div>` : ''}<div style="margin-top:12px;color:#555;font-size:9px"></div></div>
 
 </div>`
 }
@@ -1135,7 +1135,7 @@ function receiptTemplate(d: SiteData): string {
   const txn = d.google_review_count ? String(d.google_review_count * 73).padStart(6, '0') : '001337'
   const div1 = '════════════════════════════════════════'
   const div2 = '────────────────────────────────────────'
-  const servicesHtml = d.services.map(s => `<div style="display:flex;justify-content:space-between;align-items:baseline"><span>${esc(s.name.toUpperCase())}</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;min-width:20px;align-self:flex-end;margin-bottom:3px"></span><span>${esc(s.price || '---')}</span></div>${s.description ? `<div style="font-size:9px;color:#888;padding-left:8px">&nbsp;&nbsp;${esc(s.description)}</div>` : ''}`).join('')
+  const servicesHtml = d.services.map(s => `<div style="display:flex;justify-content:space-between;align-items:baseline"><span>${esc(s.name.toUpperCase())}</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;min-width:20px;align-self:flex-end;margin-bottom:3px"></span><span>${esc(s.price || '---')}</span></div>${s.description ? `<div style="font-size:11px;color:#555;padding-left:8px">&nbsp;&nbsp;${esc(s.description)}</div>` : ''}`).join('')
   const hoursHtml = DAYS_ORDER.map(day => d.hours[day] ? `<div style="display:flex;justify-content:space-between;align-items:baseline"><span>${day.toUpperCase()}</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;min-width:20px;align-self:flex-end;margin-bottom:3px"></span><span>${esc(d.hours[day])}</span></div>` : '').join('')
   const reviewsHtml = d.reviews.map((r, i) => `<div style="margin-bottom:8px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="font-weight:bold">#${i+1} — ${esc(r.author)}</span><span>${'★'.repeat(r.rating)}</span></div><div style="color:#555;font-style:italic">"${esc(r.text)}"</div></div>`).join('')
   const barcodeHtml = Array.from({length:40}).map(() => `<span style="display:inline-block;height:40px;background:#1a1a1a;width:${Math.random()>0.5?'2':'1'}px"></span>`).join('')
@@ -1143,28 +1143,28 @@ function receiptTemplate(d: SiteData): string {
 
   return `
 <div style="min-height:100vh;background:#e8e4de;font-family:'Courier New',Courier,monospace;display:flex;justify-content:center;padding:32px 16px">
-<style>.r-div{color:#888;overflow:hidden;white-space:nowrap;text-align:center;letter-spacing:1px}.r-thin{color:#aaa;overflow:hidden;white-space:nowrap;text-align:center}.r-ctr{text-align:center}.receipt{max-width:420px;width:100%;background:#fafaf7;padding:32px 24px;box-shadow:0 2px 20px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.05);position:relative;color:#1a1a1a;font-size:12px;line-height:1.6}.receipt::after{content:'';position:absolute;bottom:-12px;left:0;right:0;height:12px;background:linear-gradient(135deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(225deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(315deg,#fafaf7 33.33%,transparent 33.33%),linear-gradient(45deg,#fafaf7 33.33%,transparent 33.33%);background-size:24px 12px}</style>
+<style>.r-div{color:#555;overflow:hidden;white-space:nowrap;text-align:center;letter-spacing:1px}.r-thin{color:#777;overflow:hidden;white-space:nowrap;text-align:center}.r-ctr{text-align:center}.receipt{max-width:420px;width:100%;background:#fafaf7;padding:32px 24px;box-shadow:0 2px 20px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.05);position:relative;color:#1a1a1a;font-size:12px;line-height:1.6}.receipt::after{content:'';position:absolute;bottom:-12px;left:0;right:0;height:12px;background:linear-gradient(135deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(225deg,#fafaf7 33.33%,transparent 33.33%) -12px 0,linear-gradient(315deg,#fafaf7 33.33%,transparent 33.33%),linear-gradient(45deg,#fafaf7 33.33%,transparent 33.33%);background-size:24px 12px}</style>
 <div class="receipt">
 ${d.logo_url ? `<div class="r-ctr" style="margin-bottom:12px"><img src="${esc(d.logo_url)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:4px;filter:grayscale(30%)"></div>` : ''}
 <div class="r-ctr" style="font-weight:bold;font-size:22px;letter-spacing:3px;margin-bottom:4px">${esc(d.business_name.toUpperCase())}</div>
-${d.tagline ? `<div class="r-ctr" style="font-size:10px;color:#666;margin-bottom:4px">${esc(d.tagline)}</div>` : ''}
-<div class="r-ctr" style="font-size:10px;color:#888;margin-bottom:8px">${d.address ? `<div>${esc(d.address)}</div>` : ''}${d.city ? `<div>${esc(d.city)}${d.state ? ', '+esc(d.state) : ''}</div>` : ''}${d.phone ? `<div>TEL: ${esc(d.phone)}</div>` : ''}${email ? `<div>${esc(email)}</div>` : ''}</div>
+${d.tagline ? `<div class="r-ctr" style="font-size:12px;color:#666;margin-bottom:4px">${esc(d.tagline)}</div>` : ''}
+<div class="r-ctr" style="font-size:12px;color:#555;margin-bottom:8px">${d.address ? `<div>${esc(d.address)}</div>` : ''}${d.city ? `<div>${esc(d.city)}${d.state ? ', '+esc(d.state) : ''}</div>` : ''}${d.phone ? `<div>TEL: ${esc(d.phone)}</div>` : ''}${email ? `<div>${esc(email)}</div>` : ''}</div>
 <div class="r-div">${div1}</div>
-<div style="display:flex;justify-content:space-between;font-size:10px;color:#666;padding:4px 0"><span>DATE: ${dateStr}</span><span>TXN #: ${txn}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:12px;color:#666;padding:4px 0"><span>DATE: ${dateStr}</span><span>TXN #: ${txn}</span></div>
 <div class="r-thin">${div2}</div>
 ${d.hero_image_url ? `<div style="margin:8px 0"><img src="${esc(d.hero_image_url)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center ${d.hero_crop ?? 50}%;filter:contrast(1.1);border:1px solid #ddd"></div>` : ''}
 ${d.services.length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">SERVICES</div>${servicesHtml}</div><div class="r-thin">${div2}</div><div style="margin:4px 0 8px"><div style="display:flex;justify-content:space-between"><span>ITEMS</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;align-self:flex-end;margin-bottom:3px"></span><span>${d.services.length}</span></div><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:14px;margin-top:4px"><span>SATISFACTION</span><span style="flex:1;border-bottom:1px dotted #ccc;margin:0 4px;align-self:flex-end;margin-bottom:3px"></span><span>GUARANTEED</span></div></div>` : ''}
 <div class="r-div">${div1}</div>
-${d.description ? `<div style="border:1px dashed #ccc;padding:8px;margin:8px 0;font-size:11px"><div style="font-weight:bold;font-size:10px;margin-bottom:4px">*** MEMO ***</div>${esc(d.description)}</div>` : ''}
+${d.description ? `<div style="border:1px dashed #ccc;padding:8px;margin:8px 0;font-size:11px"><div style="font-weight:bold;font-size:12px;margin-bottom:4px">*** MEMO ***</div>${esc(d.description)}</div>` : ''}
 ${Object.keys(d.hours).length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">HOURS OF OPERATION</div>${hoursHtml}</div><div class="r-thin">${div2}</div>` : ''}
 ${d.reviews.length > 0 ? `<div style="margin:8px 0"><div style="font-weight:bold;margin-bottom:4px">CUSTOMER REVIEWS</div>${reviewsHtml}</div>` : ''}
-${d.google_rating ? `<div class="r-thin">${div2}</div><div class="r-ctr" style="font-weight:bold;margin:8px 0">RATING: ${'★'.repeat(Math.round(d.google_rating))}${'☆'.repeat(5-Math.round(d.google_rating))} (${d.google_rating})${d.google_review_count >= 20 ? `<div style="font-size:10px;color:#888">${d.google_review_count} REVIEWS ON GOOGLE</div>` : ''}</div>` : ''}
+${d.google_rating ? `<div class="r-thin">${div2}</div><div class="r-ctr" style="font-weight:bold;margin:8px 0">RATING: ${'★'.repeat(Math.round(d.google_rating))}${'☆'.repeat(5-Math.round(d.google_rating))} (${d.google_rating})${d.google_review_count >= 20 ? `<div style="font-size:12px;color:#555">${d.google_review_count} REVIEWS ON GOOGLE</div>` : ''}</div>` : ''}
 <div class="r-div">${div1}</div>
 ${gallery.length > 0 ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0">${galleryHtml}</div>` : ''}
 <div style="display:flex;justify-content:center;gap:1px;margin:16px 0 8px">${barcodeHtml}</div>
 <div class="r-ctr" style="font-weight:bold;font-size:14px;letter-spacing:2px;margin:8px 0">THANK YOU!</div>
 ${d.phone ? `<div class="r-ctr" style="margin:8px 0"><a href="tel:${esc(d.phone)}" style="display:inline-block;border:2px solid #1a1a1a;padding:8px 24px;font-weight:bold;font-size:14px;color:#1a1a1a;text-decoration:none;font-family:inherit;letter-spacing:1px">${ind ? 'CALL ME' : 'CALL US'}: ${esc(d.phone)}</a></div>` : ''}
-<div class="r-ctr" style="font-size:9px;color:#aaa;margin-top:16px">Powered by AutoLocal.ai</div>
+<div class="r-ctr" style="font-size:11px;color:#777;margin-top:16px"></div>
 </div>
 
 </div>`

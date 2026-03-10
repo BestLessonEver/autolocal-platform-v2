@@ -221,10 +221,10 @@ export default function AIMTemplate({ data }: TemplateProps) {
                 <div className="aim-chat-msg" style={{ borderTop: '1px solid #eee', marginTop: '8px', paddingTop: '8px' }}>
                   <span style={{ color: '#888', fontSize: '10px' }}>— What people are saying —</span>
                 </div>
-                {reviews.map((r, i) => (
+                {reviews.slice(0, 3).map((r, i) => (
                   <div key={i} className="aim-chat-msg">
                     <span className="aim-chat-user" style={{ color: '#006600' }}>{r.author}:</span>{' '}
-                    <span>&quot;{r.text}&quot; {'⭐'.repeat(r.rating)}</span>
+                    <span>&quot;{r.text.length > 120 ? r.text.slice(0, 120) + '...' : r.text}&quot; {'⭐'.repeat(r.rating)}</span>
                   </div>
                 ))}
               </>
@@ -258,7 +258,6 @@ export default function AIMTemplate({ data }: TemplateProps) {
 
           {/* Footer */}
           <div style={{ background: '#ece9d8', padding: '2px 6px', borderTop: '1px solid #bbb', fontSize: '9px', color: '#888', textAlign: 'center' }}>
-            Powered by AutoLocal.ai · © {new Date().getFullYear()} {data.business_name}
           </div>
         </div>
       </div>

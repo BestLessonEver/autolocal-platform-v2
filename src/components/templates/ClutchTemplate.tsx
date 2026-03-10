@@ -328,7 +328,7 @@ export default function ClutchTemplate({ data }: TemplateProps) {
           <p className="text-white font-black text-xl mb-2">{data.business_name}</p>
           {data.phone && <p className="text-sm">{data.phone}</p>}
           {data.address && <p className="text-sm mt-1">{data.address}{data.city ? `, ${data.city}` : ''}{data.state ? `, ${data.state}` : ''}</p>}
-          <p className="text-xs mt-8 text-gray-600">© {new Date().getFullYear()} {data.business_name} · Powered by <span className="text-[#f97316]">AutoLocal.ai</span></p>
+          <p className="text-xs mt-8 text-gray-600">© {new Date().getFullYear()} {data.business_name}</p>
         </div>
       </footer>
 

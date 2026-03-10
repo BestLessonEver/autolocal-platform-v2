@@ -88,7 +88,7 @@ export default function ReceiptTemplate({ data }: TemplateProps) {
         )}
 
         {/* Address & Contact */}
-        <div className="receipt-center" style={{ fontSize: '10px', color: '#888', marginBottom: '8px' }}>
+        <div className="receipt-center" style={{ fontSize: '10px', color: '#555', marginBottom: '8px' }}>
           {data.address && <div>{data.address}</div>}
           {data.city && <div>{data.city}{data.state ? `, ${data.state}` : ''}</div>}
           {data.phone && <div>TEL: {data.phone}</div>}
@@ -131,7 +131,7 @@ export default function ReceiptTemplate({ data }: TemplateProps) {
                   <span>{s.price || '---'}</span>
                 </div>
                 {s.description && (
-                  <div style={{ fontSize: '9px', color: '#888', paddingLeft: '8px' }}>  {s.description}</div>
+                  <div style={{ fontSize: '9px', color: '#555', paddingLeft: '8px' }}>  {s.description}</div>
                 )}
               </div>
             ))}
@@ -204,7 +204,7 @@ export default function ReceiptTemplate({ data }: TemplateProps) {
             <div className="receipt-thin">{thinDivider}</div>
             <div className="receipt-center" style={{ fontWeight: 'bold', margin: '8px 0' }}>
               RATING: {'★'.repeat(Math.round(data.google_rating))}{'☆'.repeat(5 - Math.round(data.google_rating))} ({data.google_rating})
-              {data.google_review_count >= 20 && <div style={{ fontSize: '10px', color: '#888' }}>{data.google_review_count} REVIEWS ON GOOGLE</div>}
+              {data.google_review_count >= 20 && <div style={{ fontSize: '10px', color: '#555' }}>{data.google_review_count} REVIEWS ON GOOGLE</div>}
             </div>
           </>
         )}
@@ -245,8 +245,7 @@ export default function ReceiptTemplate({ data }: TemplateProps) {
         )}
 
         {/* Footer */}
-        <div className="receipt-center" style={{ fontSize: '9px', color: '#aaa', marginTop: '16px' }}>
-          Powered by AutoLocal.ai
+        <div className="receipt-center" style={{ fontSize: '9px', color: '#777', marginTop: '16px' }}>
         </div>
       </div>
 

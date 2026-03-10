@@ -285,7 +285,6 @@ export default function BDETemplate({ data }: TemplateProps) {
       {/* ════════ FOOTER ════════ */}
       <footer className="py-12 border-t border-white/5 text-center">
         <p className="text-white font-black text-lg">{data.business_name}</p>
-        <p className="text-gray-600 text-xs mt-3">Powered by AutoLocal.ai</p>
       </footer>
 
       {/* StickyContactBar removed */}
