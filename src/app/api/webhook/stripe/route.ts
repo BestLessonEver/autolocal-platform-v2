@@ -280,10 +280,89 @@ export async function POST(req: Request) {
 
       if (updatedSub.cancel_at_period_end) {
         const cancelDate = updatedSub.cancel_at ? new Date(updatedSub.cancel_at * 1000).toISOString() : null
-        await supabase
+        
+        // Update status
+        const { data: cancelledSites } = await supabase
           .from('website_previews')
           .update({ hosting_status: 'pending_cancel', cancel_date: cancelDate })
           .eq('stripe_customer_id', updCustomerId)
+          .select('email, business_name, contact_name, slug')
+        
+        // Send win-back email (fire-and-forget)
+        if (cancelledSites?.[0]) {
+          const site = cancelledSites[0]
+          const firstName = (site.contact_name || '').split(' ')[0] || 'there'
+          const endDate = cancelDate ? new Date(cancelDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'the end of your billing period'
+          
+          const winbackHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:40px 20px;">
+    <tr><td align="center">
+      <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
+        <tr><td align="center" style="padding-bottom:32px;">
+          <span style="font-size:24px;font-weight:800;color:#111827;">⚡ AutoLocal.ai</span>
+        </td></tr>
+        <tr><td style="background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:16px;padding:40px 32px;">
+          <h1 style="color:#111827;font-size:22px;font-weight:800;margin:0 0 16px;">We're sorry to see you go, ${firstName}</h1>
+          <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 16px;">
+            We received your cancellation request for <strong style="color:#111827;">${site.business_name}</strong>. Your site will stay live until <strong style="color:#111827;">${endDate}</strong>.
+          </p>
+          <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 24px;">
+            Before you go — would you mind telling us why? We're a small team and your feedback genuinely helps us get better. Just reply to this email.
+          </p>
+
+          <!-- Feedback prompts -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">💰 Was it the price?</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">🎨 Not happy with the design?</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">🔧 Missing a feature you needed?</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">🤷 Just not using it?</td></tr>
+          </table>
+
+          <!-- Win-back offer -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td align="center" bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:16px;padding:28px 32px;border:2px solid #c7d2fe;">
+              <span style="color:#312e81;font-size:20px;font-weight:800;display:block;margin:0 0 8px;">🎁 Stay for 20% off</span>
+              <span style="color:#3730a3;font-size:15px;line-height:1.5;display:block;margin:0 0 4px;">We'd love to keep you. Reply "SAVE" and we'll lock in <b style="color:#312e81;">$7.20/mo for a full year</b>.</span>
+              <span style="color:#6b7280;font-size:13px;display:block;">That's less than the cost of a coffee for a professional website.</span>
+            </td></tr>
+          </table>
+
+          <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 16px;">
+            If you change your mind before ${endDate}, just log back in and your site will be right where you left it. No data is lost.
+          </p>
+
+          <!-- Reactivate CTA -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;" role="presentation">
+            <tr><td align="center">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr><td align="center" bgcolor="#6366f1" style="background-color:#6366f1;border-radius:12px;">
+                  <a href="https://autolocal.ai/login" style="display:inline-block;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 44px;border-radius:12px;border:1px solid #6366f1;">Keep My Site →</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <p style="color:#9ca3af;font-size:13px;margin:0;">
+            Either way, thanks for giving us a shot. — Brian
+          </p>
+        </td></tr>
+        <tr><td align="center" style="padding-top:24px;">
+          <p style="color:#9ca3af;font-size:12px;margin:0;">Brian @ AutoLocal.ai · Custom websites for local businesses</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+          sendEmail(site.email, `Your ${site.business_name} cancellation — quick question`, winbackHtml).catch(err =>
+            console.error('Win-back email failed:', err)
+          )
+        }
+        
         if (process.env.DEBUG) console.log(`⏳ Pending cancel: ${updCustomerId}`)
       } else if (!updatedSub.cancel_at_period_end && updatedSub.status === 'active') {
         // User re-activated (un-cancelled)
