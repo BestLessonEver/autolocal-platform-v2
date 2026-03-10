@@ -55,15 +55,21 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
           </p>
 
           <!-- CTA -->
-          <div style="text-align:center;margin:0 0 28px;">
-            <a href="${dashboardUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Open My Dashboard →</a>
-          </div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td align="center">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr><td align="center" bgcolor="#6366f1" style="background-color:#6366f1;border-radius:12px;">
+                  <a href="${dashboardUrl}" style="display:inline-block;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 44px;border-radius:12px;border:1px solid #6366f1;">Open My Dashboard →</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
 
           <!-- Promo box -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
-            <tr><td align="center" bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:12px;padding:20px 24px;border:2px solid #c7d2fe;">
-              <span style="color:#312e81;font-size:15px;font-weight:800;display:block;margin:0 0 6px;">🎉 Free Month of Hosting</span>
-              <span style="color:#3730a3;font-size:14px;display:block;">Activate from your dashboard — <b style="color:#312e81;">$0 today</b>, just $9/mo after your free trial. Cancel anytime.</span>
+            <tr><td align="center" bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:16px;padding:28px 32px;border:2px solid #c7d2fe;">
+              <span style="color:#312e81;font-size:22px;font-weight:800;display:block;margin:0 0 8px;">🎉 Free Month of Hosting</span>
+              <span style="color:#3730a3;font-size:16px;line-height:1.5;display:block;">Activate from your dashboard — <b style="color:#312e81;">$0 today</b>, just $9/mo after your free trial. Cancel anytime.</span>
             </td></tr>
           </table>
 
