@@ -43,14 +43,15 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;padding:40px 20px;">
-    <tr><td align="center">
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background-color:#09090b;">
+  <div style="background-color:#09090b;width:100%;min-height:100%;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#09090b" style="background-color:#09090b;padding:40px 20px;">
+    <tr><td align="center" bgcolor="#09090b" style="background-color:#09090b;">
       <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
         <tr><td align="center" style="padding-bottom:32px;">
           <span style="font-size:24px;font-weight:800;color:#ffffff;">⚡ AutoLocal.ai</span>
         </td></tr>
-        <tr><td style="background-color:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;">
+        <tr><td style="background-color:#18181b;border:1px solid #27272a;border-radius:16px;padding:40px 32px;">
           <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 16px;">Hi ${firstName}, your website is ready! 🎉</h1>
           <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 16px;">
             We just built a custom website for <strong style="color:#ffffff;">${businessName}</strong> using your real business info. It's live and ready to customize right now.
@@ -62,9 +63,9 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
           </div>
 
           <!-- Promo box -->
-          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:16px 24px;margin:0 0 28px;text-align:center;">
-            <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 4px;">🎉 Free Month of Hosting</p>
-            <p style="color:#e0e7ff;font-size:13px;margin:0;">Activate from your dashboard — $0 today, just $9/mo after your free trial. Cancel anytime.</p>
+          <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border-radius:12px;padding:20px 24px;margin:0 0 28px;text-align:center;">
+            <p style="color:#ffffff;font-size:15px;font-weight:800;margin:0 0 6px;">🎉 Free Month of Hosting</p>
+            <p style="color:#ffffff;font-size:14px;margin:0;">Activate from your dashboard — <strong>$0 today</strong>, just $9/mo after your free trial. Cancel anytime.</p>
           </div>
 
           <!-- How to make your site great -->
@@ -110,6 +111,7 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
       </table>
     </td></tr>
   </table>
+  </div>
 </body>
 </html>`
 
