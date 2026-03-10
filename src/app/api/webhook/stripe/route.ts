@@ -21,78 +21,95 @@ function slugify(name: string): string {
     .trim()
 }
 
-async function sendWelcomeEmail(to: string, contactName: string, businessName: string, hasGoogleData: boolean = false) {
+async function sendActivationEmail(to: string, contactName: string, businessName: string, slug: string, siteId?: string) {
   const firstName = contactName?.split(' ')[0] || 'there'
+  const dashboardToken = siteId ? `${siteId.substring(0, 8)}-${slug}` : null
+  const dashboardUrl = dashboardToken
+    ? `https://autolocal.ai/my-site/${dashboardToken}`
+    : 'https://autolocal.ai/login'
+  const siteUrl = `https://autolocal.ai/preview/${slug}`
 
-  // Use Supabase's built-in magic link generation
-  const { data } = await supabase.auth.admin.generateLink({
-    type: 'magiclink',
-    email: to,
-    options: {
-      redirectTo: 'https://autolocal.ai/auth/callback?next=/dashboard',
-    },
-  })
-
-  const magicLinkUrl = data?.properties?.action_link || 'https://autolocal.ai/login'
-
-  // Send via direct SMTP — no self-calling API
   try {
     const html = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;padding:40px 20px;">
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:40px 20px;">
     <tr><td align="center">
       <table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
         <tr><td align="center" style="padding-bottom:32px;">
-          <span style="font-size:24px;font-weight:800;color:#ffffff;">⚡ AutoLocal.ai</span>
+          <span style="font-size:24px;font-weight:800;color:#111827;">⚡ AutoLocal.ai</span>
         </td></tr>
-        <tr><td style="background-color:#111113;border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:40px 32px;">
-          <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0 0 16px;">Hi ${firstName}, welcome aboard!</h1>
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 8px;">
-            We've received your order for a custom website for <strong style="color:#ffffff;">${businessName}</strong>.
+        <tr><td style="background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:16px;padding:40px 32px;">
+          <h1 style="color:#111827;font-size:22px;font-weight:800;margin:0 0 16px;">🎉 ${firstName}, your site is LIVE!</h1>
+          <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 24px;">
+            Your <strong style="color:#111827;">${businessName}</strong> website is now live and hosted by AutoLocal.ai. Your free month starts today!
           </p>
-          ${hasGoogleData ? `
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
-            We already pulled your business info from Google and started building. Here's what happens next:
-          </p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Your custom website is ready!</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Log in with the button below</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Preview your site and make changes in your dashboard</span></td></tr>
+
+          <!-- Dashboard CTA -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td align="center">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr><td align="center" bgcolor="#6366f1" style="background-color:#6366f1;border-radius:12px;">
+                  <a href="${dashboardUrl}" style="display:inline-block;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 44px;border-radius:12px;border:1px solid #6366f1;">Open My Dashboard →</a>
+                </td></tr>
+              </table>
+            </td></tr>
           </table>
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
-            Your dashboard is ready — you can access it anytime:
-          </p>
-          <a href="${magicLinkUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Go to My Dashboard →</a>
-          ` : `
-          <p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
-            To build the best possible website, we need a few details from you. It takes about 5 minutes:
-          </p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">1.</span> <span style="color:#d4d4d8;">Fill out your business details (5 min)</span></td></tr>
-            <tr><td style="padding:0 0 12px;"><span style="color:#6366f1;font-weight:700;">2.</span> <span style="color:#d4d4d8;">Upload your photos and logo</span></td></tr>
-            <tr><td><span style="color:#6366f1;font-weight:700;">3.</span> <span style="color:#d4d4d8;">Preview your site and make changes in your dashboard</span></td></tr>
+
+          <!-- Domain setup section -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
+            <tr><td bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:16px;padding:28px 32px;border:2px solid #c7d2fe;">
+              <span style="color:#312e81;font-size:20px;font-weight:800;display:block;margin:0 0 12px;">🌐 Connect Your Own Domain</span>
+              <span style="color:#3730a3;font-size:14px;line-height:1.6;display:block;margin:0 0 16px;">Want your site on <b style="color:#312e81;">yourbusiness.com</b> instead of autolocal.ai? Here's how:</span>
+              <table cellpadding="0" cellspacing="0" style="width:100%;" role="presentation">
+                <tr><td style="padding:8px 0;border-bottom:1px solid #c7d2fe;">
+                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 1: Buy a domain</span>
+                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">If you don't have one, we recommend <b>Namecheap</b> or <b>Google Domains</b> (~$12/year).</span>
+                </td></tr>
+                <tr><td style="padding:8px 0;border-bottom:1px solid #c7d2fe;">
+                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 2: Reply to this email</span>
+                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">Tell us your domain name and we'll handle the setup for you — <b>completely free</b>.</span>
+                </td></tr>
+                <tr><td style="padding:8px 0;">
+                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 3: We connect it</span>
+                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">We'll configure the DNS and have your custom domain live within 24 hours.</span>
+                </td></tr>
+              </table>
+            </td></tr>
           </table>
-          <a href="https://autolocal.ai/intake/${slugify(businessName)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 40px;border-radius:12px;">Complete Your Details →</a>
-          `}
-          <p style="color:#52525b;font-size:13px;margin:24px 0 0;">
-            You can also sign in anytime at <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> using this email address.
+
+          <!-- What's included -->
+          <h2 style="color:#111827;font-size:16px;font-weight:700;margin:0 0 12px;">✅ What's Included</h2>
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;width:100%;" role="presentation">
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ Custom-designed website</td></tr>
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ Mobile-optimized & fast</td></tr>
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ Free custom domain setup</td></tr>
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ SEO built in</td></tr>
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ Dashboard to edit anytime</td></tr>
+            <tr><td style="padding:6px 0;color:#4b5563;font-size:14px;">✓ Real human support</td></tr>
+          </table>
+
+          <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0 0 8px;">
+            Your site: <a href="${siteUrl}" style="color:#6366f1;font-weight:600;">${siteUrl}</a>
+          </p>
+
+          <p style="color:#9ca3af;font-size:13px;margin:16px 0 0;">
+            Questions? Just reply to this email — a real person reads every one.
           </p>
         </td></tr>
         <tr><td align="center" style="padding-top:24px;">
-          <p style="color:#3f3f46;font-size:12px;margin:0;">Questions? Reply to this email or reach us at brian@autolocal.ai</p>
-          <p style="color:#27272a;font-size:11px;margin:12px 0 0;">AutoLocal.ai · Custom websites for local businesses</p>
+          <p style="color:#9ca3af;font-size:12px;margin:0;">Brian @ AutoLocal.ai · Custom websites for local businesses</p>
         </td></tr>
       </table>
     </td></tr>
   </table>
 </body>
 </html>`
-    await sendEmail(to, `Your ${businessName} website is on its way! 🚀`, html)
+    await sendEmail(to, `🎉 ${businessName} is live — connect your domain!`, html)
   } catch (err) {
-    console.error('Welcome email error:', err)
+    console.error('Activation email error:', err)
   }
 }
 
@@ -171,10 +188,9 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
   }
 
-  // Send welcome email (fire-and-forget — don't block webhook response)
-  const hasGoogleData = existing !== null && existing !== undefined
-  sendWelcomeEmail(email, contactName, businessName, hasGoogleData).catch(err =>
-    console.error('Webhook welcome email failed (non-fatal):', err)
+  // Send activation email with domain setup instructions (fire-and-forget)
+  sendActivationEmail(email, contactName, businessName, slug, existing?.id).catch(err =>
+    console.error('Webhook activation email failed (non-fatal):', err)
   )
 
   // Auto-deploy — site goes LIVE only after hosting is activated
