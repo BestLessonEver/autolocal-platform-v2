@@ -1,21 +1,6 @@
 import nodemailer from 'nodemailer'
 import dns from 'dns'
 
-// Force IPv4 DNS resolution GLOBALLY — Railway can't reach Gmail SMTP over IPv6
-// Must be called at module load time before any connections
-dns.setDefaultResultOrder('ipv4first')
-
-// Also patch dns.lookup to force family:4
-const originalLookup = dns.lookup
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(dns as any).lookup = function(hostname: string, optionsOrCb: any, cb?: any) {
-  if (typeof optionsOrCb === 'function') {
-    return originalLookup(hostname, { family: 4 }, optionsOrCb)
-  }
-  const opts = typeof optionsOrCb === 'object' ? { ...optionsOrCb, family: 4 } : { family: 4 }
-  return originalLookup(hostname, opts, cb)
-}
-
 let transporter: nodemailer.Transporter | null = null
 
 function getTransporter() {
@@ -30,7 +15,12 @@ function getTransporter() {
       },
       connectionTimeout: 10000,
       socketTimeout: 15000,
-    })
+      // Force IPv4 — Railway can't reach Gmail SMTP over IPv6
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dnsLookup: (hostname: string, options: any, callback: any) => {
+        dns.lookup(hostname, { ...options, family: 4 }, callback)
+      },
+    } as nodemailer.TransportOptions)
   }
   return transporter
 }
