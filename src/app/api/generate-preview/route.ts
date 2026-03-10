@@ -62,7 +62,7 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
             <tr><td align="center">
               <table cellpadding="0" cellspacing="0" role="presentation">
                 <tr><td align="center" bgcolor="#6366f1" style="background-color:#6366f1;border-radius:12px;">
-                  <a href="${dashboardUrl}" style="display:inline-block;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 44px;border-radius:12px;border:1px solid #6366f1;">Open My Dashboard →</a>
+                  <a href="${dashboardUrl}" style="display:inline-block;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 44px;border-radius:12px;border:1px solid #6366f1;">Sign In to My Dashboard →</a>
                 </td></tr>
               </table>
             </td></tr>
