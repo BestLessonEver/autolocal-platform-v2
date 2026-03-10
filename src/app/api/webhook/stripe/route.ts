@@ -128,14 +128,30 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     .limit(1)
     .single()
 
+  // Get trial end date from subscription if available
+  let trialEnd: string | null = null
+  if (session.subscription) {
+    try {
+      const subId = typeof session.subscription === 'string' ? session.subscription : session.subscription.id
+      const sub = await stripe.subscriptions.retrieve(subId)
+      if (sub.trial_end) {
+        trialEnd = new Date(sub.trial_end * 1000).toISOString()
+      }
+    } catch (err) {
+      console.error('Failed to fetch subscription trial info:', err)
+    }
+  }
+
   if (existing) {
+    const updateData: Record<string, unknown> = {
+      email,
+      hosting_status: 'active',
+      stripe_customer_id: stripeCustomerId,
+    }
+    if (trialEnd) updateData.trial_end = trialEnd
     await supabase
       .from('website_previews')
-      .update({
-        email,
-        hosting_status: 'active',
-        stripe_customer_id: stripeCustomerId,
-      })
+      .update(updateData)
       .eq('id', existing.id)
   }
 

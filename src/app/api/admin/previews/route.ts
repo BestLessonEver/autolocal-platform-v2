@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('website_previews')
-    .select('id, slug, business_name, city, state, phone, email, category, google_rating, google_review_count, status, template, created_at, view_count, hosting_status, cancel_date')
+    .select('id, slug, business_name, city, state, phone, email, category, google_rating, google_review_count, status, template, created_at, view_count, hosting_status, cancel_date, trial_end, stripe_customer_id')
     .order('created_at', { ascending: false })
 
   if (error) {

@@ -35,6 +35,8 @@ interface Preview {
   view_count: number
   hosting_status: string | null
   cancel_date: string | null
+  trial_end: string | null
+  stripe_customer_id: string | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -169,7 +171,7 @@ export default function AdminClientsPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 border border-white/10 rounded-xl p-4">
             <p className="text-3xl font-black text-white">{previews.length}</p>
             <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Previews</p>
@@ -183,8 +185,12 @@ export default function AdminClientsPage() {
             <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Total Views</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-3xl font-black text-white">{previews.filter(p => p.hosting_status === 'active').length}</p>
+            <p className="text-3xl font-black text-white">{previews.filter(p => p.hosting_status === 'active' || p.hosting_status === 'pending_cancel').length}</p>
             <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">Hosting Active</p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <p className="text-3xl font-black text-green-400">${previews.filter(p => (p.hosting_status === 'active' || p.hosting_status === 'pending_cancel') && p.trial_end && new Date(p.trial_end) < new Date()).length * 9}</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mt-1">MRR</p>
           </div>
         </div>
 
@@ -407,11 +413,30 @@ export default function AdminClientsPage() {
                             <td className="px-4 py-3 text-gray-400 text-xs">{primary.phone || '—'}</td>
                             <td className="px-4 py-3 text-gray-400 text-xs">{primary.city}{primary.state ? `, ${primary.state}` : ''}</td>
                             <td className="px-4 py-3">
-                              {activeCount > 0 ? (
-                                <span className="text-green-400 text-xs font-semibold">${activeCount * 9}/mo</span>
-                              ) : (
-                                <span className="text-gray-600 text-xs">$0</span>
-                              )}
+                              {(() => {
+                                const now = new Date()
+                                const paying = sites.filter(s =>
+                                  (s.hosting_status === 'active' || s.hosting_status === 'pending_cancel') &&
+                                  s.trial_end && new Date(s.trial_end) < now
+                                )
+                                const onTrial = sites.filter(s =>
+                                  (s.hosting_status === 'active' || s.hosting_status === 'pending_cancel') &&
+                                  (!s.trial_end || new Date(s.trial_end) >= now)
+                                )
+                                return (
+                                  <div className="flex flex-col gap-0.5">
+                                    {paying.length > 0 && (
+                                      <span className="text-green-400 text-xs font-semibold">${paying.length * 9}/mo</span>
+                                    )}
+                                    {onTrial.length > 0 && (
+                                      <span className="text-yellow-400 text-[10px]">🆓 {onTrial.length} on trial</span>
+                                    )}
+                                    {paying.length === 0 && onTrial.length === 0 && (
+                                      <span className="text-gray-600 text-xs">$0</span>
+                                    )}
+                                  </div>
+                                )
+                              })()}
                             </td>
                             <td className="px-4 py-3 text-gray-500 text-xs">{new Date(primary.created_at).toLocaleDateString()}</td>
                             <td className="px-4 py-3 text-right">
