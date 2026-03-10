@@ -1331,15 +1331,18 @@ export default function ClientDashboard() {
               { icon: '📸', title: 'Upload quality photos with your hero image', desc: 'Google uses images in local search results. Your hero image shows up in social shares and AI summaries.', field: 'photos' },
               { icon: '⏰', title: 'Keep your hours up to date', desc: 'Accurate hours build trust with search engines and prevent customers from showing up when you\'re closed.', field: 'hours' },
               { icon: '📍', title: 'Add your full address', desc: 'A complete address helps you show up in "near me" searches and Google Maps results.', field: 'contact' },
-              { icon: '⭐', title: 'Get Google reviews', desc: 'Sites with 20+ reviews at 4.0+ stars get priority in local search. Ask happy customers to leave a review!' },
-              { icon: '🌐', title: 'Connect a custom domain', desc: 'A branded domain (yourbusiness.com) signals authority to search engines vs. a subdomain.' },
-              { icon: '🤖', title: 'How ChatGPT finds you', desc: 'ChatGPT and other AI assistants read your structured data (JSON-LD) — your business name, services, reviews, and location are all included automatically.' },
+              { icon: '⭐', title: 'Get Google reviews', desc: 'Sites with 20+ reviews at 4.0+ stars get priority in local search. Ask happy customers to leave a review!', field: 'reviews' },
+              { icon: '🌐', title: 'Connect a custom domain', desc: null, field: 'domain' },
+              { icon: '🤖', title: 'How ChatGPT finds you', desc: 'ChatGPT and other AI assistants read your structured data (JSON-LD) — your business name, services, reviews, and location are all included automatically.', field: 'chatgpt' },
             ].map((tip, i) => {
               const complete = tip.field === 'about' ? !!data.description
                 : tip.field === 'services' ? (data.services?.length ?? 0) > 0
                 : tip.field === 'photos' ? !!data.hero_image_url
                 : tip.field === 'hours' ? Object.keys(data.hours || {}).length > 0
                 : tip.field === 'contact' ? !!data.address
+                : tip.field === 'reviews' ? (data.google_review_count ?? 0) > 0
+                : tip.field === 'domain' ? !!data.custom_domain
+                : tip.field === 'chatgpt' ? true
                 : null
               return (
                 <div key={i} className="flex gap-3 items-start">
@@ -1350,7 +1353,14 @@ export default function ClientDashboard() {
                       {complete === true && <span className="text-green-400 text-xs">✓ Done</span>}
                       {complete === false && <span className="text-yellow-400 text-xs">Missing</span>}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
+                    {tip.field === 'domain' ? (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        A branded domain (yourbusiness.com) signals authority to search engines.{' '}
+                        <a href="/setup" target="_blank" className="text-indigo-400 hover:underline">Connect your domain →</a>
+                      </p>
+                    ) : tip.desc ? (
+                      <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
+                    ) : null}
                   </div>
                 </div>
               )
