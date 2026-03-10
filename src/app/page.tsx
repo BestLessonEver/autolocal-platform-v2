@@ -38,6 +38,7 @@ export default function HomePage() {
     phone: '',
     businessType: '',
     package: 'starter',
+    smsConsent: false,
   })
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
@@ -168,6 +169,7 @@ export default function HomePage() {
           contactName: orderForm.contactName || '',
           phone: orderForm.phone || '',
           businessType: orderForm.businessType || '',
+          smsConsent: orderForm.smsConsent,
         }),
       })
       const data = await res.json()
@@ -612,6 +614,30 @@ export default function HomePage() {
                 />
               </div>
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-300 mb-2">Phone <span className="text-gray-500 font-normal">(optional)</span></label>
+              <input
+                type="tel"
+                value={orderForm.phone}
+                onChange={e => setOrderForm(f => ({ ...f, phone: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
+                placeholder="(555) 123-4567"
+              />
+            </div>
+
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={orderForm.smsConsent}
+                onChange={e => setOrderForm(f => ({ ...f, smsConsent: e.target.checked }))}
+                className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+              />
+              <span className="text-xs text-gray-400 leading-relaxed group-hover:text-gray-300 transition">
+                I agree to receive text messages from AutoLocal.ai about my website status and updates. Message frequency varies, max 10/mo. Reply STOP to unsubscribe. Msg &amp; data rates may apply. Consent is not a condition of purchase.{' '}
+                <a href="/privacy" className="text-indigo-400 hover:underline">Privacy Policy</a> · <a href="/terms" className="text-indigo-400 hover:underline">Terms</a>
+              </span>
+            </label>
 
             <button
               type="submit"
