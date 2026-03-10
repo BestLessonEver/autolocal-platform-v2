@@ -682,6 +682,8 @@ export default function HomePage() {
           <div className="flex items-center gap-6 text-sm text-gray-600">
             <a href="mailto:support@autolocal.ai" className="hover:text-gray-400 transition">support@autolocal.ai</a>
             <a href="/setup" className="hover:text-gray-400 transition">Domain Setup</a>
+            <a href="/privacy" className="hover:text-gray-400 transition">Privacy Policy</a>
+            <a href="/terms" className="hover:text-gray-400 transition">Terms</a>
           </div>
         </div>
       </footer>
