@@ -1,0 +1,1502 @@
+[
+  {
+    "city": "Tupelo",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 38300,
+    "nearby": [
+      "Saltillo",
+      "Pontotoc",
+      "New Albany"
+    ],
+    "slug": "tupelo-ms"
+  },
+  {
+    "city": "Hattiesburg",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 48280,
+    "nearby": [
+      "Petal",
+      "Laurel",
+      "Purvis"
+    ],
+    "slug": "hattiesburg-ms"
+  },
+  {
+    "city": "Meridian",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 33200,
+    "nearby": [
+      "Marion",
+      "Quitman",
+      "DeKalb"
+    ],
+    "slug": "meridian-ms"
+  },
+  {
+    "city": "Greenville",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 27400,
+    "nearby": [
+      "Leland",
+      "Indianola",
+      "Cleveland"
+    ],
+    "slug": "greenville-ms"
+  },
+  {
+    "city": "Vicksburg",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 21500,
+    "nearby": [
+      "Clinton",
+      "Edwards",
+      "Port Gibson"
+    ],
+    "slug": "vicksburg-ms"
+  },
+  {
+    "city": "Columbus",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 23600,
+    "nearby": [
+      "Starkville",
+      "West Point",
+      "Aberdeen"
+    ],
+    "slug": "columbus-ms"
+  },
+  {
+    "city": "Starkville",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 25900,
+    "nearby": [
+      "Columbus",
+      "West Point",
+      "Louisville"
+    ],
+    "slug": "starkville-ms"
+  },
+  {
+    "city": "Laurel",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 18500,
+    "nearby": [
+      "Hattiesburg",
+      "Ellisville",
+      "Waynesboro"
+    ],
+    "slug": "laurel-ms"
+  },
+  {
+    "city": "Clinton",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 24800,
+    "nearby": [
+      "Jackson",
+      "Raymond",
+      "Vicksburg"
+    ],
+    "slug": "clinton-ms"
+  },
+  {
+    "city": "Pearl",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 27100,
+    "nearby": [
+      "Jackson",
+      "Brandon",
+      "Flowood"
+    ],
+    "slug": "pearl-ms"
+  },
+  {
+    "city": "Brandon",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 24100,
+    "nearby": [
+      "Pearl",
+      "Jackson",
+      "Flowood"
+    ],
+    "slug": "brandon-ms"
+  },
+  {
+    "city": "Ridgeland",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 24500,
+    "nearby": [
+      "Jackson",
+      "Madison",
+      "Canton"
+    ],
+    "slug": "ridgeland-ms"
+  },
+  {
+    "city": "Olive Branch",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 42700,
+    "nearby": [
+      "Southaven",
+      "Horn Lake",
+      "Hernando"
+    ],
+    "slug": "olive-branch-ms"
+  },
+  {
+    "city": "Southaven",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 55000,
+    "nearby": [
+      "Olive Branch",
+      "Horn Lake",
+      "Hernando"
+    ],
+    "slug": "southaven-ms"
+  },
+  {
+    "city": "Oxford",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 28100,
+    "nearby": [
+      "Batesville",
+      "Water Valley",
+      "Holly Springs"
+    ],
+    "slug": "oxford-ms"
+  },
+  {
+    "city": "Pascagoula",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 21800,
+    "nearby": [
+      "Gautier",
+      "Moss Point",
+      "Ocean Springs"
+    ],
+    "slug": "pascagoula-ms"
+  },
+  {
+    "city": "Ocean Springs",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 18300,
+    "nearby": [
+      "Biloxi",
+      "Gautier",
+      "Pascagoula"
+    ],
+    "slug": "ocean-springs-ms"
+  },
+  {
+    "city": "Natchez",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 14700,
+    "nearby": [
+      "Vidalia",
+      "Ferriday",
+      "Brookhaven"
+    ],
+    "slug": "natchez-ms"
+  },
+  {
+    "city": "Brookhaven",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 12200,
+    "nearby": [
+      "Natchez",
+      "McComb",
+      "Hazlehurst"
+    ],
+    "slug": "brookhaven-ms"
+  },
+  {
+    "city": "Corinth",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 14500,
+    "nearby": [
+      "Booneville",
+      "Iuka",
+      "New Albany"
+    ],
+    "slug": "corinth-ms"
+  },
+  {
+    "city": "McComb",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 12400,
+    "nearby": [
+      "Brookhaven",
+      "Magnolia",
+      "Summit"
+    ],
+    "slug": "mccomb-ms"
+  },
+  {
+    "city": "Canton",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 11800,
+    "nearby": [
+      "Madison",
+      "Ridgeland",
+      "Flora"
+    ],
+    "slug": "canton-ms"
+  },
+  {
+    "city": "Yazoo City",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 10800,
+    "nearby": [
+      "Canton",
+      "Greenville",
+      "Jackson"
+    ],
+    "slug": "yazoo-city-ms"
+  },
+  {
+    "city": "Cleveland",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 11300,
+    "nearby": [
+      "Indianola",
+      "Greenville",
+      "Clarksdale"
+    ],
+    "slug": "cleveland-ms"
+  },
+  {
+    "city": "Clarksdale",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 14200,
+    "nearby": [
+      "Cleveland",
+      "Tunica",
+      "Batesville"
+    ],
+    "slug": "clarksdale-ms"
+  },
+  {
+    "city": "Grenada",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 12100,
+    "nearby": [
+      "Greenwood",
+      "Batesville",
+      "Water Valley"
+    ],
+    "slug": "grenada-ms"
+  },
+  {
+    "city": "Greenwood",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 13400,
+    "nearby": [
+      "Grenada",
+      "Indianola",
+      "Winona"
+    ],
+    "slug": "greenwood-ms"
+  },
+  {
+    "city": "Bay St. Louis",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 13200,
+    "nearby": [
+      "Waveland",
+      "Pass Christian",
+      "Diamondhead"
+    ],
+    "slug": "bay-st-louis-ms"
+  },
+  {
+    "city": "Picayune",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 12400,
+    "nearby": [
+      "Poplarville",
+      "Wiggins",
+      "Bay St. Louis"
+    ],
+    "slug": "picayune-ms"
+  },
+  {
+    "city": "Hernando",
+    "state": "Mississippi",
+    "stateAbbr": "MS",
+    "pop": 17400,
+    "nearby": [
+      "Southaven",
+      "Olive Branch",
+      "Senatobia"
+    ],
+    "slug": "hernando-ms"
+  },
+  {
+    "city": "Auburn",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 76140,
+    "nearby": [
+      "Opelika",
+      "Tuskegee",
+      "Alexander City"
+    ],
+    "slug": "auburn-al"
+  },
+  {
+    "city": "Opelika",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 32100,
+    "nearby": [
+      "Auburn",
+      "Tuskegee",
+      "Phenix City"
+    ],
+    "slug": "opelika-al"
+  },
+  {
+    "city": "Phenix City",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 38700,
+    "nearby": [
+      "Columbus GA",
+      "Opelika",
+      "Auburn"
+    ],
+    "slug": "phenix-city-al"
+  },
+  {
+    "city": "Dothan",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 72300,
+    "nearby": [
+      "Enterprise",
+      "Ozark",
+      "Daleville"
+    ],
+    "slug": "dothan-al"
+  },
+  {
+    "city": "Enterprise",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 29100,
+    "nearby": [
+      "Dothan",
+      "Ozark",
+      "Daleville"
+    ],
+    "slug": "enterprise-al"
+  },
+  {
+    "city": "Florence",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 41200,
+    "nearby": [
+      "Muscle Shoals",
+      "Sheffield",
+      "Tuscumbia"
+    ],
+    "slug": "florence-al"
+  },
+  {
+    "city": "Muscle Shoals",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 16900,
+    "nearby": [
+      "Florence",
+      "Sheffield",
+      "Tuscumbia"
+    ],
+    "slug": "muscle-shoals-al"
+  },
+  {
+    "city": "Prattville",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 38200,
+    "nearby": [
+      "Montgomery",
+      "Millbrook",
+      "Wetumpka"
+    ],
+    "slug": "prattville-al"
+  },
+  {
+    "city": "Albertville",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 22100,
+    "nearby": [
+      "Boaz",
+      "Guntersville",
+      "Arab"
+    ],
+    "slug": "albertville-al"
+  },
+  {
+    "city": "Cullman",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 17200,
+    "nearby": [
+      "Hanceville",
+      "Arab",
+      "Jasper"
+    ],
+    "slug": "cullman-al"
+  },
+  {
+    "city": "Jasper",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 13500,
+    "nearby": [
+      "Cullman",
+      "Carbon Hill",
+      "Cordova"
+    ],
+    "slug": "jasper-al"
+  },
+  {
+    "city": "Selma",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 17100,
+    "nearby": [
+      "Montgomery",
+      "Prattville",
+      "Demopolis"
+    ],
+    "slug": "selma-al"
+  },
+  {
+    "city": "Talladega",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 15200,
+    "nearby": [
+      "Lincoln",
+      "Sylacauga",
+      "Oxford"
+    ],
+    "slug": "talladega-al"
+  },
+  {
+    "city": "Alexander City",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 14600,
+    "nearby": [
+      "Sylacauga",
+      "Talladega",
+      "Dadeville"
+    ],
+    "slug": "alexander-city-al"
+  },
+  {
+    "city": "Scottsboro",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 14600,
+    "nearby": [
+      "Fort Payne",
+      "Guntersville",
+      "Stevenson"
+    ],
+    "slug": "scottsboro-al"
+  },
+  {
+    "city": "Fort Payne",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 14500,
+    "nearby": [
+      "Scottsboro",
+      "Rainsville",
+      "Albertville"
+    ],
+    "slug": "fort-payne-al"
+  },
+  {
+    "city": "Ozark",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 14200,
+    "nearby": [
+      "Enterprise",
+      "Dothan",
+      "Daleville"
+    ],
+    "slug": "ozark-al"
+  },
+  {
+    "city": "Troy",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 19200,
+    "nearby": [
+      "Pike Road",
+      "Brundidge",
+      "Enterprise"
+    ],
+    "slug": "troy-al"
+  },
+  {
+    "city": "Tuskegee",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 10200,
+    "nearby": [
+      "Auburn",
+      "Opelika",
+      "Tallassee"
+    ],
+    "slug": "tuskegee-al"
+  },
+  {
+    "city": "Demopolis",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 6800,
+    "nearby": [
+      "Selma",
+      "Livingston",
+      "Greensboro"
+    ],
+    "slug": "demopolis-al"
+  },
+  {
+    "city": "Eufaula",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 11800,
+    "nearby": [
+      "Phenix City",
+      "Clayton",
+      "Dothan"
+    ],
+    "slug": "eufaula-al"
+  },
+  {
+    "city": "Andalusia",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 8600,
+    "nearby": [
+      "Opp",
+      "Greenville",
+      "Luverne"
+    ],
+    "slug": "andalusia-al"
+  },
+  {
+    "city": "Atmore",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 9500,
+    "nearby": [
+      "Brewton",
+      "Monroeville",
+      "Evergreen"
+    ],
+    "slug": "atmore-al"
+  },
+  {
+    "city": "Brewton",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 5200,
+    "nearby": [
+      "Atmore",
+      "Monroeville",
+      "Evergreen"
+    ],
+    "slug": "brewton-al"
+  },
+  {
+    "city": "Monroeville",
+    "state": "Alabama",
+    "stateAbbr": "AL",
+    "pop": 5800,
+    "nearby": [
+      "Brewton",
+      "Atmore",
+      "Evergreen"
+    ],
+    "slug": "monroeville-al"
+  },
+  {
+    "city": "Jonesboro",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 78500,
+    "nearby": [
+      "Paragould",
+      "Blytheville",
+      "Trumann"
+    ],
+    "slug": "jonesboro-ar"
+  },
+  {
+    "city": "Conway",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 68600,
+    "nearby": [
+      "Greenbrier",
+      "Vilonia",
+      "Morrilton"
+    ],
+    "slug": "conway-ar"
+  },
+  {
+    "city": "Rogers",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 70700,
+    "nearby": [
+      "Bentonville",
+      "Springdale",
+      "Lowell"
+    ],
+    "slug": "rogers-ar"
+  },
+  {
+    "city": "Pine Bluff",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 40100,
+    "nearby": [
+      "White Hall",
+      "Stuttgart",
+      "Dumas"
+    ],
+    "slug": "pine-bluff-ar"
+  },
+  {
+    "city": "Hot Springs",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 38600,
+    "nearby": [
+      "Malvern",
+      "Benton",
+      "Arkadelphia"
+    ],
+    "slug": "hot-springs-ar"
+  },
+  {
+    "city": "Paragould",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 29600,
+    "nearby": [
+      "Jonesboro",
+      "Pocahontas",
+      "Walnut Ridge"
+    ],
+    "slug": "paragould-ar"
+  },
+  {
+    "city": "Texarkana",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 30200,
+    "nearby": [
+      "Hope",
+      "Ashdown",
+      "Nashville"
+    ],
+    "slug": "texarkana-ar"
+  },
+  {
+    "city": "Russellville",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 30100,
+    "nearby": [
+      "Dardanelle",
+      "Morrilton",
+      "Clarksville"
+    ],
+    "slug": "russellville-ar"
+  },
+  {
+    "city": "Searcy",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 23800,
+    "nearby": [
+      "Heber Springs",
+      "Bald Knob",
+      "Beebe"
+    ],
+    "slug": "searcy-ar"
+  },
+  {
+    "city": "West Memphis",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 24300,
+    "nearby": [
+      "Marion",
+      "Forrest City",
+      "Earle"
+    ],
+    "slug": "west-memphis-ar"
+  },
+  {
+    "city": "Cabot",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 26500,
+    "nearby": [
+      "Jacksonville",
+      "Lonoke",
+      "Beebe"
+    ],
+    "slug": "cabot-ar"
+  },
+  {
+    "city": "Mountain Home",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 12600,
+    "nearby": [
+      "Yellville",
+      "Flippin",
+      "Gassville"
+    ],
+    "slug": "mountain-home-ar"
+  },
+  {
+    "city": "Harrison",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 13100,
+    "nearby": [
+      "Mountain Home",
+      "Yellville",
+      "Berryville"
+    ],
+    "slug": "harrison-ar"
+  },
+  {
+    "city": "Batesville",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 11400,
+    "nearby": [
+      "Newport",
+      "Mountain View",
+      "Heber Springs"
+    ],
+    "slug": "batesville-ar"
+  },
+  {
+    "city": "Forrest City",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 13800,
+    "nearby": [
+      "West Memphis",
+      "Wynne",
+      "Helena"
+    ],
+    "slug": "forrest-city-ar"
+  },
+  {
+    "city": "Hope",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 9400,
+    "nearby": [
+      "Texarkana",
+      "Prescott",
+      "Nashville"
+    ],
+    "slug": "hope-ar"
+  },
+  {
+    "city": "Magnolia",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 11200,
+    "nearby": [
+      "El Dorado",
+      "Camden",
+      "Hope"
+    ],
+    "slug": "magnolia-ar"
+  },
+  {
+    "city": "El Dorado",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 17800,
+    "nearby": [
+      "Camden",
+      "Magnolia",
+      "Smackover"
+    ],
+    "slug": "el-dorado-ar"
+  },
+  {
+    "city": "Camden",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 10800,
+    "nearby": [
+      "El Dorado",
+      "Magnolia",
+      "Fordyce"
+    ],
+    "slug": "camden-ar"
+  },
+  {
+    "city": "Stuttgart",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 8800,
+    "nearby": [
+      "Pine Bluff",
+      "DeWitt",
+      "Clarendon"
+    ],
+    "slug": "stuttgart-ar"
+  },
+  {
+    "city": "Clarksville",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 9700,
+    "nearby": [
+      "Russellville",
+      "Ozark",
+      "Lamar"
+    ],
+    "slug": "clarksville-ar"
+  },
+  {
+    "city": "Pocahontas",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 6700,
+    "nearby": [
+      "Paragould",
+      "Walnut Ridge",
+      "Corning"
+    ],
+    "slug": "pocahontas-ar"
+  },
+  {
+    "city": "Malvern",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 11300,
+    "nearby": [
+      "Hot Springs",
+      "Benton",
+      "Arkadelphia"
+    ],
+    "slug": "malvern-ar"
+  },
+  {
+    "city": "Arkadelphia",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 10400,
+    "nearby": [
+      "Malvern",
+      "Hot Springs",
+      "Gurdon"
+    ],
+    "slug": "arkadelphia-ar"
+  },
+  {
+    "city": "Siloam Springs",
+    "state": "Arkansas",
+    "stateAbbr": "AR",
+    "pop": 17400,
+    "nearby": [
+      "Rogers",
+      "Springdale",
+      "Gentry"
+    ],
+    "slug": "siloam-springs-ar"
+  },
+  {
+    "city": "Morgantown",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 30700,
+    "nearby": [
+      "Fairmont",
+      "Westover",
+      "Star City"
+    ],
+    "slug": "morgantown-wv"
+  },
+  {
+    "city": "Parkersburg",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 28700,
+    "nearby": [
+      "Vienna",
+      "Belpre",
+      "Williamstown"
+    ],
+    "slug": "parkersburg-wv"
+  },
+  {
+    "city": "Wheeling",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 25400,
+    "nearby": [
+      "Weirton",
+      "Moundsville",
+      "St. Clairsville"
+    ],
+    "slug": "wheeling-wv"
+  },
+  {
+    "city": "Weirton",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 18100,
+    "nearby": [
+      "Wheeling",
+      "Steubenville",
+      "Follansbee"
+    ],
+    "slug": "weirton-wv"
+  },
+  {
+    "city": "Fairmont",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 18400,
+    "nearby": [
+      "Morgantown",
+      "Clarksburg",
+      "Grafton"
+    ],
+    "slug": "fairmont-wv"
+  },
+  {
+    "city": "Beckley",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 16700,
+    "nearby": [
+      "Oak Hill",
+      "Fayetteville",
+      "Princeton"
+    ],
+    "slug": "beckley-wv"
+  },
+  {
+    "city": "Clarksburg",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 15300,
+    "nearby": [
+      "Fairmont",
+      "Bridgeport",
+      "Grafton"
+    ],
+    "slug": "clarksburg-wv"
+  },
+  {
+    "city": "Martinsburg",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 18600,
+    "nearby": [
+      "Shepherdstown",
+      "Charles Town",
+      "Inwood"
+    ],
+    "slug": "martinsburg-wv"
+  },
+  {
+    "city": "Bluefield",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 9300,
+    "nearby": [
+      "Princeton",
+      "Bramwell",
+      "Tazewell"
+    ],
+    "slug": "bluefield-wv"
+  },
+  {
+    "city": "Princeton",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 5800,
+    "nearby": [
+      "Bluefield",
+      "Beckley",
+      "Hinton"
+    ],
+    "slug": "princeton-wv"
+  },
+  {
+    "city": "Vienna",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 10200,
+    "nearby": [
+      "Parkersburg",
+      "Belpre",
+      "Williamstown"
+    ],
+    "slug": "vienna-wv"
+  },
+  {
+    "city": "Bridgeport",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 9200,
+    "nearby": [
+      "Clarksburg",
+      "Fairmont",
+      "Grafton"
+    ],
+    "slug": "bridgeport-wv"
+  },
+  {
+    "city": "Elkins",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 6900,
+    "nearby": [
+      "Buckhannon",
+      "Philippi",
+      "Beverly"
+    ],
+    "slug": "elkins-wv"
+  },
+  {
+    "city": "Buckhannon",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 5400,
+    "nearby": [
+      "Elkins",
+      "Weston",
+      "Philippi"
+    ],
+    "slug": "buckhannon-wv"
+  },
+  {
+    "city": "Lewisburg",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 3800,
+    "nearby": [
+      "White Sulphur Springs",
+      "Ronceverte",
+      "Hinton"
+    ],
+    "slug": "lewisburg-wv"
+  },
+  {
+    "city": "Charles Town",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 6300,
+    "nearby": [
+      "Martinsburg",
+      "Shepherdstown",
+      "Ranson"
+    ],
+    "slug": "charles-town-wv"
+  },
+  {
+    "city": "Huntington",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 44500,
+    "nearby": [
+      "Barboursville",
+      "Ceredo",
+      "Kenova"
+    ],
+    "slug": "huntington-wv"
+  },
+  {
+    "city": "Moundsville",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 8400,
+    "nearby": [
+      "Wheeling",
+      "New Martinsville",
+      "Glen Dale"
+    ],
+    "slug": "moundsville-wv"
+  },
+  {
+    "city": "Point Pleasant",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 4000,
+    "nearby": [
+      "Gallipolis",
+      "Mason",
+      "Henderson"
+    ],
+    "slug": "point-pleasant-wv"
+  },
+  {
+    "city": "Logan",
+    "state": "West Virginia",
+    "stateAbbr": "WV",
+    "pop": 1500,
+    "nearby": [
+      "Chapmanville",
+      "Man",
+      "Williamson"
+    ],
+    "slug": "logan-wv"
+  },
+  {
+    "city": "Lake Charles",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 84900,
+    "nearby": [
+      "Sulphur",
+      "Westlake",
+      "Moss Bluff"
+    ],
+    "slug": "lake-charles-la"
+  },
+  {
+    "city": "Monroe",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 47200,
+    "nearby": [
+      "West Monroe",
+      "Bastrop",
+      "Ruston"
+    ],
+    "slug": "monroe-la"
+  },
+  {
+    "city": "Alexandria",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 44600,
+    "nearby": [
+      "Pineville",
+      "Ball",
+      "Woodworth"
+    ],
+    "slug": "alexandria-la"
+  },
+  {
+    "city": "Ruston",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 21900,
+    "nearby": [
+      "Monroe",
+      "Grambling",
+      "Jonesboro"
+    ],
+    "slug": "ruston-la"
+  },
+  {
+    "city": "Natchitoches",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 17900,
+    "nearby": [
+      "Many",
+      "Winnfield",
+      "Leesville"
+    ],
+    "slug": "natchitoches-la"
+  },
+  {
+    "city": "Sulphur",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 21500,
+    "nearby": [
+      "Lake Charles",
+      "Westlake",
+      "Vinton"
+    ],
+    "slug": "sulphur-la"
+  },
+  {
+    "city": "Minden",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 12400,
+    "nearby": [
+      "Shreveport",
+      "Bossier City",
+      "Homer"
+    ],
+    "slug": "minden-la"
+  },
+  {
+    "city": "Opelousas",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 16000,
+    "nearby": [
+      "Eunice",
+      "Crowley",
+      "Ville Platte"
+    ],
+    "slug": "opelousas-la"
+  },
+  {
+    "city": "Eunice",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 9600,
+    "nearby": [
+      "Opelousas",
+      "Crowley",
+      "Ville Platte"
+    ],
+    "slug": "eunice-la"
+  },
+  {
+    "city": "Crowley",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 12300,
+    "nearby": [
+      "Rayne",
+      "Eunice",
+      "Jennings"
+    ],
+    "slug": "crowley-la"
+  },
+  {
+    "city": "Jennings",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 9600,
+    "nearby": [
+      "Lake Charles",
+      "Crowley",
+      "Welsh"
+    ],
+    "slug": "jennings-la"
+  },
+  {
+    "city": "Abbeville",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 11500,
+    "nearby": [
+      "Kaplan",
+      "Erath",
+      "New Iberia"
+    ],
+    "slug": "abbeville-la"
+  },
+  {
+    "city": "New Iberia",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 28800,
+    "nearby": [
+      "Abbeville",
+      "Jeanerette",
+      "Loreauville"
+    ],
+    "slug": "new-iberia-la"
+  },
+  {
+    "city": "Morgan City",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 10400,
+    "nearby": [
+      "Patterson",
+      "Franklin",
+      "Berwick"
+    ],
+    "slug": "morgan-city-la"
+  },
+  {
+    "city": "Thibodaux",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 14500,
+    "nearby": [
+      "Houma",
+      "Raceland",
+      "Napoleonville"
+    ],
+    "slug": "thibodaux-la"
+  },
+  {
+    "city": "Bogalusa",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 10800,
+    "nearby": [
+      "Franklinton",
+      "Covington",
+      "Slidell"
+    ],
+    "slug": "bogalusa-la"
+  },
+  {
+    "city": "DeRidder",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 11200,
+    "nearby": [
+      "Leesville",
+      "Lake Charles",
+      "Oakdale"
+    ],
+    "slug": "deridder-la"
+  },
+  {
+    "city": "Leesville",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 5500,
+    "nearby": [
+      "DeRidder",
+      "Many",
+      "Natchitoches"
+    ],
+    "slug": "leesville-la"
+  },
+  {
+    "city": "Bastrop",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 9600,
+    "nearby": [
+      "Monroe",
+      "West Monroe",
+      "Mer Rouge"
+    ],
+    "slug": "bastrop-la"
+  },
+  {
+    "city": "Ville Platte",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 6800,
+    "nearby": [
+      "Opelousas",
+      "Eunice",
+      "Mamou"
+    ],
+    "slug": "ville-platte-la"
+  },
+  {
+    "city": "Donaldsonville",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 8300,
+    "nearby": [
+      "Gonzales",
+      "Plaquemine",
+      "White Castle"
+    ],
+    "slug": "donaldsonville-la"
+  },
+  {
+    "city": "Hammond",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 20500,
+    "nearby": [
+      "Ponchatoula",
+      "Amite",
+      "Covington"
+    ],
+    "slug": "hammond-la"
+  },
+  {
+    "city": "Covington",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 11200,
+    "nearby": [
+      "Mandeville",
+      "Slidell",
+      "Hammond"
+    ],
+    "slug": "covington-la"
+  },
+  {
+    "city": "Gonzales",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 12200,
+    "nearby": [
+      "Donaldsonville",
+      "Prairieville",
+      "Sorrento"
+    ],
+    "slug": "gonzales-la"
+  },
+  {
+    "city": "Breaux Bridge",
+    "state": "Louisiana",
+    "stateAbbr": "LA",
+    "pop": 8200,
+    "nearby": [
+      "Lafayette",
+      "Henderson",
+      "St. Martinville"
+    ],
+    "slug": "breaux-bridge-la"
+  }
+]
