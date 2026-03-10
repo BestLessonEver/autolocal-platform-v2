@@ -113,24 +113,55 @@ export default function SetupPage() {
       {/* Don't have a domain? */}
       <section className="px-4 pb-12">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <span className="text-3xl">🌐</span>
-            <div className="flex-1">
-              <p className="font-bold text-white mb-1">Don&apos;t have a domain yet?</p>
-              <p className="text-gray-400 text-sm">
-                We recommend <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Namecheap</a> — 
-                domains start at ~$9/year. Search for your business name .com and purchase it. 
-                Then come back here to connect it.
-              </p>
+          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6">
+            <div className="flex items-start gap-4 mb-5">
+              <span className="text-3xl">🌐</span>
+              <div>
+                <p className="font-bold text-white text-lg mb-1">Don&apos;t have a domain yet?</p>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  A .com domain costs about $10-15/year. Search for your business name and grab it — then come back here to connect it to your site.
+                </p>
+              </div>
             </div>
-            <a
-              href="https://www.namecheap.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition shrink-0"
-            >
-              Get a Domain →
-            </a>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <a
+                href="https://www.cloudflare.com/products/registrar/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10 hover:border-indigo-500/50 transition group"
+              >
+                <span className="text-xl">🟠</span>
+                <div>
+                  <p className="text-white font-bold text-sm group-hover:text-indigo-400 transition">Cloudflare</p>
+                  <p className="text-gray-500 text-xs">At-cost pricing (~$10/yr)</p>
+                </div>
+              </a>
+              <a
+                href="https://www.namecheap.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10 hover:border-indigo-500/50 transition group"
+              >
+                <span className="text-xl">🔴</span>
+                <div>
+                  <p className="text-white font-bold text-sm group-hover:text-indigo-400 transition">Namecheap</p>
+                  <p className="text-gray-500 text-xs">Popular + easy (~$12/yr)</p>
+                </div>
+              </a>
+              <a
+                href="https://domains.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10 hover:border-indigo-500/50 transition group"
+              >
+                <span className="text-xl">🔵</span>
+                <div>
+                  <p className="text-white font-bold text-sm group-hover:text-indigo-400 transition">Google Domains</p>
+                  <p className="text-gray-500 text-xs">Simple + trusted (~$12/yr)</p>
+                </div>
+              </a>
+            </div>
+            <p className="text-gray-500 text-xs mt-4">💡 Tip: Search for <strong className="text-gray-400">yourbusinessname.com</strong> — keep it short, easy to spell, and memorable.</p>
           </div>
         </div>
       </section>
