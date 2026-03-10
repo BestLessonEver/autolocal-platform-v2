@@ -1356,7 +1356,7 @@ export default function ClientDashboard() {
                     {tip.field === 'domain' ? (
                       <p className="text-xs text-gray-500 mt-0.5">
                         A branded domain (yourbusiness.com) signals authority to search engines.{' '}
-                        <a href="/setup" target="_blank" className="text-indigo-400 hover:underline">Connect your domain →</a>
+                        <a href={`/setup?slug=${data.slug}`} target="_blank" className="text-indigo-400 hover:underline">Connect your domain →</a>
                       </p>
                     ) : tip.desc ? (
                       <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
