@@ -55,6 +55,7 @@ export async function GET() {
     hours: site.hours,
     preview_url: `https://autolocal.ai/preview/${site.slug}`,
     website_url: site.website_current || `https://autolocal.ai/preview/${site.slug}`,
+    website_current: site.website_current || null,
     view_count: site.view_count || 0,
     created_at: site.created_at,
     plan,
