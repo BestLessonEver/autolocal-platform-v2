@@ -38,6 +38,7 @@ interface SiteData {
   created_at: string
   plan: 'starter' | 'living'
   hosting_status: 'preview' | 'active' | 'expired'
+  custom_domain: string | null
   changes_this_month: number
   free_changes_remaining: number
   unlimited_changes: boolean
@@ -623,7 +624,7 @@ function MobileMenu({ data, onLogout, onClose, onSubdomainUpdate, onSiteTypeTogg
         </div>
 
         {/* Actions */}
-        <a href={`/preview/${data.slug}`} target="_blank" className="block w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">View Site ↗</a>
+        <a href={data.custom_domain ? `https://${data.custom_domain}` : `/preview/${data.slug}`} target="_blank" className="block w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-bold text-center hover:bg-indigo-500 transition">{data.custom_domain ? `${data.custom_domain} ↗` : 'View Site ↗'}</a>
         <button onClick={onLogout} className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-sm font-bold hover:text-white transition">Sign Out</button>
       </div>
     </div>

@@ -34,6 +34,7 @@ interface SiteData {
   created_at: string
   plan: 'starter' | 'living'
   hosting_status: 'preview' | 'active' | 'expired'
+  custom_domain: string | null
   changes_this_month: number
   free_changes_remaining: number
   unlimited_changes: boolean
@@ -520,11 +521,11 @@ export default function ClientDashboard() {
 
           {/* View Site */}
           <a
-            href={`/preview/${data.slug}?token=${token}`}
+            href={data.custom_domain ? `https://${data.custom_domain}` : `/preview/${data.slug}?token=${token}`}
             target="_blank"
             className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition"
           >
-            View Site ↗
+            {data.custom_domain ? `${data.custom_domain} ↗` : 'View Site ↗'}
           </a>
         </div>
       </header>

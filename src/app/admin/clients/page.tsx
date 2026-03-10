@@ -37,6 +37,7 @@ interface Preview {
   cancel_date: string | null
   trial_end: string | null
   stripe_customer_id: string | null
+  custom_domain: string | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -277,9 +278,31 @@ export default function AdminClientsPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <a href={`/preview/${p.slug}`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
-                          {p.slug}
+                        <a href={p.custom_domain ? `https://${p.custom_domain}` : `/preview/${p.slug}`} target="_blank" className="text-indigo-400 hover:text-indigo-300 text-xs">
+                          {p.custom_domain || p.slug}
                         </a>
+                        {!p.custom_domain && p.hosting_status === 'active' && (
+                          <button
+                            onClick={async () => {
+                              const domain = prompt('Enter custom domain (e.g. mybusiness.com):')
+                              if (!domain) return
+                              const res = await fetch('/api/admin/previews', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: p.id, custom_domain: domain }),
+                              })
+                              if (res.ok) {
+                                setPreviews(prev => prev.map(x => x.id === p.id ? { ...x, custom_domain: domain } : x))
+                              }
+                            }}
+                            className="block text-[10px] text-gray-600 hover:text-indigo-400 transition mt-0.5"
+                          >
+                            + add domain
+                          </button>
+                        )}
+                        {p.custom_domain && (
+                          <span className="block text-[10px] text-gray-600">{p.slug}</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-xs">
                         {p.city}{p.state ? `, ${p.state}` : ''}

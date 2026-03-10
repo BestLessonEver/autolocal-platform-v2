@@ -59,6 +59,7 @@ export async function GET() {
     created_at: site.created_at,
     plan,
     hosting_status: site.hosting_status || 'preview',
+    custom_domain: site.custom_domain || null,
     changes_this_month: used,
     free_changes_remaining: freeRemaining,
     unlimited_changes: unlimited,

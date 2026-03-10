@@ -82,6 +82,7 @@ export async function GET(
     created_at: data.created_at,
     plan,
     hosting_status: (data as any).hosting_status || 'preview',
+    custom_domain: (data as any).custom_domain || null,
     changes_this_month: changesThisMonth,
     free_changes_remaining: freeChangesRemaining,
     unlimited_changes: plan === 'living',
