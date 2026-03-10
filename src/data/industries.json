@@ -1,0 +1,167 @@
+[
+  {
+    "slug": "barbershops",
+    "name": "Barbershops",
+    "emoji": "💈",
+    "headline": "Free Website for Your Barbershop",
+    "subhead": "Your cuts. Your reviews. Your vibe. We build the site — you keep cutting.",
+    "description": "Show off your best fades, lineups, and client reviews. We pull everything from your Google profile and build a clean, professional site that gets you found online.",
+    "pain": "Most barbershops rely on walk-ins and word of mouth. But when someone new moves to town, they Google \"barbershop near me.\" If you don't have a website, you're invisible.",
+    "features": ["Your best Google reviews front and center", "Photo gallery of your cuts and shop", "Click-to-call on every page", "Hours, location, and walk-in availability", "Mobile-perfect — looks great on any phone"],
+    "searchTerms": ["barbershop website", "free barbershop website", "barber shop web design", "website for barbers"]
+  },
+  {
+    "slug": "restaurants",
+    "name": "Restaurants",
+    "emoji": "🍽️",
+    "headline": "Free Website for Your Restaurant",
+    "subhead": "Your food. Your reviews. Your hours. Online in 15 seconds.",
+    "description": "Customers want to see your menu, hours, and reviews before they drive over. We build a site that puts your best foot forward — with your real Google photos and 5-star reviews.",
+    "pain": "You're on DoorDash and Yelp, but you don't own those pages. A website you control means customers find YOU first — not your competitors.",
+    "features": ["Menu display with your real photos", "Google reviews showcased automatically", "Hours, location, and directions", "Click-to-call for reservations", "Works on every phone and tablet"],
+    "searchTerms": ["restaurant website", "free restaurant website", "website for my restaurant", "restaurant web design"]
+  },
+  {
+    "slug": "auto-repair",
+    "name": "Auto Repair Shops",
+    "emoji": "🔧",
+    "headline": "Free Website for Your Auto Repair Shop",
+    "subhead": "Your reputation does the selling. We just put it online.",
+    "description": "When someone's car breaks down, they Google. If your shop has great reviews but no website, you're losing jobs to the shop down the street that does. We fix that — for free.",
+    "pain": "Customers trust online reviews more than anything. But without a website, your reviews are buried on Google Maps. We put them front and center on YOUR site.",
+    "features": ["Your Google reviews displayed prominently", "Services list and specialties", "Click-to-call for appointments", "Hours and location with map", "Photos of your shop and work"],
+    "searchTerms": ["auto repair website", "mechanic website", "free auto repair website", "website for mechanics"]
+  },
+  {
+    "slug": "salons",
+    "name": "Hair Salons & Spas",
+    "emoji": "💇",
+    "headline": "Free Website for Your Salon",
+    "subhead": "Beautiful work deserves a beautiful website. We build it free.",
+    "description": "Your transformations speak for themselves. We pull your best photos and reviews from Google and create a stunning site that matches the quality of your work.",
+    "pain": "Instagram is great for showing your work, but it doesn't show up in Google searches. When someone searches \"salon near me,\" a real website wins every time.",
+    "features": ["Photo gallery of your best work", "Client reviews and testimonials", "Services and pricing display", "Online booking link integration", "Mobile-perfect design"],
+    "searchTerms": ["salon website", "free salon website", "hair salon web design", "website for beauty salon"]
+  },
+  {
+    "slug": "contractors",
+    "name": "Contractors & Home Services",
+    "emoji": "🏠",
+    "headline": "Free Website for Your Contracting Business",
+    "subhead": "Your project photos and reviews — on a site that wins you jobs.",
+    "description": "Homeowners check your website before they call. We build a professional site with your real project photos and Google reviews so you look as good online as your work does in person.",
+    "pain": "You're competing against contractors with fancy websites built by agencies. Now you can have the same thing — for free. Level the playing field.",
+    "features": ["Project photo gallery", "Google reviews and ratings", "Services and service area", "Click-to-call and contact form", "License and insurance display"],
+    "searchTerms": ["contractor website", "free contractor website", "handyman website", "website for contractors"]
+  },
+  {
+    "slug": "dentists",
+    "name": "Dentists & Dental Clinics",
+    "emoji": "🦷",
+    "headline": "Free Website for Your Dental Practice",
+    "subhead": "Build trust before they walk through the door.",
+    "description": "Patients research dentists online before booking. A professional website with your real reviews and office photos builds the trust that gets them to call.",
+    "pain": "New patients pick dentists based on reviews and first impressions. Without a website, your only first impression is a Google Maps pin. That's not enough.",
+    "features": ["Patient reviews displayed automatically", "Office photos and team info", "Services and insurance accepted", "Online appointment requests", "Directions and parking info"],
+    "searchTerms": ["dentist website", "dental website design", "free dentist website", "website for dental practice"]
+  },
+  {
+    "slug": "churches",
+    "name": "Churches & Places of Worship",
+    "emoji": "⛪",
+    "headline": "Free Website for Your Church",
+    "subhead": "Help your community find you online.",
+    "description": "Families searching for a church home start online. A welcoming website with your service times, location, and community photos helps them take that first step.",
+    "pain": "Many churches have no online presence beyond a Facebook page. When someone Googles \"church near me,\" a real website shows you're active and welcoming.",
+    "features": ["Service times and location", "Community photos and events", "Pastor and leadership info", "Visitor welcome information", "Directions and parking"],
+    "searchTerms": ["church website", "free church website", "website for churches", "church web design"]
+  },
+  {
+    "slug": "fitness",
+    "name": "Gyms & Fitness Studios",
+    "emoji": "💪",
+    "headline": "Free Website for Your Gym or Studio",
+    "subhead": "Get more members with a site that shows what you're about.",
+    "description": "People research gyms before committing. Your website should show them the energy, the community, and the results. We build it from your Google profile — free.",
+    "pain": "Big chain gyms have massive marketing budgets. Your advantage is community and results. A great website levels the playing field.",
+    "features": ["Facility photos and tour", "Class schedules and programs", "Member reviews and testimonials", "Membership info and pricing", "Click-to-call and location"],
+    "searchTerms": ["gym website", "fitness studio website", "free gym website", "website for personal trainers"]
+  },
+  {
+    "slug": "cleaning-services",
+    "name": "Cleaning Services",
+    "emoji": "🧹",
+    "headline": "Free Website for Your Cleaning Business",
+    "subhead": "Your reviews are your best salesperson. Put them to work online.",
+    "description": "Trust is everything in the cleaning business. A professional website with your real Google reviews builds that trust before you ever pick up the phone.",
+    "pain": "Most cleaning businesses get clients through referrals. A website turns those referrals into a machine — people check your site, see your reviews, and call.",
+    "features": ["Customer reviews and ratings", "Services offered and pricing", "Before/after photos", "Service area information", "Easy contact and booking"],
+    "searchTerms": ["cleaning service website", "free cleaning business website", "maid service website", "website for cleaners"]
+  },
+  {
+    "slug": "landscaping",
+    "name": "Landscaping & Lawn Care",
+    "emoji": "🌿",
+    "headline": "Free Website for Your Landscaping Business",
+    "subhead": "Show off your best work. Get more yards to transform.",
+    "description": "Your before-and-after photos sell better than any ad. We build a site that showcases your work, displays your reviews, and makes it easy to get a quote.",
+    "pain": "Homeowners scroll through Google looking for landscapers with great reviews and photos. No website = no consideration.",
+    "features": ["Project photo gallery", "Google reviews displayed", "Services and pricing", "Service area map", "Free estimate request"],
+    "searchTerms": ["landscaping website", "lawn care website", "free landscaper website", "website for landscaping business"]
+  },
+  {
+    "slug": "plumbers",
+    "name": "Plumbers",
+    "emoji": "🔧",
+    "headline": "Free Website for Your Plumbing Business",
+    "subhead": "When pipes burst, people Google. Make sure they find you.",
+    "description": "Emergency plumbing calls go to the first plumber with a website and good reviews. We make sure that's you — with a professional site built in 15 seconds.",
+    "pain": "Plumbing is an emergency business. When someone's toilet is flooding at 10pm, they Google \"plumber near me\" and call the first one with a website. Be that plumber.",
+    "features": ["24/7 availability display", "Emergency contact prominent", "Google reviews and trust signals", "Services and pricing", "Service area coverage"],
+    "searchTerms": ["plumber website", "plumbing website design", "free plumber website", "website for plumbers"]
+  },
+  {
+    "slug": "real-estate",
+    "name": "Real Estate Agents",
+    "emoji": "🏘️",
+    "headline": "Free Website for Real Estate Agents",
+    "subhead": "Your listings. Your reviews. Your brand. Online in 15 seconds.",
+    "description": "Buyers and sellers check you out online before reaching out. A professional website with your reviews and credentials builds the trust that gets you the listing.",
+    "pain": "Zillow and Realtor.com own the search results. Your own website gives you a presence YOU control — and builds your personal brand.",
+    "features": ["Agent bio and credentials", "Client testimonials and reviews", "Contact and consultation booking", "Service area information", "Professional headshot display"],
+    "searchTerms": ["real estate website", "realtor website", "free real estate agent website", "website for realtors"]
+  },
+  {
+    "slug": "pet-services",
+    "name": "Pet Groomers & Vets",
+    "emoji": "🐾",
+    "headline": "Free Website for Your Pet Business",
+    "subhead": "Pet parents research everything. Make sure they find you.",
+    "description": "Pet owners are fiercely loyal — once they find a groomer or vet they trust. Your website with real reviews and happy pet photos is what gets them through the door.",
+    "pain": "Pet parents read every review before trusting someone with their fur baby. A website with your Google reviews does the convincing for you.",
+    "features": ["Happy pet photo gallery", "Client reviews and ratings", "Services and pricing", "Appointment booking", "Location and hours"],
+    "searchTerms": ["pet groomer website", "veterinarian website", "free pet business website", "website for dog groomers"]
+  },
+  {
+    "slug": "bakeries",
+    "name": "Bakeries & Cafes",
+    "emoji": "🧁",
+    "headline": "Free Website for Your Bakery or Cafe",
+    "subhead": "Your pastries look amazing. Your website should too.",
+    "description": "People eat with their eyes first. We build a mouthwatering website with your real food photos and rave reviews that gets customers through the door.",
+    "pain": "You post on Instagram, but that doesn't help when someone Googles \"bakery near me.\" A real website gets you found in search AND looks incredible.",
+    "features": ["Food photo gallery from Google", "Customer reviews and ratings", "Menu and daily specials", "Hours, location, and ordering", "Catering and custom order info"],
+    "searchTerms": ["bakery website", "cafe website", "free bakery website", "website for bakeries"]
+  },
+  {
+    "slug": "tattoo-shops",
+    "name": "Tattoo & Piercing Studios",
+    "emoji": "🎨",
+    "headline": "Free Website for Your Tattoo Studio",
+    "subhead": "Your art deserves a gallery. We build it free.",
+    "description": "Clients spend hours researching tattoo artists before booking. A portfolio website with your work and reviews is what separates booked-solid from slow days.",
+    "pain": "Instagram helps, but it's not searchable by location. When someone Googles \"tattoo shop near me,\" a real website with your portfolio wins.",
+    "features": ["Portfolio gallery of your work", "Artist bios and specialties", "Google reviews and ratings", "Booking and consultation info", "Shop photos and vibe"],
+    "searchTerms": ["tattoo website", "tattoo shop website", "free tattoo studio website", "website for tattoo artists"]
+  }
+]
