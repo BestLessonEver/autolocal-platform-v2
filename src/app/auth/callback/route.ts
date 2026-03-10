@@ -4,8 +4,6 @@ import { NextResponse } from 'next/server'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://autolocal.ai'
 const ADMIN_EMAILS = [
   'brian@autolocal.ai',
-  'whoisbc@me.com',
-  'bestlessoninfo@gmail.com',
 ]
 
 export async function GET(request: Request) {

@@ -14,7 +14,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'whoisbc@me.com,bestlessoninfo@gmail.com').split(',').map(e => e.trim().toLowerCase())
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brian@autolocal.ai').split(',').map(e => e.trim().toLowerCase())
 
 interface Props {
   params: { slug: string }

@@ -10,8 +10,6 @@ const supabase = createClient(
 const ADMIN_KEY = process.env.ADMIN_API_KEY
 const ADMIN_EMAILS = [
   'brian@autolocal.ai',
-  'whoisbc@me.com',
-  'bestlessoninfo@gmail.com',
 ]
 
 async function isAuthorized(req: NextRequest): Promise<boolean> {

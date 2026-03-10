@@ -4,8 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const ADMIN_EMAILS = [
   'brian@autolocal.ai',
-  'mrbriancarrion@gmail.com',
-  'bestlessoninfo@gmail.com',
 ]
 
 export async function middleware(request: NextRequest) {
