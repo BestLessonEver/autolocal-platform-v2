@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
-import StickyContactBar from './StickyContactBar'
+// StickyContactBar removed
 
 /* ── Fade-in on scroll hook ── */
 function useFadeIn() {
@@ -288,7 +288,7 @@ export default function BDETemplate({ data }: TemplateProps) {
         <p className="text-gray-600 text-xs mt-3">Powered by AutoLocal.ai</p>
       </footer>
 
-      <StickyContactBar data={data} />
+      {/* StickyContactBar removed */}
     </div>
   )
 }
