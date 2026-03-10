@@ -66,21 +66,13 @@ async function sendActivationEmail(to: string, contactName: string, businessName
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
             <tr><td bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:16px;padding:28px 32px;border:2px solid #c7d2fe;">
               <span style="color:#312e81;font-size:20px;font-weight:800;display:block;margin:0 0 12px;">🌐 Connect Your Own Domain</span>
-              <span style="color:#3730a3;font-size:14px;line-height:1.6;display:block;margin:0 0 16px;">Want your site on <b style="color:#312e81;">yourbusiness.com</b> instead of autolocal.ai? Here's how:</span>
-              <table cellpadding="0" cellspacing="0" style="width:100%;" role="presentation">
-                <tr><td style="padding:8px 0;border-bottom:1px solid #c7d2fe;">
-                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 1: Buy a domain</span>
-                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">If you don't have one, we recommend <b>Namecheap</b> or <b>Google Domains</b> (~$12/year).</span>
-                </td></tr>
-                <tr><td style="padding:8px 0;border-bottom:1px solid #c7d2fe;">
-                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 2: Reply to this email</span>
-                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">Tell us your domain name and we'll handle the setup for you — <b>completely free</b>.</span>
-                </td></tr>
-                <tr><td style="padding:8px 0;">
-                  <span style="color:#6366f1;font-weight:700;font-size:14px;">Step 3: We connect it</span>
-                  <span style="color:#4b5563;font-size:13px;display:block;margin:4px 0 0;">We'll configure the DNS and have your custom domain live within 24 hours.</span>
+              <span style="color:#3730a3;font-size:15px;line-height:1.6;display:block;margin:0 0 20px;">Want your site on <b style="color:#312e81;">yourbusiness.com</b>? We made a step-by-step guide that walks you through it — takes about 5 minutes, no technical experience needed.</span>
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr><td align="center" bgcolor="#4f46e5" style="background-color:#4f46e5;border-radius:10px;">
+                  <a href="https://autolocal.ai/setup" style="display:inline-block;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:10px;border:1px solid #4f46e5;">Connect My Domain →</a>
                 </td></tr>
               </table>
+              <span style="color:#6b7280;font-size:13px;display:block;margin:16px 0 0;">Don't have a domain? No worries — the guide helps with that too. Or reply to this email and we'll help.</span>
             </td></tr>
           </table>
 
