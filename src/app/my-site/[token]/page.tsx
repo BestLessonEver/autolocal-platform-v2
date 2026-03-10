@@ -51,6 +51,19 @@ interface ServiceItem {
   price?: string
 }
 
+/** Only use website_current if it's an autolocal.ai subdomain — never link to external sites */
+function getSiteUrl(data: { custom_domain: string | null; website_current: string | null; slug: string }, token?: string): string {
+  if (data.custom_domain) return `https://${data.custom_domain}`
+  if (data.website_current?.includes('autolocal.ai')) return data.website_current
+  return `/preview/${data.slug}${token ? `?token=${token}` : ''}`
+}
+
+function getSiteLabel(data: { custom_domain: string | null; website_current: string | null }): string {
+  if (data.custom_domain) return `${data.custom_domain} ↗`
+  if (data.website_current?.includes('autolocal.ai')) return `${data.website_current.replace('https://','')} ↗`
+  return 'View Site ↗'
+}
+
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
 const TEMPLATES = [
@@ -521,11 +534,11 @@ export default function ClientDashboard() {
 
           {/* View Site */}
           <a
-            href={data.custom_domain ? `https://${data.custom_domain}` : data.website_current || `/preview/${data.slug}?token=${token}`}
+            href={getSiteUrl(data, token)}
             target="_blank"
             className="shrink-0 px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition"
           >
-            {data.custom_domain ? `${data.custom_domain} ↗` : data.website_current ? `${data.website_current.replace('https://','')} ↗` : 'View Site ↗'}
+            {getSiteLabel(data)}
           </a>
         </div>
       </header>
