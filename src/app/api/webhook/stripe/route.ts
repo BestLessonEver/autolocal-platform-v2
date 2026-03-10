@@ -21,13 +21,17 @@ function slugify(name: string): string {
     .trim()
 }
 
-async function sendActivationEmail(to: string, contactName: string, businessName: string, slug: string, siteId?: string) {
+async function sendActivationEmail(to: string, contactName: string, businessName: string, slug: string) {
   const firstName = contactName?.split(' ')[0] || 'there'
-  const dashboardToken = siteId ? `${siteId.substring(0, 8)}-${slug}` : null
-  const dashboardUrl = dashboardToken
-    ? `https://autolocal.ai/my-site/${dashboardToken}`
-    : 'https://autolocal.ai/login'
   const siteUrl = `https://autolocal.ai/preview/${slug}`
+
+  // Generate magic link for secure dashboard access
+  const { data } = await supabase.auth.admin.generateLink({
+    type: 'magiclink',
+    email: to,
+    options: { redirectTo: 'https://autolocal.ai/auth/callback?next=/dashboard' },
+  })
+  const dashboardUrl = data?.properties?.action_link || 'https://autolocal.ai/login'
 
   try {
     const html = `
@@ -189,7 +193,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   // Send activation email with domain setup instructions (fire-and-forget)
-  sendActivationEmail(email, contactName, businessName, slug, existing?.id).catch(err =>
+  sendActivationEmail(email, contactName, businessName, slug).catch(err =>
     console.error('Webhook activation email failed (non-fatal):', err)
   )
 

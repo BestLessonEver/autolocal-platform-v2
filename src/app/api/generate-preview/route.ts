@@ -28,13 +28,16 @@ if (!GOOGLE_PLACES_KEY) {
 // Welcome email for free preview
 // ============================================================
 
-async function sendPreviewEmail(to: string, contactName: string, businessName: string, slug: string, dashboardToken?: string) {
+async function sendPreviewEmail(to: string, contactName: string, businessName: string, slug: string) {
   const firstName = contactName?.split(' ')[0] || 'there'
 
-  // Link directly to token dashboard if available, otherwise login
-  const dashboardUrl = dashboardToken
-    ? `https://autolocal.ai/my-site/${dashboardToken}`
-    : 'https://autolocal.ai/login'
+  // Generate magic link for secure dashboard access
+  const { data } = await supabase.auth.admin.generateLink({
+    type: 'magiclink',
+    email: to,
+    options: { redirectTo: 'https://autolocal.ai/auth/callback?next=/dashboard' },
+  })
+  const dashboardUrl = data?.properties?.action_link || 'https://autolocal.ai/login'
 
   const html = `
 <!DOCTYPE html>
@@ -95,12 +98,12 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
           </table>
 
           <!-- How to log in -->
-          <h2 style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 8px;">🔑 Your Dashboard</h2>
+          <h2 style="color:#ffffff;font-size:16px;font-weight:700;margin:0 0 8px;">🔑 How to Log In</h2>
           <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 6px;">
-            Click the button above to go straight to your dashboard — no login required.
+            <strong style="color:#d4d4d8;">Option 1:</strong> Click the button above — it signs you in automatically.
           </p>
           <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 6px;">
-            You can also bookmark your dashboard link to access it anytime.
+            <strong style="color:#d4d4d8;">Option 2:</strong> Go to <a href="https://autolocal.ai/login" style="color:#6366f1;">autolocal.ai/login</a> and enter this email. We'll send a sign-in link (no password needed).
           </p>
           <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0 0 20px;">
             <strong style="color:#d4d4d8;">Your preview:</strong> <a href="https://autolocal.ai/preview/${slug}" style="color:#6366f1;">autolocal.ai/preview/${slug}</a>
@@ -481,7 +484,7 @@ export async function POST(req: NextRequest) {
 
     // Now send welcome email with the token dashboard link
     if (email) {
-      sendPreviewEmail(email, emailContactName, name, fullSlug, previewToken || undefined).catch(err =>
+      sendPreviewEmail(email, emailContactName, name, fullSlug).catch(err =>
         console.error('[generate-preview] Email send failed:', err)
       )
     }
