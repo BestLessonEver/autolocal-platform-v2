@@ -2,6 +2,16 @@
 'use client'
 
 import { useState, useEffect, Component, type ErrorInfo, type ReactNode } from 'react'
+
+// Google Ads conversion helper
+declare global {
+  interface Window { gtag?: (...args: unknown[]) => void }
+}
+function trackConversion(sendTo: string, value: number) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'conversion', { send_to: sendTo, value, currency: 'USD' })
+  }
+}
 import { type PreviewData, type TemplateName, categoryToTemplate } from '@/components/templates/types'
 import BoldTemplate from '@/components/templates/BoldTemplate'
 import ElegantTemplate from '@/components/templates/ElegantTemplate'
@@ -184,6 +194,8 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
                 <button
                   onClick={async () => {
                     try {
+                      // Fire Google Ads begin checkout conversion
+                      trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)
                       const res = await fetch('/api/checkout', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

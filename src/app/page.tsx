@@ -5,6 +5,25 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
+// Google Ads conversion helpers
+declare global {
+  interface Window { gtag?: (...args: unknown[]) => void }
+}
+function trackConversion(sendTo: string, value: number, callback?: () => void) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'conversion', {
+      send_to: sendTo,
+      value,
+      currency: 'USD',
+      event_callback: callback,
+    })
+    // Fallback if gtag doesn't call back within 1s
+    if (callback) setTimeout(callback, 1000)
+  } else if (callback) {
+    callback()
+  }
+}
+
 const STEPS = [
   'Finding your business on Google...',
   'Pulling your reviews and photos...',
@@ -141,6 +160,8 @@ export default function HomePage() {
         // Fire and forget — don't block navigation
         sb.auth.verifyOtp({ token_hash: data.autoLoginToken, type: 'magiclink' }).catch(() => {})
       }
+      // Fire Google Ads lead conversion
+      trackConversion('AW-17996760129/0rTFCISvnoYcEMGIw4VD', 1.0)
       // Preview URL already has ?token= for instant access (no auth needed)
       router.push(data.previewUrl)
     } catch {
@@ -158,6 +179,8 @@ export default function HomePage() {
     e.preventDefault()
     setCheckoutLoading(true)
     try {
+      // Fire Google Ads begin checkout conversion
+      trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)
       const product = 'website'
       const res = await fetch('/api/checkout', {
         method: 'POST',
