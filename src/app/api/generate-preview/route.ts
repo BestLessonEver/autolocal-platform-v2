@@ -61,9 +61,9 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
 
           <!-- Promo box -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;" role="presentation">
-            <tr><td align="center" bgcolor="#6366f1" style="background:#6366f1;border-radius:12px;padding:20px 24px;">
-              <span style="color:#ffffff !important;font-size:15px;font-weight:800;display:block;margin:0 0 6px;">🎉 Free Month of Hosting</span>
-              <span style="color:#ffffff !important;font-size:14px;display:block;">Activate from your dashboard — <b style="color:#ffffff !important;">$0 today</b>, just $9/mo after your free trial. Cancel anytime.</span>
+            <tr><td align="center" bgcolor="#eef2ff" style="background-color:#eef2ff;border-radius:12px;padding:20px 24px;border:2px solid #c7d2fe;">
+              <span style="color:#312e81;font-size:15px;font-weight:800;display:block;margin:0 0 6px;">🎉 Free Month of Hosting</span>
+              <span style="color:#3730a3;font-size:14px;display:block;">Activate from your dashboard — <b style="color:#312e81;">$0 today</b>, just $9/mo after your free trial. Cancel anytime.</span>
             </td></tr>
           </table>
 
