@@ -1,11 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#09090b]" />}>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const searchParams = useSearchParams()
   const prefillEmail = searchParams.get('email') || ''
   const redirect = searchParams.get('redirect') || ''
