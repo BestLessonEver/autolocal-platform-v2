@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { internalAuthHeader } from '@/lib/internal-auth'
+import { sendEmail } from '@/lib/mailer'
 
 // ============================================================
 // Config — fail fast on missing credentials
@@ -112,15 +113,7 @@ async function sendPreviewEmail(to: string, contactName: string, businessName: s
 </body>
 </html>`
 
-  await fetch('https://autolocal.ai/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': internalAuthHeader() },
-    body: JSON.stringify({
-      to,
-      subject: `Your ${businessName} website is ready! 🎉`,
-      html,
-    }),
-  })
+  await sendEmail(to, `Your ${businessName} website is ready! 🎉`, html)
 }
 
 // ============================================================

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getDripEmail } from '@/lib/drip-emails'
-import { internalAuthHeader } from '@/lib/internal-auth'
+import { sendEmail } from '@/lib/mailer'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -101,30 +101,18 @@ async function processQueue() {
         continue
       }
 
-      // Send the email
+      // Send the email — direct SMTP, no self-calling API
       try {
-        const emailRes = await fetch('https://autolocal.ai/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': internalAuthHeader(),
-          },
-          body: JSON.stringify({
-            to: item.email,
-            subject: template.subject,
-            html: template.html,
-          }),
-        })
+        const result = await sendEmail(item.email, template.subject, template.html)
 
-        if (emailRes.ok) {
+        if (result.success) {
           await supabase
             .from('drip_queue')
             .update({ status: 'sent', sent_at: now })
             .eq('id', item.id)
           sent++
         } else {
-          const errBody = await emailRes.text()
-          console.error(`Drip email failed for ${item.email}:`, errBody)
+          console.error(`Drip email failed for ${item.email}:`, result.error)
           await supabase
             .from('drip_queue')
             .update({ status: 'failed', sent_at: now })
