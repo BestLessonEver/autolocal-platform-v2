@@ -4,6 +4,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 
+// Google Ads conversion helper
+declare global {
+  interface Window { gtag?: (...args: unknown[]) => void }
+}
+function trackConversion(sendTo: string, value: number) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'conversion', { send_to: sendTo, value, currency: 'USD' })
+  }
+}
+
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
 interface SiteData {
@@ -556,6 +566,8 @@ export default function ClientDashboard() {
             </div>
             <button
               onClick={async () => {
+                // Fire Google Ads begin checkout conversion
+                trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)
                 const res = await fetch('/api/checkout', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
