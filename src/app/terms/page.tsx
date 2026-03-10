@@ -29,7 +29,7 @@ export default function TermsPage() {
               <li>Website creation is free</li>
               <li>Hosting is $9/month, billed monthly via Stripe</li>
               <li>First month is free — no credit card required for preview</li>
-              <li>Premium features are available for a one-time $99 fee</li>
+              <li>Premium features may be available as add-ons at posted prices</li>
               <li>You may cancel hosting at any time with no cancellation fee</li>
               <li>Refunds are handled on a case-by-case basis — contact <a href="mailto:support@autolocal.ai" className="text-indigo-400 hover:underline">support@autolocal.ai</a></li>
             </ul>

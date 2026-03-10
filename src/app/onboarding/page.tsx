@@ -349,7 +349,7 @@ export default function OnboardingPage() {
               <span className="text-sm">Generating your content...</span>
             </div>
             <button onClick={handleComplete} disabled={loading} className="btn-gradient text-white font-semibold px-8 py-3 rounded-xl disabled:opacity-50">
-              {loading ? 'Setting up...' : 'Go to Dashboard →'}
+              {loading ? 'Setting up...' : 'Customize Your Site →'}
             </button>
           </div>
         )

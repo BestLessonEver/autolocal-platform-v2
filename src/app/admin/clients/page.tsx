@@ -50,7 +50,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 const PACKAGE_LABELS: Record<string, string> = {
-  starter: '$99 Website',
+  starter: 'Free Website',
   living: '$49/mo Living',
   social_revive: '$499/mo Social',
   growth: '$1,499/mo Growth',

@@ -240,7 +240,7 @@ export default function HomePage() {
       </header>
 
       {/* ══════════════════════════════════════════════
-          HERO — $99 is the headline
+          HERO — Free website is the headline
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
