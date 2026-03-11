@@ -7,6 +7,7 @@ const SANDBOX_URL = 'https://api.sandbox.namecheap.com/xml.response'
 const PROD_URL = 'https://api.namecheap.com/xml.response'
 
 function getBaseUrl(): string {
+  // Default to production — set NAMECHEAP_SANDBOX=true to use sandbox
   return process.env.NAMECHEAP_SANDBOX === 'true' ? SANDBOX_URL : PROD_URL
 }
 

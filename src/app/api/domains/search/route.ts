@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkAvailability, getPricing } from '@/lib/namecheap'
 
 // Common TLDs to check alongside the requested domain
-const TLDS = ['com', 'net', 'co', 'io', 'ai', 'biz', 'info', 'us']
+const TLDS = ['com', 'net', 'co', 'io', 'us', 'biz', 'info']
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,17 +31,27 @@ export async function POST(req: NextRequest) {
     // Check availability
     const results = await checkAvailability(domainsToCheck)
     
-    // Retail pricing by TLD — marked up from Namecheap wholesale for healthy margins
-    // Wholesale .com ~$8.58, we charge $14.99 → ~$4-5 profit after Stripe
+    // Retail pricing by TLD — based on actual Namecheap API costs + markup
+    // Format: { register: first year price, renew: annual renewal price }
+    // Stripe takes 2.9% + $0.30 per charge
+    //
+    // Actual Namecheap costs (YourPrice):
+    //   .com: register $11.48, renew $15.18  → sell $17.99, profit ~$2-4
+    //   .net: register $13.18, renew $15.18  → sell $18.99, profit ~$2-4
+    //   .co:  register $6.98,  renew $33.98  → sell $39.99 (renewal is brutal)
+    //   .io:  register $34.98, renew $75.98  → sell $84.99
+    //   .us:  register $5.98,  renew $8.48   → sell $12.99
+    //   .info: register $4.18, renew $29.18  → sell $34.99
+    //   .biz:  register $8.68, renew $21.18  → sell $24.99
+    //   .ai:  not available via API
     const FALLBACK_PRICES: Record<string, { register: number; renew: number }> = {
-      com:  { register: 14.99, renew: 14.99 },
-      net:  { register: 16.99, renew: 16.99 },
-      co:   { register: 19.99, renew: 34.99 },
-      io:   { register: 44.99, renew: 49.99 },
-      ai:   { register: 89.99, renew: 89.99 },
-      biz:  { register: 14.99, renew: 19.99 },
-      info: { register: 9.99, renew: 22.99 },
-      us:   { register: 9.99, renew: 12.99 },
+      com:  { register: 17.99, renew: 17.99 },
+      net:  { register: 18.99, renew: 18.99 },
+      co:   { register: 14.99, renew: 39.99 },
+      io:   { register: 49.99, renew: 84.99 },
+      biz:  { register: 14.99, renew: 24.99 },
+      info: { register: 9.99,  renew: 34.99 },
+      us:   { register: 9.99,  renew: 12.99 },
     }
 
     // Try to get live pricing for .com (fallback to hardcoded if API fails)
