@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkAvailability, getPricing } from '@/lib/namecheap'
 
 // Common TLDs to check alongside the requested domain
-const TLDS = ['com', 'net', 'co', 'io', 'us', 'biz', 'info']
+// Only TLDs that make sense for local businesses
+const TLDS = ['com', 'net', 'us', 'co']
 
 export async function POST(req: NextRequest) {
   try {
