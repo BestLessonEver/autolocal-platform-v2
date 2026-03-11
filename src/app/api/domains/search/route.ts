@@ -31,12 +31,24 @@ export async function POST(req: NextRequest) {
     // Check availability
     const results = await checkAvailability(domainsToCheck)
     
-    // Get .com pricing (use as baseline)
-    let pricing = { register: 10.98, renew: 12.98 }
+    // Fallback pricing by TLD (Namecheap approximate rates)
+    const FALLBACK_PRICES: Record<string, { register: number; renew: number }> = {
+      com: { register: 10.98, renew: 14.98 },
+      net: { register: 12.98, renew: 14.98 },
+      co:  { register: 11.98, renew: 30.98 },
+      io:  { register: 32.98, renew: 39.98 },
+      ai:  { register: 74.98, renew: 74.98 },
+      biz: { register: 11.98, renew: 17.98 },
+      info: { register: 4.98, renew: 19.98 },
+      us:  { register: 5.98, renew: 9.98 },
+    }
+
+    // Try to get live pricing for .com (fallback to hardcoded if API fails)
     try {
-      pricing = await getPricing('com')
+      const comPricing = await getPricing('com')
+      FALLBACK_PRICES.com = comPricing
     } catch {
-      // Use defaults if pricing API fails
+      // Use fallback
     }
 
     // Sort: available first, .com first among available
@@ -49,11 +61,15 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({
-      results: sorted.map(r => ({
-        ...r,
-        price: r.available ? pricing.register : undefined,
-        renewPrice: r.available ? pricing.renew : undefined,
-      })),
+      results: sorted.map(r => {
+        const tld = r.domain.split('.').pop() || 'com'
+        const prices = FALLBACK_PRICES[tld] || FALLBACK_PRICES.com
+        return {
+          ...r,
+          price: r.available ? prices.register : undefined,
+          renewPrice: r.available ? prices.renew : undefined,
+        }
+      }),
       searchName,
     })
   } catch (err) {

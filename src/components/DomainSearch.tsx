@@ -51,22 +51,23 @@ export default function DomainSearch({ siteId, slug, currentDomain }: Props) {
     }
   }
 
-  const handleRegister = async (domain: string, price: number) => {
+  const handleRegister = async (domain: string, price: number, renewPrice: number) => {
     setRegistering(domain)
     setError('')
 
     try {
-      // Create Stripe checkout for domain purchase
+      // Create Stripe checkout for yearly domain subscription
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           product: 'domain',
           domain,
-          domainPrice: Math.round(price * 100), // convert to cents
+          domainPrice: Math.round(price * 100),
+          renewPrice: Math.round(renewPrice * 100),
           siteId,
           slug,
-          email: '', // will be collected by Stripe
+          email: '',
         }),
       })
       const data = await res.json()
@@ -159,7 +160,7 @@ export default function DomainSearch({ siteId, slug, currentDomain }: Props) {
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-gray-400 text-xs">${r.price?.toFixed(2)}/yr</span>
                     <button
-                      onClick={() => handleRegister(r.domain, r.price || 12.98)}
+                      onClick={() => handleRegister(r.domain, r.price || 12.98, r.renewPrice || r.price || 12.98)}
                       disabled={!!registering}
                       className="px-4 py-1.5 rounded-lg bg-green-600 text-white text-xs font-bold hover:bg-green-500 transition disabled:opacity-50"
                     >
@@ -168,7 +169,7 @@ export default function DomainSearch({ siteId, slug, currentDomain }: Props) {
                           <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Redirecting...
                         </span>
-                      ) : `Get — $${r.price?.toFixed(2) || '12.98'}`}
+                      ) : `$${r.price?.toFixed(2) || '12.98'}/yr`}
                     </button>
                   </div>
                 )}

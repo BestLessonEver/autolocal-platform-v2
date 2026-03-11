@@ -69,9 +69,10 @@ export async function POST(req: Request) {
         },
       }
     } else if (product === 'domain') {
-      // One-time domain registration — dynamic price
+      // Yearly domain subscription — price varies by TLD
       const domainName = body.domain
-      const domainPrice = body.domainPrice // cents (e.g. 1298 for $12.98)
+      const domainPrice = body.domainPrice // cents/year (e.g. 1298 for $12.98/yr)
+      const renewPrice = body.renewPrice   // cents/year for renewal (may differ from first year)
       const siteId = body.siteId
 
       if (!domainName || !domainPrice || !siteId) {
@@ -81,15 +82,18 @@ export async function POST(req: Request) {
       const domainMeta = { ...metadata, domain: domainName, siteId }
 
       sessionParams = {
-        mode: 'payment',
+        mode: 'subscription',
         line_items: [{
           price_data: {
             currency: 'usd',
             product_data: {
               name: `Domain: ${domainName}`,
-              description: '1-year registration with auto-renewal. Includes DNS setup, SSL, and WHOIS privacy.',
+              description: 'Annual domain registration. Includes DNS, SSL, and WHOIS privacy. Cancel anytime.',
             },
-            unit_amount: Math.round(Number(domainPrice)),
+            unit_amount: Math.round(Number(renewPrice || domainPrice)),
+            recurring: {
+              interval: 'year',
+            },
           },
           quantity: 1,
         }],
@@ -99,9 +103,9 @@ export async function POST(req: Request) {
           : `https://autolocal.ai/dashboard`,
         customer_email: email || undefined,
         metadata: domainMeta,
-        payment_intent_data: {
+        subscription_data: {
           metadata: domainMeta,
-          statement_descriptor: 'AUTOLOCAL DOMAIN',
+          description: `Domain: ${domainName} — Annual Registration`,
         },
       }
     } else {
