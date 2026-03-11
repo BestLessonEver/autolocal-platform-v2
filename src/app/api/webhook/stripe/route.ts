@@ -109,8 +109,79 @@ async function sendActivationEmail(to: string, contactName: string, businessName
   }
 }
 
+async function handleDomainPurchase(session: Stripe.Checkout.Session) {
+  const metadata = session.metadata || {}
+  const domain = metadata.domain
+  const siteId = metadata.siteId
+  const email = metadata.email || session.customer_email || ''
+  const businessName = metadata.business_name || ''
+  const slug = metadata.slug || ''
+
+  if (!domain || !siteId) {
+    console.error('Missing domain or siteId in domain purchase metadata:', metadata)
+    return
+  }
+
+  console.log(`🌐 Domain purchased: ${domain} for site ${siteId}`)
+
+  // Update domain status to registering
+  await supabase
+    .from('website_previews')
+    .update({
+      custom_domain: domain,
+      domain_status: 'registering',
+      domain_provider: 'namecheap',
+    })
+    .eq('id', siteId)
+
+  // Fire off async domain registration (don't block webhook response)
+  fetch('https://autolocal.ai/api/domains/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': internalAuthHeader(),
+    },
+    body: JSON.stringify({ domain, siteId, email, slug }),
+  }).then(async (res) => {
+    const data = await res.json()
+    if (data.success) {
+      console.log(`✅ Domain registered: ${domain}`)
+      // Send domain confirmation email
+      sendEmail(
+        email,
+        `🌐 ${domain} is live!`,
+        `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;color:#333">
+          <h2 style="color:#6366f1">Your domain is live! 🎉</h2>
+          <p>Great news — <strong>${domain}</strong> is now connected to your ${businessName} website.</p>
+          <p>Your site is live at:</p>
+          <p style="font-size:18px"><a href="https://${domain}" style="color:#6366f1;font-weight:bold">https://${domain}</a></p>
+          <p style="color:#666;font-size:13px">DNS, SSL, and WHOIS privacy are all set up automatically. Your domain will auto-renew in 1 year.</p>
+          <p style="margin-top:24px">— Brian @ AutoLocal.ai</p>
+        </div>`,
+      ).catch(() => {})
+    } else {
+      console.error(`❌ Domain registration failed for ${domain}:`, data.error)
+      // Notify admin
+      sendEmail(
+        'brian@autolocal.ai',
+        `⚠️ Domain registration failed: ${domain}`,
+        `<p>Domain: ${domain}<br>Site ID: ${siteId}<br>Email: ${email}<br>Error: ${data.error || 'unknown'}</p>`,
+      ).catch(() => {})
+    }
+  }).catch(err => {
+    console.error(`Domain registration request failed for ${domain}:`, err)
+  })
+}
+
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const metadata = session.metadata || {}
+
+  // Domain purchase — separate flow
+  if (metadata.product === 'domain' && metadata.domain) {
+    await handleDomainPurchase(session)
+    return
+  }
+
   const email = metadata.email || session.customer_email || ''
   const businessName = metadata.business_name || ''
   const contactName = metadata.contact_name || ''

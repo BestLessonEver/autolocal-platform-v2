@@ -8,6 +8,13 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
+  // Auth: only internal webhook calls
+  const auth = req.headers.get('authorization') || ''
+  const internalKey = process.env.INTERNAL_API_KEY || ''
+  if (!auth.includes(internalKey) && internalKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { domain, siteId } = await req.json()
 

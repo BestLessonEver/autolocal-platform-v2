@@ -17,12 +17,11 @@ interface Props {
   onDomainRegistered?: (domain: string) => void
 }
 
-export default function DomainSearch({ siteId, slug, currentDomain, onDomainRegistered }: Props) {
+export default function DomainSearch({ siteId, slug, currentDomain }: Props) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<DomainResult[]>([])
   const [searching, setSearching] = useState(false)
   const [registering, setRegistering] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState('')
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -52,28 +51,33 @@ export default function DomainSearch({ siteId, slug, currentDomain, onDomainRegi
     }
   }
 
-  const handleRegister = async (domain: string) => {
-    if (!confirm(`Register ${domain} for your site? This will be added to your monthly hosting.`)) return
-
+  const handleRegister = async (domain: string, price: number) => {
     setRegistering(domain)
     setError('')
 
     try {
-      const res = await fetch('/api/domains/register', {
+      // Create Stripe checkout for domain purchase
+      const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain, siteId }),
+        body: JSON.stringify({
+          product: 'domain',
+          domain,
+          domainPrice: Math.round(price * 100), // convert to cents
+          siteId,
+          slug,
+          email: '', // will be collected by Stripe
+        }),
       })
       const data = await res.json()
-      if (data.error) {
-        setError(data.error)
+      if (data.url) {
+        window.location.href = data.url
       } else {
-        setSuccess(domain)
-        onDomainRegistered?.(domain)
+        setError(data.error || 'Failed to start checkout')
+        setRegistering(null)
       }
     } catch {
-      setError('Registration failed. Please try again.')
-    } finally {
+      setError('Something went wrong. Please try again.')
       setRegistering(null)
     }
   }
@@ -89,19 +93,6 @@ export default function DomainSearch({ siteId, slug, currentDomain, onDomainRegi
             <p className="text-green-400 text-sm font-mono">{currentDomain}</p>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  // Registration success
-  if (success) {
-    return (
-      <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center">
-        <div className="text-4xl mb-3">🎉</div>
-        <h3 className="text-white font-bold text-lg mb-2">{success} is yours!</h3>
-        <p className="text-gray-400 text-sm">
-          We&apos;re setting up your domain now. Your site will be live at <span className="text-green-400 font-mono">{success}</span> within a few minutes.
-        </p>
       </div>
     )
   }
@@ -168,16 +159,16 @@ export default function DomainSearch({ siteId, slug, currentDomain, onDomainRegi
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-gray-400 text-xs">${r.price?.toFixed(2)}/yr</span>
                     <button
-                      onClick={() => handleRegister(r.domain)}
-                      disabled={registering === r.domain}
+                      onClick={() => handleRegister(r.domain, r.price || 12.98)}
+                      disabled={!!registering}
                       className="px-4 py-1.5 rounded-lg bg-green-600 text-white text-xs font-bold hover:bg-green-500 transition disabled:opacity-50"
                     >
                       {registering === r.domain ? (
                         <span className="flex items-center gap-1">
                           <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Registering...
+                          Redirecting...
                         </span>
-                      ) : 'Get This Domain'}
+                      ) : `Get — $${r.price?.toFixed(2) || '12.98'}`}
                     </button>
                   </div>
                 )}

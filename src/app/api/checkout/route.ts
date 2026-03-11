@@ -68,6 +68,42 @@ export async function POST(req: Request) {
           statement_descriptor: 'AUTOLOCAL.AI',
         },
       }
+    } else if (product === 'domain') {
+      // One-time domain registration — dynamic price
+      const domainName = body.domain
+      const domainPrice = body.domainPrice // cents (e.g. 1298 for $12.98)
+      const siteId = body.siteId
+
+      if (!domainName || !domainPrice || !siteId) {
+        return NextResponse.json({ error: 'Domain, price, and siteId required' }, { status: 400 })
+      }
+
+      const domainMeta = { ...metadata, domain: domainName, siteId }
+
+      sessionParams = {
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Domain: ${domainName}`,
+              description: '1-year registration with auto-renewal. Includes DNS setup, SSL, and WHOIS privacy.',
+            },
+            unit_amount: Math.round(Number(domainPrice)),
+          },
+          quantity: 1,
+        }],
+        success_url: `https://autolocal.ai/dashboard?domain_purchased=${encodeURIComponent(domainName)}`,
+        cancel_url: slug
+          ? `https://autolocal.ai/my-site/${encodeURIComponent(slug)}`
+          : `https://autolocal.ai/dashboard`,
+        customer_email: email || undefined,
+        metadata: domainMeta,
+        payment_intent_data: {
+          metadata: domainMeta,
+          statement_descriptor: 'AUTOLOCAL DOMAIN',
+        },
+      }
     } else {
       return NextResponse.json({ error: 'Invalid product' }, { status: 400 })
     }
