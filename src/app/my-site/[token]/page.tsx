@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import DomainSearch from '@/components/DomainSearch'
 
 // Google Ads conversion helper
 declare global {
@@ -17,6 +18,7 @@ function trackConversion(sendTo: string, value: number) {
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
 interface SiteData {
+  id: string
   business_name: string
   slug: string
   tagline: string | null
@@ -967,6 +969,11 @@ export default function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* ─── Custom Domain ─── */}
+      <section className="px-4 py-6">
+        <DomainSearch siteId={data.id} slug={data.slug} currentDomain={data.custom_domain} />
+      </section>
 
       {/* ─── SEO & Discovery Tips ─── */}
       <section className="px-4 py-6 space-y-4">

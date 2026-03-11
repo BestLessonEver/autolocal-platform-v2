@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import DomainSearch from '@/components/DomainSearch'
 import { useRouter } from 'next/navigation'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
@@ -11,6 +12,7 @@ import { CSS } from '@dnd-kit/utilities'
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
 interface SiteData {
+  id: string
   business_name: string
   slug: string
   tagline: string | null
@@ -1318,6 +1320,11 @@ export default function ClientDashboard() {
           setCropPhoto(null)
         }} onClose={() => setCropPhoto(null)} />
       )}
+
+      {/* ─── Custom Domain ─── */}
+      <section className="px-4 py-6">
+        <DomainSearch siteId={data.id} slug={data.slug} currentDomain={data.custom_domain} />
+      </section>
 
       {/* ─── SEO & Discovery Tips ─── */}
       <section id="sec-seo-tips" className="px-4 py-6 space-y-4">
