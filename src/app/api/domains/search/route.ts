@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkAvailability, getPricing } from '@/lib/namecheap'
 
 // Common TLDs to check alongside the requested domain
-const TLDS = ['com', 'net', 'org', 'co', 'us', 'io', 'biz']
+const TLDS = ['com', 'net', 'org', 'co', 'us', 'biz']
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       org:  { register: 14.99, renew: 17.99 },
       co:   { register: 14.99, renew: 39.99 },
       us:   { register: 9.99,  renew: 12.99 },
-      io:   { register: 49.99, renew: 84.99 },
+
       biz:  { register: 14.99, renew: 24.99 },
     }
 
