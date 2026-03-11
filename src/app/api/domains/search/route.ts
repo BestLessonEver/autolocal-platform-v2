@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkAvailability, getPricing } from '@/lib/namecheap'
 
 // Common TLDs to check alongside the requested domain
-// Only TLDs that make sense for local businesses
-const TLDS = ['com', 'net', 'us', 'co']
+const TLDS = ['com', 'net', 'org', 'co', 'us', 'io', 'biz']
 
 export async function POST(req: NextRequest) {
   try {
@@ -48,11 +47,11 @@ export async function POST(req: NextRequest) {
     const FALLBACK_PRICES: Record<string, { register: number; renew: number }> = {
       com:  { register: 17.99, renew: 17.99 },
       net:  { register: 18.99, renew: 18.99 },
+      org:  { register: 14.99, renew: 17.99 },
       co:   { register: 14.99, renew: 39.99 },
+      us:   { register: 9.99,  renew: 12.99 },
       io:   { register: 49.99, renew: 84.99 },
       biz:  { register: 14.99, renew: 24.99 },
-      info: { register: 9.99,  renew: 34.99 },
-      us:   { register: 9.99,  renew: 12.99 },
     }
 
     // Try to get live pricing for .com (fallback to hardcoded if API fails)
