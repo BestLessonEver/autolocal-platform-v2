@@ -31,16 +31,17 @@ export async function POST(req: NextRequest) {
     // Check availability
     const results = await checkAvailability(domainsToCheck)
     
-    // Fallback pricing by TLD (Namecheap approximate rates)
+    // Retail pricing by TLD — marked up from Namecheap wholesale for healthy margins
+    // Wholesale .com ~$8.58, we charge $14.99 → ~$4-5 profit after Stripe
     const FALLBACK_PRICES: Record<string, { register: number; renew: number }> = {
-      com: { register: 10.98, renew: 14.98 },
-      net: { register: 12.98, renew: 14.98 },
-      co:  { register: 11.98, renew: 30.98 },
-      io:  { register: 32.98, renew: 39.98 },
-      ai:  { register: 74.98, renew: 74.98 },
-      biz: { register: 11.98, renew: 17.98 },
-      info: { register: 4.98, renew: 19.98 },
-      us:  { register: 5.98, renew: 9.98 },
+      com:  { register: 14.99, renew: 14.99 },
+      net:  { register: 16.99, renew: 16.99 },
+      co:   { register: 19.99, renew: 34.99 },
+      io:   { register: 44.99, renew: 49.99 },
+      ai:   { register: 89.99, renew: 89.99 },
+      biz:  { register: 14.99, renew: 19.99 },
+      info: { register: 9.99, renew: 22.99 },
+      us:   { register: 9.99, renew: 12.99 },
     }
 
     // Try to get live pricing for .com (fallback to hardcoded if API fails)
