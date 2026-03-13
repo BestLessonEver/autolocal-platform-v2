@@ -972,7 +972,7 @@ export default function ClientDashboard() {
 
       {/* ─── Custom Domain ─── */}
       <section className="px-4 py-6">
-        <DomainSearch siteId={data.id} slug={data.slug} currentDomain={data.custom_domain} />
+        <DomainSearch siteId={data.id} slug={data.slug} businessName={data.business_name} currentDomain={data.custom_domain} />
       </section>
 
       {/* ─── SEO & Discovery Tips ─── */}
