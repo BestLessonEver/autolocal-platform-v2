@@ -68,6 +68,50 @@ export async function POST(req: Request) {
           statement_descriptor: 'AUTOLOCAL.AI',
         },
       }
+    } else if (product === 'hosting_and_domain') {
+      // Bundled: $9/mo hosting (30-day trial) + yearly domain
+      const domainName = body.domain
+      const domainPrice = body.domainPrice // cents/year
+      const renewPrice = body.renewPrice   // cents/year for renewal
+
+      if (!domainName || !domainPrice) {
+        return NextResponse.json({ error: 'Domain and price required' }, { status: 400 })
+      }
+
+      const bundleMeta = { ...metadata, domain: domainName, siteId: body.siteId || '' }
+
+      sessionParams = {
+        mode: 'subscription',
+        line_items: [
+          // Hosting — $9/mo with 30-day trial
+          { price: PRICES.hosting, quantity: 1 },
+          // Domain — yearly
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `Domain: ${domainName}`,
+                description: 'Annual domain registration with DNS, SSL, and WHOIS privacy.',
+              },
+              unit_amount: Math.round(Number(renewPrice || domainPrice)),
+              recurring: { interval: 'year' },
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `https://autolocal.ai/thank-you?session_id={CHECKOUT_SESSION_ID}&product=hosting&business=${encodeURIComponent(businessName || '')}&slug=${encodeURIComponent(slug || '')}&email=${encodeURIComponent(email || '')}&domain=${encodeURIComponent(domainName)}`,
+        cancel_url: slug
+          ? `https://autolocal.ai/my-site/${encodeURIComponent(slug)}`
+          : `https://autolocal.ai`,
+        customer_email: email || undefined,
+        metadata: bundleMeta,
+        subscription_data: {
+          trial_period_days: 30,
+          metadata: bundleMeta,
+          description: `AutoLocal.ai - ${businessName || 'Website'} Hosting + ${domainName}`,
+        },
+        payment_method_collection: 'always',
+      }
     } else if (product === 'domain') {
       // Yearly domain subscription — price varies by TLD
       const domainName = body.domain

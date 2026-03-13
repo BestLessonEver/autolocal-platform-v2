@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import DomainSearch from '@/components/DomainSearch'
+import GoLiveFlow from '@/components/GoLiveFlow'
 import { useRouter } from 'next/navigation'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
@@ -975,39 +975,15 @@ export default function ClientDashboard() {
         </div>
       </header>
 
-      {/* ═══ Go Live Banner (when hosting not active) ═══ */}
-      {data.hosting_status !== 'active' && (
-        <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border-b border-indigo-500/30">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="text-lg">🚀</span>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-white">Ready to go live?</p>
-                <p className="text-xs text-gray-400 truncate">Your site is in preview mode. Activate hosting to get your own {data.slug}.autolocal.ai URL — first month free!</p>
-              </div>
-            </div>
-            <button
-              onClick={async () => {
-                const res = await fetch('/api/checkout', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    product: 'hosting',
-                    email: userEmail,
-                    businessName: data.business_name,
-                    slug: data.slug,
-                  }),
-                })
-                const result = await res.json()
-                if (result.url) window.location.href = result.url
-              }}
-              className="shrink-0 px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
-            >
-              Go Live — $0 Today
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ═══ Go Live / Domain Flow ═══ */}
+      <GoLiveFlow
+        siteId={data.id}
+        slug={data.slug}
+        businessName={data.business_name}
+        email={userEmail || data.email || data.contact_email || ''}
+        hostingStatus={data.hosting_status}
+        currentDomain={data.custom_domain}
+      />
 
       {/* ═══ Section Nav Pills (mobile + tablet) ═══ */}
       <SectionNav activeSection={activeSection} />
@@ -1320,11 +1296,6 @@ export default function ClientDashboard() {
           setCropPhoto(null)
         }} onClose={() => setCropPhoto(null)} />
       )}
-
-      {/* ─── Custom Domain ─── */}
-      <section className="px-4 py-6">
-        <DomainSearch siteId={data.id} slug={data.slug} businessName={data.business_name} currentDomain={data.custom_domain} />
-      </section>
 
       {/* ─── SEO & Discovery Tips ─── */}
       <section id="sec-seo-tips" className="px-4 py-6 space-y-4">
