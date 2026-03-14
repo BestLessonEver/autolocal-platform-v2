@@ -403,9 +403,9 @@ export default function HomePage() {
               <ul className="text-left space-y-2.5 text-sm text-gray-200">
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Custom design for YOUR brand</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> See it before you pay anything</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 1 revision round included</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Your own .com domain from $9.99/yr</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Hosting just $9/mo · cancel anytime</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Cancel anytime guarantee</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> We handle everything — domain, SSL, SEO</li>
               </ul>
               <button
                 onClick={() => scrollTo('order')}
@@ -456,7 +456,7 @@ export default function HomePage() {
             {[
               { num: '1', title: 'Type Your Business Name', desc: 'We pull your reviews, photos, hours, and contact info from Google automatically.', tag: '15 seconds' },
               { num: '2', title: 'Preview Your Custom Site', desc: 'See your business on a professional website. Switch between 4 unique designs.', tag: 'Instant preview' },
-              { num: '3', title: 'Love It? Go Live.', desc: 'We connect your domain and handle everything. Just $9/mo hosting. Cancel anytime.', tag: 'Zero risk' },
+              { num: '3', title: 'Get Your .com & Go Live', desc: 'Pick your custom domain, we handle registration and setup. $9/mo hosting + domain from $9.99/yr.', tag: 'Zero risk' },
             ].map((step, i) => (
               <div key={i} className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg shadow-indigo-500/20">{step.num}</div>
@@ -506,22 +506,22 @@ export default function HomePage() {
           <h2 className="text-3xl sm:text-4xl font-black mb-12">Simple Pricing</h2>
           <div className="bg-gradient-to-b from-indigo-600/10 to-purple-600/10 border-2 border-indigo-500/40 rounded-2xl p-8 text-center relative max-w-md mx-auto">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full">FREE TO START</div>
-            <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">Custom Website + Hosting</p>
+            <p className="text-sm text-indigo-400 uppercase tracking-wide mb-2">Custom Website + Domain + Hosting</p>
             <div className="flex items-baseline justify-center gap-2 mb-1">
               <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">$0</span>
             </div>
-            <p className="text-sm text-gray-500 mb-2">First month free · Then $9/mo</p>
-            <p className="text-xs text-gray-600 mb-8">Cancel anytime · No contracts</p>
+            <p className="text-sm text-gray-500 mb-2">First month free · Then $9/mo hosting</p>
+            <p className="text-xs text-gray-600 mb-8">Custom .com from $9.99/yr · Cancel anytime</p>
             <ul className="space-y-3 mb-8 text-left">
               {[
                 'Custom design for your brand',
+                'Your own .com domain (from $9.99/yr)',
                 'Your real Google reviews & photos',
                 '10 unique template styles',
                 'SEO + ChatGPT structured data',
                 'SSL, mobile-optimized, fast',
                 'Dashboard to edit anytime',
-                'Domain connection help (free)',
-                'First month completely free',
+                'First month hosting completely free',
               ].map((f, i) => (
                 <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
                   <span className="text-green-400">✓</span> {f}
@@ -537,6 +537,11 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════
+          DOMAIN CHECK
+      ══════════════════════════════════════════════ */}
+      <DomainChecker />
 
       {/* ══════════════════════════════════════════════
           SOCIAL PROOF
@@ -737,5 +742,105 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+/* ─── Inline Domain Checker for Homepage ─── */
+function DomainChecker() {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<{ domain: string; available: boolean; price?: number }[]>([])
+  const [searching, setSearching] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!query.trim()) return
+    setSearching(true)
+    setResults([])
+    setHasSearched(false)
+
+    try {
+      const res = await fetch('/api/domains/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query.trim().toLowerCase().replace(/[^a-z0-9]/g, ''), slug: '' }),
+      })
+      const data = await res.json()
+      setResults(data.results || [])
+    } catch { /* silent */ }
+    finally { setSearching(false); setHasSearched(true) }
+  }
+
+  const available = results.filter(r => r.available)
+
+  return (
+    <section className="py-20 px-4 border-t border-white/5">
+      <div className="max-w-2xl mx-auto text-center">
+        <h2 className="text-3xl sm:text-4xl font-black mb-3">
+          Is your .com available?
+        </h2>
+        <p className="text-gray-500 mb-8 max-w-md mx-auto">
+          Check if your business name is available as a domain. We&apos;ll register it for you and set everything up.
+        </p>
+
+        <form onSubmit={handleSearch} className="flex gap-2 max-w-lg mx-auto mb-6">
+          <input
+            type="text"
+            placeholder="yourbusiness"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="flex-1 px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 text-sm font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 outline-none"
+          />
+          <button
+            type="submit"
+            disabled={searching || !query.trim()}
+            className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition disabled:opacity-50 shrink-0"
+          >
+            {searching ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              </span>
+            ) : 'Check'}
+          </button>
+        </form>
+
+        {/* Results */}
+        {!searching && available.length > 0 && (
+          <div className="max-w-lg mx-auto space-y-2 mb-4">
+            {available.slice(0, 4).map((r, i) => (
+              <div
+                key={r.domain}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl border text-left ${
+                  i === 0 && r.domain.endsWith('.com')
+                    ? 'border-green-500/30 bg-green-500/5'
+                    : 'border-white/10 bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400 text-sm">✓</span>
+                  <span className="font-mono text-sm text-white">{r.domain}</span>
+                  {i === 0 && r.domain.endsWith('.com') && (
+                    <span className="text-[10px] font-bold uppercase bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded">Available!</span>
+                  )}
+                </div>
+                <span className="text-gray-400 text-sm">${r.price?.toFixed(2)}/yr</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!searching && hasSearched && available.length === 0 && results.length > 0 && (
+          <p className="text-yellow-400 text-sm mb-4">
+            Those are taken — try adding your city or a different spelling
+          </p>
+        )}
+
+        {available.length > 0 && (
+          <p className="text-gray-500 text-sm">
+            👆 Build your free website first, then claim your domain at checkout
+          </p>
+        )}
+      </div>
+    </section>
   )
 }
