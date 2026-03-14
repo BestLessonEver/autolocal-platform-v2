@@ -88,7 +88,7 @@ export default function HomePage() {
         city: city.trim() || undefined,
         source: 'landing_page_search',
       }),
-    }).catch(err => console.error("Background request failed:", err))
+    }).catch(() => { /* fire-and-forget lead capture */ })
 
     try {
       const res = await fetch('/api/search-business', {
@@ -129,7 +129,7 @@ export default function HomePage() {
         city: city.trim() || undefined,
         source: 'selected_google_business',
       }),
-    }).catch(err => console.error("Background request failed:", err))
+    }).catch(() => { /* fire-and-forget lead stage update */ })
 
     try {
       const res = await fetch('/api/generate-preview', {
@@ -158,7 +158,7 @@ export default function HomePage() {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         )
         // Fire and forget — don't block navigation
-        sb.auth.verifyOtp({ token_hash: data.autoLoginToken, type: 'magiclink' }).catch(() => {})
+        sb.auth.verifyOtp({ token_hash: data.autoLoginToken, type: 'magiclink' }).catch(() => { /* auto-login is best-effort — don't block navigation */ })
       }
       // Fire Google Ads lead conversion
       trackConversion('AW-17996760129/0rTFCISvnoYcEMGIw4VD', 1.0)
@@ -751,6 +751,7 @@ function DomainChecker() {
   const [results, setResults] = useState<{ domain: string; available: boolean; price?: number }[]>([])
   const [searching, setSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -758,6 +759,7 @@ function DomainChecker() {
     setSearching(true)
     setResults([])
     setHasSearched(false)
+    setError('')
 
     try {
       const res = await fetch('/api/domains/search', {
@@ -767,8 +769,12 @@ function DomainChecker() {
       })
       const data = await res.json()
       setResults(data.results || [])
-    } catch { /* silent */ }
-    finally { setSearching(false); setHasSearched(true) }
+    } catch {
+      setError('Search failed. Please try again.')
+    } finally {
+      setSearching(false)
+      setHasSearched(true)
+    }
   }
 
   const available = results.filter(r => r.available)
@@ -803,6 +809,11 @@ function DomainChecker() {
             ) : 'Check'}
           </button>
         </form>
+
+        {/* Error */}
+        {error && (
+          <p className="text-red-400 text-sm mb-4">{error}</p>
+        )}
 
         {/* Results */}
         {!searching && available.length > 0 && (

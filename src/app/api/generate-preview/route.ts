@@ -480,7 +480,9 @@ export async function POST(req: NextRequest) {
       if (row?.id) {
         previewToken = `${row.id.substring(0, 8)}-${fullSlug}`
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[generate-preview] Could not fetch preview token:', err)
+    }
 
     // Now send welcome email with the token dashboard link
     if (email) {
@@ -509,7 +511,7 @@ export async function POST(req: NextRequest) {
           <a href="https://autolocal.ai/admin/clients" style="display:inline-block;padding:8px 20px;background:#333;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin-left:8px">Admin →</a>
         </div>
       </div>`,
-    ).catch(() => {})
+    ).catch(err => console.warn('[generate-preview] Admin alert email failed:', err))
     return NextResponse.json({
       success: true,
       previewUrl: previewToken

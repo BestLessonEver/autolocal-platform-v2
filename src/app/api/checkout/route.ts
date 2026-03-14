@@ -74,8 +74,9 @@ export async function POST(req: Request) {
       const domainPrice = body.domainPrice // cents/year
       const renewPrice = body.renewPrice   // cents/year for renewal
 
-      if (!domainName || !domainPrice) {
-        return NextResponse.json({ error: 'Domain and price required' }, { status: 400 })
+      const resolvedPrice = Number(renewPrice || domainPrice)
+      if (!domainName || !domainPrice || isNaN(resolvedPrice) || resolvedPrice <= 0) {
+        return NextResponse.json({ error: 'Domain and valid price required' }, { status: 400 })
       }
 
       const bundleMeta = { ...metadata, domain: domainName, siteId: body.siteId || '' }
@@ -93,7 +94,7 @@ export async function POST(req: Request) {
                 name: `Domain: ${domainName}`,
                 description: 'Annual domain registration with DNS, SSL, and WHOIS privacy.',
               },
-              unit_amount: Math.round(Number(renewPrice || domainPrice)),
+              unit_amount: Math.round(resolvedPrice),
               recurring: { interval: 'year' },
             },
             quantity: 1,
@@ -119,8 +120,9 @@ export async function POST(req: Request) {
       const renewPrice = body.renewPrice   // cents/year for renewal (may differ from first year)
       const siteId = body.siteId
 
-      if (!domainName || !domainPrice || !siteId) {
-        return NextResponse.json({ error: 'Domain, price, and siteId required' }, { status: 400 })
+      const resolvedDomainPrice = Number(renewPrice || domainPrice)
+      if (!domainName || !domainPrice || !siteId || isNaN(resolvedDomainPrice) || resolvedDomainPrice <= 0) {
+        return NextResponse.json({ error: 'Domain, valid price, and siteId required' }, { status: 400 })
       }
 
       const domainMeta = { ...metadata, domain: domainName, siteId }
@@ -134,7 +136,7 @@ export async function POST(req: Request) {
               name: `Domain: ${domainName}`,
               description: 'Annual domain registration. Includes DNS, SSL, and WHOIS privacy. Cancel anytime.',
             },
-            unit_amount: Math.round(Number(renewPrice || domainPrice)),
+            unit_amount: Math.round(resolvedDomainPrice),
             recurring: {
               interval: 'year',
             },

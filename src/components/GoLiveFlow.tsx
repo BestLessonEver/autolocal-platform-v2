@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { slugify } from '@/lib/slugify'
 
 interface DomainResult {
   domain: string
@@ -20,14 +21,6 @@ interface Props {
   onTrackConversion?: (id: string, value: number) => void
 }
 
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '')
-    .slice(0, 63)
-}
-
 export default function GoLiveFlow({
   siteId, slug, businessName, email, hostingStatus, currentDomain, onTrackConversion,
 }: Props) {
@@ -38,6 +31,7 @@ export default function GoLiveFlow({
   const [checkingOut, setCheckingOut] = useState(false)
   const [error, setError] = useState('')
   const [expanded, setExpanded] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
   const autoSearched = useRef(false)
 
   // Auto-search on expand
@@ -57,6 +51,7 @@ export default function GoLiveFlow({
     setSearching(true)
     setError('')
     setResults([])
+    setHasSearched(false)
 
     try {
       const res = await fetch('/api/domains/search', {
@@ -74,6 +69,7 @@ export default function GoLiveFlow({
       setError('Search failed. Please try again.')
     } finally {
       setSearching(false)
+      setHasSearched(true)
     }
   }
 
@@ -275,7 +271,7 @@ export default function GoLiveFlow({
         )}
 
         {/* All taken */}
-        {!searching && results.length > 0 && available.length === 0 && (
+        {!searching && hasSearched && results.length > 0 && available.length === 0 && (
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 text-center mb-4">
             <p className="text-yellow-300 text-sm font-medium mb-1">All variations are taken</p>
             <p className="text-gray-400 text-xs">Try adding your city — like <span className="text-gray-300 font-mono">{slugify(businessName)}houston</span></p>
@@ -392,6 +388,7 @@ function DomainUpsell({ siteId, slug, businessName, email }: {
   const [searching, setSearching] = useState(false)
   const [checkingOut, setCheckingOut] = useState(false)
   const [error, setError] = useState('')
+  const [hasSearched, setHasSearched] = useState(false)
   const autoSearched = useRef(false)
 
   useEffect(() => {
@@ -407,7 +404,7 @@ function DomainUpsell({ siteId, slug, businessName, email }: {
 
   const doSearch = async (q: string) => {
     if (!q.trim()) return
-    setSearching(true); setError(''); setResults([])
+    setSearching(true); setError(''); setResults([]); setHasSearched(false)
     try {
       const res = await fetch('/api/domains/search', {
         method: 'POST',
@@ -417,8 +414,12 @@ function DomainUpsell({ siteId, slug, businessName, email }: {
       const data = await res.json()
       if (data.error) setError(data.error)
       else setResults(data.results || [])
-    } catch { setError('Search failed.') }
-    finally { setSearching(false) }
+    } catch {
+      setError('Search failed.')
+    } finally {
+      setSearching(false)
+      setHasSearched(true)
+    }
   }
 
   const handleBuy = async (r: DomainResult) => {
@@ -436,7 +437,10 @@ function DomainUpsell({ siteId, slug, businessName, email }: {
       const data = await res.json()
       if (data.url) window.location.href = data.url
       else { setError(data.error || 'Checkout failed'); setCheckingOut(false) }
-    } catch { setError('Something went wrong.'); setCheckingOut(false) }
+    } catch {
+      setError('Something went wrong.')
+      setCheckingOut(false)
+    }
   }
 
   const available = results.filter(r => r.available)
@@ -477,6 +481,9 @@ function DomainUpsell({ siteId, slug, businessName, email }: {
               </div>
             ))}
           </div>
+        )}
+        {!searching && hasSearched && available.length === 0 && results.length > 0 && (
+          <p className="text-yellow-400 text-sm mb-3">All variations are taken — try adding your city or a different name</p>
         )}
         <div className="mt-3 text-center">
           <a href={`/setup?slug=${slug}`} target="_blank" className="text-xs text-gray-500 hover:text-indigo-400">

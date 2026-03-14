@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { slugify } from '@/lib/slugify'
 
 interface DomainResult {
   domain: string
@@ -16,14 +17,6 @@ interface Props {
   businessName?: string
   currentDomain?: string | null
   onDomainRegistered?: (domain: string) => void
-}
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '')
-    .slice(0, 63)
 }
 
 export default function DomainSearch({ siteId, slug, businessName, currentDomain }: Props) {
