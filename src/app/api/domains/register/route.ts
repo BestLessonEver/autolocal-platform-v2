@@ -1,135 +1,100 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { registerDomain, addDomainToProject } from '@/lib/vercel-domains'
 import { createClient } from '@supabase/supabase-js'
-import { registerDomain, setDnsRecords } from '@/lib/namecheap'
+import { sendEmail } from '@/lib/mailer'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function POST(req: NextRequest) {
-  // Auth: only internal webhook calls
-  const auth = req.headers.get('authorization') || ''
-  const internalKey = process.env.INTERNAL_API_KEY || ''
-  if (!auth.includes(internalKey) && internalKey) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+// Default contact info for domain registration (AutoLocal as registrant)
+const REGISTRANT = {
+  firstName: 'Brian',
+  lastName: 'Carrion',
+  email: 'brian@autolocal.ai',
+  phone: '+1.8325551234',
+  address1: '123 Main St',
+  city: 'Friendswood',
+  state: 'TX',
+  zip: '77546',
+  country: 'US',
+  companyName: 'AutoLocal AI',
+}
 
+export async function POST(req: Request) {
   try {
-    const { domain, siteId } = await req.json()
+    // Only callable from webhook — verify internal key
+    const authHeader = req.headers.get('authorization') || ''
+    const key = authHeader.replace('Bearer ', '')
+    if (key !== process.env.INTERNAL_API_KEY) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { domain, siteId, expectedPrice, customerEmail } = await req.json()
 
     if (!domain || !siteId) {
-      return NextResponse.json({ error: 'Domain and siteId required' }, { status: 400 })
+      return NextResponse.json({ error: 'domain and siteId required' }, { status: 400 })
     }
 
-    // Verify the site exists and belongs to this user
-    const { data: site, error: siteErr } = await supabase
-      .from('website_previews')
-      .select('id, slug, email, business_name, hosting_status')
-      .eq('id', siteId)
-      .single()
+    // 1. Register domain via Vercel
+    const regResult = await registerDomain(domain, expectedPrice || 20, REGISTRANT)
 
-    if (siteErr || !site) {
-      return NextResponse.json({ error: 'Site not found' }, { status: 404 })
+    if (!regResult.success) {
+      console.error(`Domain registration failed for ${domain}:`, regResult.error)
+      return NextResponse.json({ error: regResult.error }, { status: 500 })
     }
 
-    // Update domain status to "registering"
+    // 2. Add domain to Vercel project (auto-configures DNS + SSL)
+    const vercelProjectId = process.env.VERCEL_PROJECT_ID || ''
+    if (vercelProjectId) {
+      await addDomainToProject(domain, vercelProjectId)
+    }
+
+    // 3. Update database
     await supabase
       .from('website_previews')
       .update({
         custom_domain: domain,
-        domain_status: 'registering',
-        domain_provider: 'namecheap',
-      })
-      .eq('id', siteId)
-
-    // Register the domain via Namecheap
-    // Using AutoLocal's registrant info (we own the registration, user gets the site)
-    const result = await registerDomain({
-      domain,
-      firstName: 'Brian',
-      lastName: 'Carrion',
-      address: '1000 Friendswood Dr',
-      city: 'Friendswood',
-      state: 'TX',
-      postalCode: '77546',
-      country: 'US',
-      phone: '+1.8888888888', // TODO: Use real business phone
-      email: 'domains@autolocal.ai',
-    })
-
-    if (!result.success) {
-      await supabase
-        .from('website_previews')
-        .update({ domain_status: 'failed' })
-        .eq('id', siteId)
-      return NextResponse.json({ error: result.error || 'Registration failed' }, { status: 500 })
-    }
-
-    // Set DNS to point to the Vercel-hosted site
-    const slug = site.slug
-    try {
-      await setDnsRecords(domain, [
-        { type: 'CNAME', host: '@', value: `${slug}.autolocal.ai`, ttl: 1800 },
-        { type: 'CNAME', host: 'www', value: `${slug}.autolocal.ai`, ttl: 1800 },
-      ])
-    } catch (dnsErr) {
-      console.error('[domains/register] DNS setup failed:', dnsErr)
-      // Domain registered but DNS failed — admin can fix manually
-    }
-
-    // Add custom domain to Vercel project
-    try {
-      await addVercelDomain(slug, domain)
-      await addVercelDomain(slug, `www.${domain}`)
-    } catch (vercelErr) {
-      console.error('[domains/register] Vercel domain add failed:', vercelErr)
-    }
-
-    // Update DB with success
-    await supabase
-      .from('website_previews')
-      .update({
         domain_status: 'active',
-        domain_registrar_id: result.domainId,
+        domain_provider: 'vercel',
+        domain_registrar_id: regResult.orderId || null,
         domain_auto_renew: true,
+        domain_expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       })
       .eq('id', siteId)
 
-    return NextResponse.json({ 
-      success: true, 
-      domain,
-      message: `${domain} is registered and being configured. Your site will be live at ${domain} within a few minutes.`
-    })
+    // 4. Send confirmation email
+    if (customerEmail) {
+      try {
+        await sendEmail(
+          customerEmail,
+          `🌐 Your domain ${domain} is live!`,
+          `
+            <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 20px;">
+              <h1 style="font-size: 24px; font-weight: 700; color: #111;">Your domain is live! 🎉</h1>
+              <p style="color: #555; line-height: 1.6;">
+                <strong>${domain}</strong> is now connected to your website. Everything is set up — 
+                SSL certificate, DNS, the works.
+              </p>
+              <div style="margin: 24px 0; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
+                <p style="margin: 0; font-size: 14px; color: #166534;">
+                  ✅ Your site is live at <a href="https://${domain}" style="color: #15803d; font-weight: 600;">${domain}</a>
+                </p>
+              </div>
+              <p style="color: #888; font-size: 13px;">
+                Your domain renews automatically each year. You can manage it from your dashboard anytime.
+              </p>
+              <p style="color: #555; margin-top: 24px;">— Brian @ AutoLocal</p>
+            </div>
+          `,
+        )
+      } catch { /* fire and forget */ }
+    }
+
+    return NextResponse.json({ success: true, orderId: regResult.orderId })
   } catch (err) {
-    console.error('[domains/register]', err)
-    return NextResponse.json({ error: 'Domain registration failed. Please try again.' }, { status: 500 })
+    console.error('Domain register error:', err)
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 })
   }
-}
-
-/** Add a custom domain to a Vercel project */
-async function addVercelDomain(slug: string, domain: string) {
-  const token = process.env.VERCEL_TOKEN
-  const teamId = process.env.VERCEL_TEAM_ID
-  if (!token) throw new Error('VERCEL_TOKEN not set')
-
-  // First find the project by looking for the slug subdomain
-  const projectName = `autolocal-${slug}`
-  const teamQuery = teamId ? `teamId=${teamId}` : ''
-  
-  const res = await fetch(`https://api.vercel.com/v10/projects/${projectName}/domains?${teamQuery}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name: domain }),
-  })
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Vercel domain add failed: ${res.status} ${err}`)
-  }
-
-  return res.json()
 }
