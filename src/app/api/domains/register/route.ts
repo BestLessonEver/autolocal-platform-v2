@@ -8,18 +8,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Default contact info for domain registration (AutoLocal as registrant)
+// AutoLocal registers all domains as the registrant (customers lease them)
+// Same model as Squarespace/Wix — we own, they use
 const REGISTRANT = {
   firstName: 'Brian',
   lastName: 'Carrion',
   email: 'brian@autolocal.ai',
-  phone: '+1.8325551234',
-  address1: '123 Main St',
+  phone: '+1.8329098936',
+  address1: '1302 S Friendswood Dr Ste 100',
   city: 'Friendswood',
   state: 'TX',
   zip: '77546',
   country: 'US',
-  companyName: 'AutoLocal AI',
+  companyName: 'AutoLocal AI LLC',
 }
 
 export async function POST(req: Request) {
