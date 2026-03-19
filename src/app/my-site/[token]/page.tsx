@@ -335,8 +335,14 @@ export default function ClientDashboard() {
       <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
         <div className="text-center">
           <span className="text-5xl mb-4 block">🔒</span>
-          <h1 className="text-2xl font-black text-white mb-2">Access Denied</h1>
-          <p className="text-gray-400">{error || 'This dashboard link is invalid or expired.'}</p>
+          <h1 className="text-2xl font-black text-white mb-2">Link Expired</h1>
+          <p className="text-gray-400 mb-6">{error || 'This dashboard link has expired. Sign in to access your site.'}</p>
+          <a
+            href="/login"
+            className="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm hover:brightness-110 transition"
+          >
+            Sign In to My Dashboard →
+          </a>
           <p className="text-gray-600 text-sm mt-4">
             Need help? Email <a href="mailto:support@autolocal.ai" className="text-indigo-400 hover:underline">support@autolocal.ai</a>
           </p>
