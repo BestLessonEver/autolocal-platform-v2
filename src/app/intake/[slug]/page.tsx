@@ -188,9 +188,10 @@ export default function IntakePage() {
 
       const result = await submitRes.json()
       const previewSlug = result.slug || slug
+      const token = result.previewToken || ''
 
-      // 3. Redirect to building animation
-      window.location.href = `/building/${previewSlug}`
+      // 3. Redirect to building animation (pass token for auth-free preview)
+      window.location.href = `/building/${previewSlug}${token ? `?token=${encodeURIComponent(token)}` : ''}`
     } catch {
       alert('Something went wrong. Please try again.')
       setSubmitting(false)

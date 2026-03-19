@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -15,7 +15,17 @@ const STEPS = [
 ]
 
 export default function BuildingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#09090b]" />}>
+      <BuildingContent />
+    </Suspense>
+  )
+}
+
+function BuildingContent() {
   const { slug } = useParams()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token') || ''
   const [currentStep, setCurrentStep] = useState(0)
   const [ready, setReady] = useState(false)
 
@@ -42,9 +52,15 @@ export default function BuildingPage() {
 
   useEffect(() => {
     if (ready) {
-      window.location.href = `/preview/${slug}`
+      // Token → go directly to token-based dashboard (no auth needed)
+      // No token → fall back to preview page
+      if (token) {
+        window.location.href = `/my-site/${token}`
+      } else {
+        window.location.href = `/preview/${slug}`
+      }
     }
-  }, [ready, slug])
+  }, [ready, slug, token])
 
   return (
     <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center px-4">

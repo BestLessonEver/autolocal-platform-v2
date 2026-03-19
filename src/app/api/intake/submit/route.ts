@@ -142,7 +142,20 @@ export async function POST(req: Request) {
         }),
       }).catch(err => console.error('Intake notification email failed:', err))
 
-    return NextResponse.json({ success: true, slug: finalSlug })
+    // Build preview access token: {id-prefix-8}-{slug}
+    let previewToken = ''
+    try {
+      const { data: row } = await supabase
+        .from('website_previews')
+        .select('id')
+        .eq('slug', finalSlug)
+        .single()
+      if (row?.id) {
+        previewToken = `${row.id.substring(0, 8)}-${finalSlug}`
+      }
+    } catch { /* token is best-effort */ }
+
+    return NextResponse.json({ success: true, slug: finalSlug, previewToken })
   } catch (err) {
     console.error('Intake submit error:', err)
     return NextResponse.json({ error: 'Failed to submit' }, { status: 500 })
