@@ -385,6 +385,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          DOMAIN CHECK
+      ══════════════════════════════════════════════ */}
+      <DomainChecker />
+
+      {/* ══════════════════════════════════════════════
           PRICE COMPARISON
       ══════════════════════════════════════════════ */}
       <section className="py-20 px-4 border-t border-white/5">
@@ -537,11 +542,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ══════════════════════════════════════════════
-          DOMAIN CHECK
-      ══════════════════════════════════════════════ */}
-      <DomainChecker />
 
       {/* ══════════════════════════════════════════════
           SOCIAL PROOF
