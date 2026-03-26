@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+// Fallback webhook config for sites without discord_webhook_url column yet
+const WEBHOOK_OVERRIDES: Record<string, string> = {
+  'best-lesson-ever-friendswood': 'https://discord.com/api/webhooks/1349395434543644762/7An1hMHA6yrY9WQ1s-LlTCvTmqcF_-Xs13dWb59fQzFmJ-D4L6gWMihkJ-L-OtERI6Wq',
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -18,12 +23,12 @@ export async function POST(req: Request) {
     // Look up the site to get business name and webhook URL
     const { data: site } = await supabase
       .from('website_previews')
-      .select('business_name, email, phone, discord_webhook_url')
+      .select('business_name, email, phone')
       .eq('slug', slug)
       .single()
 
     const businessName = site?.business_name || slug
-    const webhookUrl = site?.discord_webhook_url
+    const webhookUrl = WEBHOOK_OVERRIDES[slug] || (site as Record<string, unknown>)?.discord_webhook_url as string | undefined
 
     // Store the lead in Supabase (table might not exist yet — non-fatal)
     try {
