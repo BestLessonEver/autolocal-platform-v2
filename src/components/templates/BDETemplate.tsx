@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { type TemplateProps, getCtaButtonText } from './types'
+import LeadCaptureForm from './LeadCaptureForm'
 // StickyContactBar removed
 
 /* ── Fade-in on scroll hook ── */
@@ -228,6 +229,30 @@ export default function BDETemplate({ data }: TemplateProps) {
           </div>
         </section>
       )}
+
+      {/* ════════ LEAD CAPTURE FORM ════════ */}
+      <section id="free-trial" className="py-24 border-t border-white/5">
+        <div className="max-w-3xl mx-auto px-6">
+          <FadeIn>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-black mb-4">
+                <span style={gradientTextStyle(accent)}>{getCtaButtonText(data)}</span>
+              </h2>
+              <p className="text-gray-400 text-lg">
+                Fill out the form and we&apos;ll get back to you within 24 hours.
+              </p>
+            </div>
+            <LeadCaptureForm
+              slug={data.slug}
+              accentColor={accent}
+              primaryColor={data.brand_color_primary}
+              ctaText={getCtaButtonText(data)}
+              showInstrument={data.category === 'general'}
+              darkMode={true}
+            />
+          </FadeIn>
+        </div>
+      </section>
 
       {/* ════════ HOURS + CONTACT ════════ */}
       {(Object.keys(hours).length > 0 || data.phone || data.email || data.address) && (

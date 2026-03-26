@@ -28,6 +28,7 @@ export interface PreviewData {
   cta_text: string
   cta_url: string | null
   template: string
+  discord_webhook_url?: string | null
 }
 
 export interface TemplateProps {
