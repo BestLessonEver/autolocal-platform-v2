@@ -185,18 +185,21 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
             <div className="flex items-center gap-3 shrink-0">
               {isPurchased ? (
                 <a
-                  href={accessToken ? `/my-site/${accessToken}` : '/dashboard'}
+                  href="/dashboard"
                   className="px-4 py-1.5 bg-white text-emerald-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
                   Customize Your Site →
                 </a>
               ) : (
                 <a
-                  href={accessToken ? `/my-site/${accessToken}` : '/dashboard'}
+                  href={filteredData.email
+                    ? `/login?email=${encodeURIComponent(filteredData.email)}&redirect=/dashboard`
+                    : '/login?redirect=/dashboard'
+                  }
                   onClick={() => trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)}
                   className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
-                  Customize &amp; Go Live →
+                  Customize Your Site →
                 </a>
               )}
               <button

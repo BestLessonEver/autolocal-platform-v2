@@ -23,12 +23,6 @@ async function resolveToken(token: string) {
     .single()
 
   if (error || !data || !data.id.startsWith(idPrefix)) return null
-
-  // Token expires 3 hours after site creation
-  const TOKEN_EXPIRY_MS = 3 * 60 * 60 * 1000
-  const createdAt = new Date(data.created_at).getTime()
-  if (Date.now() - createdAt > TOKEN_EXPIRY_MS) return null
-
   return data
 }
 
