@@ -326,7 +326,15 @@ export default function HomePage() {
                 <span className="text-2xl">🏢</span>
                 <h3 className="text-xl font-black text-white">Claim Your Business</h3>
               </div>
-              <p className="text-sm text-gray-400 text-center mb-5">Select your business to generate a free preview instantly</p>
+              <p className="text-sm text-gray-400 text-center mb-4">Select your business to generate a free preview instantly</p>
+              {/* Email capture at highest intent moment */}
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Your email — we'll send you the preview link"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition mb-4 text-sm"
+              />
               <div className="space-y-2">
                 {searchResults.map((r) => (
                   <button

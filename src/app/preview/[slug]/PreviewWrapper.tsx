@@ -191,31 +191,13 @@ export default function PreviewWrapper({ data, accessToken }: { data: PreviewDat
                   Customize Your Site →
                 </a>
               ) : (
-                <button
-                  onClick={async () => {
-                    try {
-                      // Fire Google Ads begin checkout conversion
-                      trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)
-                      const res = await fetch('/api/checkout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          product: 'website',
-                          email: filteredData.email || '',
-                          businessName: filteredData.business_name || '',
-                          slug: data.slug || '',
-                        }),
-                      })
-                      const d = await res.json()
-                      if (d.url) window.location.href = d.url
-                    } catch {
-                      window.location.href = `https://autolocal.ai/offer?business=${encodeURIComponent(filteredData.business_name || '')}&e=${encodeURIComponent(filteredData.email || '')}`
-                    }
-                  }}
+                <a
+                  href={accessToken ? `/my-site/${accessToken}` : '/dashboard'}
+                  onClick={() => trackConversion('AW-17996760129/aj9PCKrgioYcEMGIw4VD', 1.0)}
                   className="px-4 py-1.5 bg-white text-indigo-600 rounded-full text-sm font-bold hover:bg-gray-100 transition whitespace-nowrap"
                 >
-                  Go Live — $9/mo (first month free)
-                </button>
+                  Customize &amp; Go Live →
+                </a>
               )}
               <button
                 onClick={() => setBannerVisible(false)}
