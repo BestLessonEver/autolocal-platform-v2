@@ -94,8 +94,10 @@ export async function POST(req: Request) {
                 name: `Domain: ${domainName}`,
                 description: 'Annual domain registration with DNS, SSL, and WHOIS privacy.',
               },
-              unit_amount: Math.round(resolvedPrice),
-              recurring: { interval: 'year' },
+              // No 'recurring' — domain is one-time upfront. Stripe subscription mode
+              // supports one-time line items alongside recurring ones.
+              // Yearly renewal handled separately via webhook/cron.
+              unit_amount: Math.round(Number(domainPrice)),
             },
             quantity: 1,
           },
