@@ -72,7 +72,6 @@ export default function HomePage() {
   const handlePreview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!businessName.trim()) return
-    if (!email.trim()) { setError('Email is required'); return }
     setSearching(true)
     setError('')
     setShowResults(false)
@@ -104,8 +103,13 @@ export default function HomePage() {
         setSearchResults(data.results)
         setShowResults(true)
       } else {
-        // No results — go straight to intake
-        router.push(`/intake/new?name=${encodeURIComponent(businessName.trim())}&city=${encodeURIComponent(city.trim())}`)
+        // No results — go straight to intake, preserving everything they already typed
+        router.push(
+          `/intake/new?name=${encodeURIComponent(businessName.trim())}` +
+          `&city=${encodeURIComponent(city.trim())}` +
+          `&email=${encodeURIComponent(email.trim())}` +
+          `&contact=${encodeURIComponent(contactName.trim())}`
+        )
       }
     } catch {
       setError('Connection error. Please try again.')
@@ -255,7 +259,7 @@ export default function HomePage() {
           </a>
           <div className="flex items-center gap-4">
             <a href="/login" className="text-sm text-gray-400 hover:text-white transition">Client Login</a>
-            <a href="#order" onClick={(e) => { e.preventDefault(); scrollTo('order') }} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
+            <a href="#hero-start" onClick={(e) => { e.preventDefault(); scrollTo('hero-start') }} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition">
               Get Started
             </a>
           </div>
@@ -265,7 +269,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           HERO — Free website is the headline
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
+      <section id="hero-start" className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
 
@@ -295,30 +299,15 @@ export default function HomePage() {
               />
               <span className="absolute right-5 top-1/2 -translate-y-1/2 text-2xl">🔍</span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="max-w-sm mx-auto">
               <input
                 type="text"
                 value={city}
                 onChange={e => setCity(e.target.value)}
-                placeholder="City"
-                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
-              />
-              <input
-                type="text"
-                value={contactName}
-                onChange={e => setContactName(e.target.value)}
-                placeholder="Your name"
+                placeholder="City (optional, helps us find the right business)"
                 className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
               />
             </div>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="Email — we'll send your preview link"
-              required
-              className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition"
-            />
             {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             <button
               type="submit"
@@ -376,7 +365,7 @@ export default function HomePage() {
 
           {/* Trust row */}
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-gray-500">
-            <span>🛡️ Money-back guarantee</span>
+            <span>🛡️ No credit card required</span>
             <span>⚡ Ready in 15 seconds</span>
             <span>🌟 Powered by Google</span>
             <span>🔒 Secure checkout via Stripe</span>
@@ -413,7 +402,7 @@ export default function HomePage() {
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> We handle everything — domain, SSL, SEO</li>
               </ul>
               <button
-                onClick={() => scrollTo('order')}
+                onClick={() => scrollTo('hero-start')}
                 className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold hover:brightness-110 transition"
               >
                 Get Started Free →
@@ -534,7 +523,7 @@ export default function HomePage() {
               ))}
             </ul>
             <button
-              onClick={() => scrollTo('order')}
+              onClick={() => scrollTo('hero-start')}
               className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25"
             >
               Get My Free Website →
@@ -721,7 +710,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-black mb-4">Your Custom Website Is Waiting</h2>
           <p className="text-gray-400 mb-8 text-lg">15 seconds to see it. $0 to build it. Just $9/mo to keep it live.</p>
           <button
-            onClick={() => scrollTo('order')}
+            onClick={() => scrollTo('hero-start')}
             className="px-12 py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-black shadow-2xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Get My Free Website
