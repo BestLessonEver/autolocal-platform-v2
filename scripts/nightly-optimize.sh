@@ -31,11 +31,18 @@ response=$(curl -sS --max-time 120 \
 
 echo "$response" | python3 -m json.tool 2>/dev/null || echo "$response"
 
-# Check for errors
-if echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if 'summary' in d else 1)" 2>/dev/null; then
+# Check for errors. The API returns a message-only success when there are no
+# active sites, so accept either the normal summary payload or that empty-work
+# response.
+response_state=$(echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); print('summary' if 'summary' in d else 'empty' if d.get('message') == 'No active sites to optimize' else 'error')" 2>/dev/null || echo "error")
+
+if [[ "$response_state" == "summary" ]]; then
   sites_changed=$(echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin)['summary']['sitesChanged'])")
   echo ""
   echo "✅ Optimization complete — $sites_changed site(s) improved"
+elif [[ "$response_state" == "empty" ]]; then
+  echo ""
+  echo "✅ Optimization complete — no active sites to optimize"
 else
   echo ""
   echo "❌ Optimization failed"
