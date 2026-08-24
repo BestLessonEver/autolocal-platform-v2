@@ -6,18 +6,38 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// Fallback webhook config for sites without discord_webhook_url column yet
-const WEBHOOK_OVERRIDES: Record<string, string> = {
-  'best-lesson-ever-friendswood': 'https://discord.com/api/webhooks/1349395434543644762/7An1hMHA6yrY9WQ1s-LlTCvTmqcF_-Xs13dWb59fQzFmJ-D4L6gWMihkJ-L-OtERI6Wq',
+const BLE_SITE_SLUG = 'best-lesson-ever-friendswood'
+const BLE_DISCORD_WEBHOOK_URL = process.env.BLE_DISCORD_WEBHOOK_URL
+
+function safeText(value: unknown, maxLength = 500) {
+  return String(value ?? '')
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/@/g, '@\u200b')
+    .trim()
+    .slice(0, maxLength)
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { name, email, phone, message, slug, instrument } = body
+    const name = safeText(body.name, 150)
+    const email = safeText(body.email, 254)
+    const phone = safeText(body.phone, 40)
+    const message = safeText(body.message, 1000)
+    const slug = safeText(body.slug, 100)
+    const instrument = safeText(body.instrument, 100)
 
     if (!name || !slug) {
       return NextResponse.json({ error: 'Name and site are required' }, { status: 400 })
+    }
+
+    if (slug === BLE_SITE_SLUG) {
+      const digits = phone.replace(/\D/g, '')
+      const junkEmail = /^(test|example)@example\.com$/i.test(email)
+      const junkPhone = ['0000000000', '1111111111', '1234567890'].includes(digits)
+      if ((!email && !phone) || junkEmail || junkPhone) {
+        return NextResponse.json({ success: true, filtered: true })
+      }
     }
 
     // Look up the site to get business name and webhook URL
@@ -28,7 +48,14 @@ export async function POST(req: Request) {
       .single()
 
     const businessName = site?.business_name || slug
-    const webhookUrl = WEBHOOK_OVERRIDES[slug] || (site as Record<string, unknown>)?.discord_webhook_url as string | undefined
+    const webhookUrl = slug === BLE_SITE_SLUG ? BLE_DISCORD_WEBHOOK_URL : undefined
+    const requestIp = safeText(
+      req.headers.get('x-forwarded-for')?.split(',')[0] ||
+      req.headers.get('x-real-ip') ||
+      'Unavailable',
+      100
+    )
+    const userAgent = safeText(req.headers.get('user-agent') || 'Unavailable', 300)
 
     // Store the lead in Supabase (table might not exist yet — non-fatal)
     try {
@@ -54,6 +81,8 @@ export async function POST(req: Request) {
       if (phone) fields.push({ name: '📞 Phone', value: phone, inline: true })
       if (instrument) fields.push({ name: '🎸 Instrument', value: instrument, inline: true })
       if (message) fields.push({ name: '💬 Message', value: message, inline: false })
+      fields.push({ name: '🌐 Request IP', value: requestIp, inline: true })
+      fields.push({ name: '🧭 User Agent', value: userAgent, inline: false })
 
       await fetch(webhookUrl, {
         method: 'POST',
@@ -67,6 +96,8 @@ export async function POST(req: Request) {
             footer: { text: `Source: ${slug}` },
           }],
         }),
+      }).then(response => {
+        if (!response.ok) console.error('Webhook send failed:', response.status)
       }).catch(err => console.error('Webhook send error:', err))
     }
 
